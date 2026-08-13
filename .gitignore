@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rcheck/
+*.tar.gz
+inst/doc/
+# NOTE: docs/ is NOT ignored — it holds docs/specs/ and docs/plans/.
+# If pkgdown is ever added, point its `destination:` somewhere else.
+renv/library/
+renv/staging/
+.DS_Store
