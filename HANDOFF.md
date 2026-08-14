@@ -1,7 +1,11 @@
 # hvtiRlifetables — session handoff
 
 **Created:** 2026-08-13, from the AVR/LV-function survival study session.
-**State (2026-08-14):** a real R package skeleton — `DESCRIPTION`, `NAMESPACE`, `LICENSE.md`, `NEWS.md`, `README.md`, `.Rbuildignore`, `.Rproj`, `tests/`. `R CMD build` succeeds. Still **no user-facing code**: `R/` holds only the `_PACKAGE` doc stub.
+**State:** implemented. `us_matched()`, `us_lifetable_vintages()` and
+`us_lifetable_model()` are complete, with Tier 1, 2 and 4 tests passing and
+`R CMD check --as-cran` at 0 errors, 0 warnings, and only the unavoidable
+`New submission` note, with the manual. Tier 3 SAS acceptance still needs
+writing, in the **study's** `R_parity` project, not here.
 
 **Version `0.1.0`** (decided 2026-08-13). **Public repo** at `github.com/ehrlinger/hvtiRlifetables` (decided 2026-08-14, superseding "internal only"). The source `.sas7bdat` fits under `data-raw/uslife/` were removed from git history and are `.gitignore`d — they remain on disk, because the share is unreliable and they exist nowhere else off it. The release gate applies in full: CRAN Cookbook audit and `R CMD check --as-cran` **with** the manual.
 
@@ -38,18 +42,32 @@ The one-sentence surprise, established 2026-08-13: **`%usmatchd` is not a life-t
 
 ## Task outline
 
-For `writing-plans` to expand, not to follow as-is:
+Steps 1-6 and 8 are **done** — see
+`docs/plans/2026-08-14-hvtirlifetables-implementation.md`. Remaining:
 
-1. Package skeleton — `DESCRIPTION` (Imports: `TemporalHazard >= 1.2.0`), `NAMESPACE`, `.Rproj`, `LICENSE`, `renv`. Version is John's call; spec proposes `0.1.0`.
-2. `data-raw/build-models.R` — explicit manifest, `haven` read, `_STATUS_` preserved, writes `data/us_lifetable_models.rda`. Maintained entry point, not a one-off: new vintages land periodically.
-3. `R/models.R` — accessors, vintage/stratum resolution, `_STATUS_` gating, `us_lifetable_vintages()`.
-4. `R/evaluate.R` — `H(a)`, `h(a)` from one parameter set. Knows nothing about patients or vintages. Test this hardest.
-5. `R/us_matched.R` — stratum assignment, conditioning, `scale`, mean-curve reduction.
-6. Tiers 1, 2 and 4 tests (invariants, `_STATUS_` regression, vintage discrimination) — all ship in the package.
-7. Tier 3 SAS acceptance — lives in the **study's** `R_parity`, not here; PHI-adjacent, skips when the share is absent.
-8. Docs, `pkgdown`, `R CMD check --as-cran` with the manual to 0/0/0.
+1. **Tier 3 SAS acceptance**, in the study's `R_parity`: `us_matched()`
+   against `estimates/uslife.sas7bdat` to 1e-12 on both `SMATCHED` and
+   `HMATCHED`, reported **per stratum**, skipping when the share is absent.
+   A cohort-wide maximum hid the `_STATUS_` bug behind a plausible
+   near-miss; do not report one.
+2. **CI**, once `TemporalHazard 1.2.0` reaches CRAN. Blocked until then.
+3. **The `hs.*` job template** that consumes `us_matched()`. Belongs in
+   `hvtiRtemplates` / `~/Documents/template/`, not here.
 
-Steps 3–5 have no dependency on the share. Step 7 does.
+## Two more things that will bite
+
+Discovered during implementation; costly enough to find that a future
+maintainer shouldn't have to rediscover them.
+
+4. **`hzl_hazard()` errors at exactly age 0.** `TemporalHazard`'s early
+   phase computes `exp(-bt^(-1/nu))` (underflows to 0) times `bt^num1`
+   (overflows to `Inf`), giving `NaN`. This affects **9 of the 27** shipped
+   strata. `H(0)` is unaffected. Every age above 0, down to 1e-12, is
+   finite and strictly positive in all 27.
+5. **The spec's "THALF 0.0519 -> 0.00544, NU 4.595 -> -2.771" is
+   `table84` -> `table2008`**, which the original wording left unstated.
+   `table2023` is structurally like 2008 but its white-male `NU` is
+   **-2.000**, not -2.771. Pinned by `tests/testthat/test-vintage.R`.
 
 ## Decisions already made — do not relitigate
 

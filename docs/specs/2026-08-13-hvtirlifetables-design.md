@@ -1,6 +1,13 @@
 # hvtiRlifetables Design
 
-**Status:** Design, awaiting review. Not yet built.
+**Status:** Implemented 2026-08-14, except Tier 3 acceptance (which lives in
+the study's `R_parity`). Plan:
+`docs/plans/2026-08-14-hvtirlifetables-implementation.md`.
+
+**One deviation from this spec, deliberate.** The spec says `hmatched` is
+returned in the units of `scale`. The macro's source says otherwise —
+`usmatchd.sas:227` applies no `SCALEF` — and the implementation follows the
+source. See the README.
 **Date:** 2026-08-13
 **Supersedes:** the `hvtiRlifetables` scoping note of 2026-08-12, which assumed a life-table data package. That assumption was wrong; see [Evidence](#evidence).
 
