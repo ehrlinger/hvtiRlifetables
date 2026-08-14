@@ -3,8 +3,11 @@
 Age, sex and race matched US reference survival — the dashed comparison line on
 a clinical survival figure — computed in R.
 
-**Status: scaffold.** The design is settled and the numerics are confirmed, but
-no user-facing function exists yet. See
+**Status: working.** `us_matched()`, `us_lifetable_vintages()` and
+`us_lifetable_model()` are implemented and tested against the fitted blocks.
+What is not yet done is the SAS acceptance check — reproducing a real
+`%usmatchd` run to 1e-12 — which is PHI-adjacent and so lives in the study's
+own `R_parity` project rather than here. See
 [the design spec](docs/specs/2026-08-13-hvtirlifetables-design.md).
 
 ## What this is

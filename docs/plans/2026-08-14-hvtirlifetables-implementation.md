@@ -1862,7 +1862,19 @@ there, which is what `R CMD check` needs.
 cd /tmp && R CMD build /tmp/hvtiRlifetables-export && R CMD check --as-cran hvtiRlifetables_0.1.0.tar.gz
 ```
 
-Expected: `Status: OK`, 0 errors, 0 warnings, 0 notes.
+Expected: **0 errors, 0 warnings, and exactly one NOTE** —
+
+```
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: 'John Ehrlinger <john.ehrlinger@gmail.com>'
+New submission
+```
+
+`New submission` is emitted by `--as-cran` for any package not already on
+CRAN. It cannot be removed and is not a defect. Verified 2026-08-14: plain
+`R CMD check` (without `--as-cran`) is a clean `Status: OK`, so any *other*
+note, or any note at all without `--as-cran`, is a real finding. Do not
+spend effort chasing this one.
 
 - [ ] **Step 4: Run the CRAN Cookbook spot-checks**
 
