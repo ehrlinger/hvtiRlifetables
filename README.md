@@ -67,7 +67,18 @@ naming consistent. This package does not propagate the macro's error.
 remotes::install_github("ehrlinger/hvtiRlifetables")
 ```
 
-Requires `TemporalHazard (>= 1.2.0)`.
+**This will not resolve its dependency yet.** The package requires
+`TemporalHazard (>= 1.2.0)`, and CRAN currently carries **1.1.0**. The `>=
+1.2.0` bound is real, not defensive — the evaluator calls
+`hzr_decompos_g3()`, which 1.1.0 does not provide — so until 1.2.0 reaches
+CRAN you need it from source:
+
+```r
+remotes::install_github("ehrlinger/temporal_hazard")
+```
+
+This is also why the repository has no CI workflow: any run would fail at the
+dependency-install step.
 
 ## License
 
