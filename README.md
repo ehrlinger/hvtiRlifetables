@@ -28,6 +28,9 @@ there is no table on the R side of that comparison.
 
 ## Interface
 
+Signatures, not runnable calls — `vintage` and `stratum` appear bare because
+they have no defaults:
+
 ```r
 us_matched(age, male, other, times,
            id         = seq_along(age),
@@ -41,6 +44,41 @@ us_lifetable_model(vintage, stratum)    # the raw parameter set
 ```
 
 Argument names mirror the macro so a SAS job translates by inspection.
+
+## Example
+
+A 62-year-old white male and a 71-year-old white female, ten years of
+follow-up, against the 1984 fits:
+
+```r
+library(hvtiRlifetables)
+
+us_matched(age   = c(62, 71),
+           male  = c(1, 0),
+           other = c(0, 0),
+           times = seq(0, 10, by = 5),
+           vintage = "table84")
+#>   id time   agesurv  smatched   hmatched
+#> 1  1    0 0.7925575 1.0000000 0.01826492
+#> 2  1    5 0.7925575 0.8914976 0.02843656
+#> 3  1   10 0.7925575 0.7453229 0.04439022
+#> 4  2    0 0.7773741 1.0000000 0.02241349
+#> 5  2    5 0.7773741 0.8640873 0.03736907
+#> 6  2   10 0.7773741 0.6758045 0.06334817
+```
+
+`agesurv` is survival from birth to the patient's current age; `smatched` is
+conditional on having reached it, so it starts at 1. Add
+`individual = FALSE` for the cohort mean curve, which is what a figure's
+dashed line usually needs.
+
+Omitting `vintage` is an error, deliberately:
+
+```r
+us_matched(70, 1, 0, times = 5)
+#> Error: `vintage` has no default and must be given.
+#> Available: table84, table2008, table2023.
+```
 
 ## `vintage` has no default
 
