@@ -1,13 +1,17 @@
 # hvtiRlifetables — session handoff
 
 **Created:** 2026-08-13, from the AVR/LV-function survival study session.
-**State (2026-08-14):** a real R package skeleton — `DESCRIPTION`, `NAMESPACE`, `LICENSE.md`, `NEWS.md`, `README.md`, `.Rbuildignore`, `.Rproj`, `tests/`. `R CMD build` succeeds. Still **no user-facing code**: `R/` holds only the `_PACKAGE` doc stub.
+**State:** implemented. `us_matched()`, `us_lifetable_vintages()` and
+`us_lifetable_model()` are complete, with Tier 1, 2 and 4 tests passing and
+`R CMD check --as-cran` at 0 errors, 0 warnings, and only the unavoidable
+`New submission` note, with the manual. Tier 3 SAS acceptance still needs
+writing, in the **study's** `R_parity` project, not here.
 
 **Version `0.1.0`** (decided 2026-08-13). **Public repo** at `github.com/ehrlinger/hvtiRlifetables` (decided 2026-08-14, superseding "internal only"). The source `.sas7bdat` fits under `data-raw/uslife/` were removed from git history and are `.gitignore`d — they remain on disk, because the share is unreliable and they exist nowhere else off it. The release gate applies in full: CRAN Cookbook audit and `R CMD check --as-cran` **with** the manual.
 
 **Known blocker:** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)`, but CRAN is still at `1.1.0`. No clean machine can install this package, and CI cannot go green, until `TemporalHazard 1.2.0` reaches CRAN. Do not "fix" this by relaxing the bound — the evaluator needs the 1.2.0 API.
 
-**Start here:** read `docs/specs/2026-08-13-hvtirlifetables-design.md` in full, then execute `docs/plans/2026-08-14-hvtirlifetables-implementation.md` (written 2026-08-14) task by task via `superpowers:subagent-driven-development` or `superpowers:executing-plans`. Do not start coding from this file — it is orientation, not a plan.
+**Start here:** this is finished work, not a task queue. Read `docs/specs/2026-08-13-hvtirlifetables-design.md` for background on what the package is and why it exists, then `docs/plans/2026-08-14-hvtirlifetables-implementation.md` (written 2026-08-14) for what was built and why. See "Task outline" below for what actually remains.
 
 ---
 
@@ -26,9 +30,9 @@ The one-sentence surprise, established 2026-08-13: **`%usmatchd` is not a life-t
 | `data-raw/sas/` | 5 `%usmatchd` macro variants | copied from `~/Documents/macro.library/` |
 | `data-raw/spike-vintage-confirmation.R` | the working reproduction | reproduces this study's `uslife.sas7bdat` to 6.2e-15 |
 
-**The vendored copies are the point.** The fitted models exist nowhere else off the share, and the share is an SMB mount that has already proven unreliable this month. Everything needed to build the package is now local.
+**The vendored copies are the point.** The fitted models exist nowhere else off the share, and the share is an SMB mount that has already proven unreliable this month. Everything needed to build the package is now local. Note the `data-raw/uslife/` row above is on disk but not in git — this repo is public, and those are CCF's raw fitted blocks, so they stay untracked and `.gitignore`d. What ships publicly is the derived `data/us_lifetable_models.rda`, built from these by `data-raw/build-models.R`.
 
-`data-raw/uslife/` carries three files the package does not need — `table2008/hzicall_jr`, `hzicall_l`, and `table84` extras are absent by design (`hzall`, `hzcicall` were not copied). Only the nine `hzic{all,f,m,w,o|b,wf,wm,of|bf,om|bm}` per vintage are in scope. The manifest in `data-raw/build-models.R` should name them explicitly rather than globbing.
+`data-raw/uslife/` carries three files the package does not need — `table2008/hzicall_jr`, `hzicall_l`, and `table84` extras are absent by design (`hzall`, `hzcicall` were not copied). Only the nine `hzic{all,f,m,w,o|b,wf,wm,of|bf,om|bm}` per vintage are in scope. The manifest in `data-raw/build-models.R` names them explicitly rather than globbing, because `table2008` also carries `hzicall_jr` and `hzicall_l`, which no `%usmatchd` variant references.
 
 ## The three things that will bite
 
@@ -38,18 +42,32 @@ The one-sentence surprise, established 2026-08-13: **`%usmatchd` is not a life-t
 
 ## Task outline
 
-For `writing-plans` to expand, not to follow as-is:
+Steps 1-6 and 8 are **done** — see
+`docs/plans/2026-08-14-hvtirlifetables-implementation.md`. Remaining:
 
-1. Package skeleton — `DESCRIPTION` (Imports: `TemporalHazard >= 1.2.0`), `NAMESPACE`, `.Rproj`, `LICENSE`, `renv`. Version is John's call; spec proposes `0.1.0`.
-2. `data-raw/build-models.R` — explicit manifest, `haven` read, `_STATUS_` preserved, writes `data/us_lifetable_models.rda`. Maintained entry point, not a one-off: new vintages land periodically.
-3. `R/models.R` — accessors, vintage/stratum resolution, `_STATUS_` gating, `us_lifetable_vintages()`.
-4. `R/evaluate.R` — `H(a)`, `h(a)` from one parameter set. Knows nothing about patients or vintages. Test this hardest.
-5. `R/us_matched.R` — stratum assignment, conditioning, `scale`, mean-curve reduction.
-6. Tiers 1, 2 and 4 tests (invariants, `_STATUS_` regression, vintage discrimination) — all ship in the package.
-7. Tier 3 SAS acceptance — lives in the **study's** `R_parity`, not here; PHI-adjacent, skips when the share is absent.
-8. Docs, `pkgdown`, `R CMD check --as-cran` with the manual to 0/0/0.
+1. **Tier 3 SAS acceptance**, in the study's `R_parity`: `us_matched()`
+   against `estimates/uslife.sas7bdat` to 1e-12 on both `SMATCHED` and
+   `HMATCHED`, reported **per stratum**, skipping when the share is absent.
+   A cohort-wide maximum hid the `_STATUS_` bug behind a plausible
+   near-miss; do not report one.
+2. **CI**, once `TemporalHazard 1.2.0` reaches CRAN. Blocked until then.
+3. **The `hs.*` job template** that consumes `us_matched()`. Belongs in
+   `hvtiRtemplates` / `~/Documents/template/`, not here.
 
-Steps 3–5 have no dependency on the share. Step 7 does.
+## Two more things that will bite
+
+Discovered during implementation; costly enough to find that a future
+maintainer shouldn't have to rediscover them.
+
+4. **`hzl_hazard()` errors at exactly age 0.** `TemporalHazard`'s early
+   phase computes `exp(-bt^(-1/nu))` (underflows to 0) times `bt^num1`
+   (overflows to `Inf`), giving `NaN`. This affects **9 of the 27** shipped
+   strata. `H(0)` is unaffected. Every age above 0, down to 1e-12, is
+   finite and strictly positive in all 27.
+5. **The spec's "THALF 0.0519 -> 0.00544, NU 4.595 -> -2.771" is
+   `table84` -> `table2008`**, which the original wording left unstated.
+   `table2023` is structurally like 2008 but its white-male `NU` is
+   **-2.000**, not -2.771. Pinned by `tests/testthat/test-vintage.R`.
 
 ## Decisions already made — do not relitigate
 
@@ -61,7 +79,7 @@ Steps 3–5 have no dependency on the share. Step 7 does.
 ## Open — needs John or someone else
 
 1. ~~Initial version digit.~~ Resolved 2026-08-13: `0.1.0`.
-2. ~~May these CCF-fitted parameter blocks live in a repo?~~ Partly resolved 2026-08-14: public repo, source `.sas7bdat` untracked. **Still open:** the derived `data/us_lifetable_models.rda` carries the same fitted numbers. If the *values* are not publishable, stripping the `.sas7bdat` files bought nothing and the data-distribution design needs to change. Worth one question to CCF before `data/` is populated.
+2. ~~May these CCF-fitted parameter blocks live in a repo?~~ Partly resolved 2026-08-14: public repo, source `.sas7bdat` untracked. **Still open:** `data/us_lifetable_models.rda` is now tracked and shipping in a public repo, carrying the same fitted numbers as the untracked `.sas7bdat` files. If the *values* are not publishable, stripping the `.sas7bdat` files did not solve the problem, and the data-distribution design needs revisiting for something already published, not something ahead of us. One question to CCF, asked promptly.
 3. **`table2009`** is an empty directory on the share. Never populated, or lost? One question to Andrew Toth.
 4. **Provenance of the 1984 fit** — no recorded source, author or NCHS release found anywhere. Worth having before a published figure leans on it.
 

@@ -6,7 +6,9 @@
 *.tar.gz
 inst/doc/
 # NOTE: docs/ is NOT ignored — it holds docs/specs/ and docs/plans/.
-# If pkgdown is ever added, point its `destination:` somewhere else.
+# pkgdown's destination is set to pkgdown-site/ (below), not docs/ or pkgdown/,
+# since pkgdown/ is reserved for hand-authored assets (pkgdown/assets/, etc.).
+pkgdown-site/
 renv/library/
 renv/staging/
 .DS_Store

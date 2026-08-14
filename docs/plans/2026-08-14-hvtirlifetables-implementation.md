@@ -437,7 +437,7 @@ test_that("us_lifetable_model returns one parameter set", {
   expect_length(m$params, 11L)
   expect_length(m$status, 11L)
   expect_equal(dim(m$vcov), c(11L, 11L))
-  expect_equal(unname(m$params[["THALF"]]), 0.05188786, tolerance = 1e-7)
+  expect_equal(unname(m$params[["THALF"]]), 0.051887864, tolerance = 1e-7)
 })
 
 test_that("an unknown vintage errors and lists what is available", {
@@ -1687,10 +1687,10 @@ test_that("vintages differ in model structure, not only fitted values", {
   p84 <- us_lifetable_model("table84",   "wm")$params
   p08 <- us_lifetable_model("table2008", "wm")$params
   p23 <- us_lifetable_model("table2023", "wm")$params
-  expect_equal(unname(p84[["THALF"]]), 0.05188786,  tolerance = 1e-7)
-  expect_equal(unname(p08[["THALF"]]), 0.005438513, tolerance = 1e-7)
-  expect_equal(unname(p84[["NU"]]),  4.595204, tolerance = 1e-6)
-  expect_equal(unname(p08[["NU"]]), -2.771113, tolerance = 1e-6)
+  expect_equal(unname(p84[["THALF"]]), 0.051887864, tolerance = 1e-7)
+  expect_equal(unname(p08[["THALF"]]), 0.0054385105, tolerance = 1e-7)
+  expect_equal(unname(p84[["NU"]]),   4.5952045,   tolerance = 1e-6)
+  expect_equal(unname(p08[["NU"]]),  -2.77111,     tolerance = 1e-6)
   expect_equal(unname(p23[["NU"]]), -1.999947, tolerance = 1e-6)
 })
 
@@ -1862,7 +1862,19 @@ there, which is what `R CMD check` needs.
 cd /tmp && R CMD build /tmp/hvtiRlifetables-export && R CMD check --as-cran hvtiRlifetables_0.1.0.tar.gz
 ```
 
-Expected: `Status: OK`, 0 errors, 0 warnings, 0 notes.
+Expected: **0 errors, 0 warnings, and exactly one NOTE** —
+
+```
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: 'John Ehrlinger <john.ehrlinger@gmail.com>'
+New submission
+```
+
+`New submission` is emitted by `--as-cran` for any package not already on
+CRAN. It cannot be removed and is not a defect. Verified 2026-08-14: plain
+`R CMD check` (without `--as-cran`) is a clean `Status: OK`, so any *other*
+note, or any note at all without `--as-cran`, is a real finding. Do not
+spend effort chasing this one.
 
 - [ ] **Step 4: Run the CRAN Cookbook spot-checks**
 
@@ -1922,7 +1934,8 @@ Replace the `**State (2026-08-14):**` paragraph with:
 ```markdown
 **State:** implemented. `us_matched()`, `us_lifetable_vintages()` and
 `us_lifetable_model()` are complete, with Tier 1, 2 and 4 tests passing and
-`R CMD check --as-cran` at 0/0/0 with the manual. Tier 3 SAS acceptance
+`R CMD check --as-cran` at 0 errors, 0 warnings, and only the unavoidable
+`New submission` note, with the manual. Tier 3 SAS acceptance
 still needs writing, in the **study's** `R_parity` project, not here.
 ```
 

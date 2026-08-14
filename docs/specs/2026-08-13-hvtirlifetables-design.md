@@ -1,6 +1,13 @@
 # hvtiRlifetables Design
 
-**Status:** Design, awaiting review. Not yet built.
+**Status:** Implemented 2026-08-14, except Tier 3 acceptance (which lives in
+the study's `R_parity`). Plan:
+`docs/plans/2026-08-14-hvtirlifetables-implementation.md`.
+
+**One deviation from this spec, deliberate.** The spec says `hmatched` is
+returned in the units of `scale`. The macro's source says otherwise —
+`usmatchd.sas:227` applies no `SCALEF` — and the implementation follows the
+source. See the README.
 **Date:** 2026-08-13
 **Supersedes:** the `hvtiRlifetables` scoping note of 2026-08-12, which assumed a life-table data package. That assumption was wrong; see [Evidence](#evidence).
 
@@ -138,6 +145,8 @@ us_matched(age, male, other, times,
            individual = TRUE)
 ```
 
+[The shipped signature has no default for `vintage`; the `vintage = "table84"` shown above was the design-time draft, superseded per the Vintage policy below.]
+
 `age` in years; `male` 1 = male, 0 = female; `other` 1 = non-white, 0 = white — the macro's coding, unchanged. All three are per-patient vectors of equal length.
 
 Returns a data frame with `id`, `time`, `agesurv`, `smatched`, `hmatched` when `individual = TRUE`; when `FALSE`, one row per time with `smatched` and `hmatched` only, via the mean-curve reduction below.
@@ -188,6 +197,8 @@ The macro's default. Reproduce its arithmetic exactly, from `usmatchd.sas:338-35
 ### Units
 
 `scale` applies `SCALEF` of `1`, `1/12`, `1/365.2425`, matching `usmatchd.sas:202-204`. `times` and the returned `hmatched` are in the units of `scale`; `age` is always in years. Note the macro's `365.2425`, which is not the `365.241` used elsewhere in `survival`.
+
+[Superseded — see the deviation note at the top of this document. The implementation returns a per-year hazard regardless of `scale`, matching `usmatchd.sas:227`, which applies no `SCALEF` to `HMATCHED`.]
 
 ### Module boundaries
 
