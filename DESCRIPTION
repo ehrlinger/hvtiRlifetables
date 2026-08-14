@@ -35,7 +35,8 @@ Description: Age, sex and race matched United States reference survival, as
 Depends:
     R (>= 4.4.0)
 Imports:
-    TemporalHazard (>= 1.2.0)
+    TemporalHazard (>= 1.2.0),
+    utils
 Suggests:
     haven,
     knitr,

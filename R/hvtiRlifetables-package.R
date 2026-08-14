@@ -15,3 +15,9 @@
 #'
 #' `vintage` is never defaulted. See the package README for why.
 "_PACKAGE"
+
+## `us_lifetable_models` is this package's own lazy-loaded dataset. codetools
+## analyses statically and cannot see lazy-load bindings, so R CMD check
+## reports every reference to it in R/models.R as an undefined global. It is
+## not one.
+utils::globalVariables("us_lifetable_models")
