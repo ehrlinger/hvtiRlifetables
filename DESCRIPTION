@@ -20,8 +20,7 @@ Maintainer: John Ehrlinger <john.ehrlinger@gmail.com>
 License: GPL-3
 Encoding: UTF-8
 Language: en-US
-URL: https://github.com/ehrlinger/hvtiRlifetables,
-    https://ehrlinger.github.io/hvtiRlifetables/
+URL: https://github.com/ehrlinger/hvtiRlifetables
 BugReports: https://github.com/ehrlinger/hvtiRlifetables/issues
 Description: Age, sex and race matched United States reference survival, as
     consumed by clinical outcomes reports within The Heart and Vascular
