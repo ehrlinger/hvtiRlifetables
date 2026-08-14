@@ -224,8 +224,43 @@ Tier 3 needs patient ages and so is PHI-adjacent. It does not ship in the packag
 
 - Confidence bands on the reference curve. The covariance blocks ship; nothing reads them.
 - Re-fitting new vintages from NCHS data. The package distributes CCF's existing fits; it does not reproduce the fitting.
-- `survexp.usr` interoperability or a translation layer. The spike closed this.
+- `survexp.usr` interoperability or a translation layer, **for v1**. Not closed as a direction - see Future work.
 - The 31 `uslife*.sas7bdat` stratum outputs in this study's `estimates/`. They are this study's `%usmatchd` results, reproducible from the package, and are not package data.
+
+## Future work - an ecosystem-based approximation
+
+The 2026-08-13 spike established that `survival::survexp.usr` **cannot reproduce
+`%usmatchd`**, and that finding stands: twelve vintage x interpolation
+combinations, best individual-curve error 0.09-0.11 in every one, with an age
+tilt (ratio 1.28 at age <= 50 falling to 0.89 at 85+) that no vintage removes.
+The reason is structural rather than a data disagreement - CCF's object is a
+fitted parametric three-phase hazard evaluated on the age axis, so there is no
+table on the R side of the comparison.
+
+**What that closed was substitution, not the direction.** Reopened as future
+work, because an approximation has uses exact reproduction does not:
+
+1. **A documented approximation mode** for anyone without access to CCF's fitted
+   `.sas7bdat` blocks - collaborators, external reviewers, or a public release of
+   downstream methods. It would carry the measured error as a stated bound, never
+   as a default.
+2. **Interoperability**, letting a curve produced here be compared against
+   `survexp` output on the same axes, which is what a reviewer asking "why not
+   just use `survexp`?" actually needs to see.
+3. **Revisiting if the ecosystem changes.** The gap is that R has no parametric
+   US reference fit. If one appears, the comparison is worth re-running.
+
+**Two traps for whoever picks this up.** Both cost the original spike time:
+
+- A **cohort-mean check passes and means nothing.** At 1975-2000 vintage with
+  step interpolation the cohort mean 10-year survival agrees to +0.0017 while
+  individual curves are off by up to 0.11. Validate per-curve, per-stratum.
+- The error is **not a constant offset** and cannot be calibrated away by
+  choosing a vintage. The median hazard ratio can be tuned to 1.000; the age
+  tilt remains.
+
+Scope, acceptance bounds, and whether an approximation belongs in this package
+at all are undecided. This is a direction, not a plan.
 
 ## Open questions
 
