@@ -1,0 +1,16 @@
+url: https://ehrlinger.github.io/hvtiRlifetables/
+
+template:
+  bootstrap: 5
+
+destination: pkgdown
+
+reference:
+  - title: Reference survival
+    contents:
+      - us_matched
+  - title: Vintages and fitted models
+    contents:
+      - us_lifetable_vintages
+      - us_lifetable_model
+      - us_lifetable_models
