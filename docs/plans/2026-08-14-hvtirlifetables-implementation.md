@@ -1934,7 +1934,8 @@ Replace the `**State (2026-08-14):**` paragraph with:
 ```markdown
 **State:** implemented. `us_matched()`, `us_lifetable_vintages()` and
 `us_lifetable_model()` are complete, with Tier 1, 2 and 4 tests passing and
-`R CMD check --as-cran` at 0/0/0 with the manual. Tier 3 SAS acceptance
+`R CMD check --as-cran` at 0 errors, 0 warnings, and only the unavoidable
+`New submission` note, with the manual. Tier 3 SAS acceptance
 still needs writing, in the **study's** `R_parity` project, not here.
 ```
 

@@ -3,7 +3,7 @@ url: https://ehrlinger.github.io/hvtiRlifetables/
 template:
   bootstrap: 5
 
-destination: pkgdown
+destination: pkgdown-site
 
 reference:
   - title: Reference survival

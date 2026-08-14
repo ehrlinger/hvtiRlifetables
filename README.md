@@ -26,12 +26,12 @@ combinations were tested; the best individual-curve error in every one was
 0.09–0.11, with an age tilt no vintage removes. The reason is structural —
 there is no table on the R side of that comparison.
 
-## Planned interface
+## Interface
 
 ```r
 us_matched(age, male, other, times,
            id         = seq_along(age),
-           vintage    = "table84",
+           vintage,
            table      = c("sexrace", "race", "sex", "overall"),
            scale      = c("years", "months", "days"),
            individual = TRUE)
