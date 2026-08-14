@@ -1,11 +1,13 @@
 # hvtiRlifetables — session handoff
 
 **Created:** 2026-08-13, from the AVR/LV-function survival study session.
-**State:** scaffolded with vendored inputs and an approved-pending-review design spec, on a local git repo with **no remote**. No package yet — no `DESCRIPTION`, no `R/` code.
+**State (2026-08-14):** a real R package skeleton — `DESCRIPTION`, `NAMESPACE`, `LICENSE.md`, `NEWS.md`, `README.md`, `.Rbuildignore`, `.Rproj`, `tests/`. `R CMD build` succeeds. Still **no user-facing code**: `R/` holds only the `_PACKAGE` doc stub.
 
-**Version `0.1.0`. Internal only** (both decided 2026-08-13). No public remote, no CRAN, no pkgdown outside CCF — the repo carries CCF-fitted parameter blocks. The internal release gate still applies in full: John's rules require the CRAN Cookbook audit and `R CMD check --as-cran` **with** the manual for internal releases too.
+**Version `0.1.0`** (decided 2026-08-13). **Public repo** at `github.com/ehrlinger/hvtiRlifetables` (decided 2026-08-14, superseding "internal only"). The source `.sas7bdat` fits under `data-raw/uslife/` were removed from git history and are `.gitignore`d — they remain on disk, because the share is unreliable and they exist nowhere else off it. The release gate applies in full: CRAN Cookbook audit and `R CMD check --as-cran` **with** the manual.
 
-**Start here:** read `docs/specs/2026-08-13-hvtirlifetables-design.md` in full, then run `superpowers:writing-plans` against it to produce `docs/plans/2026-08-13-hvtirlifetables-implementation.md`. Do not start coding from this file — it is orientation, not a plan.
+**Known blocker:** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)`, but CRAN is still at `1.1.0`. No clean machine can install this package, and CI cannot go green, until `TemporalHazard 1.2.0` reaches CRAN. Do not "fix" this by relaxing the bound — the evaluator needs the 1.2.0 API.
+
+**Start here:** read `docs/specs/2026-08-13-hvtirlifetables-design.md` in full, then execute `docs/plans/2026-08-14-hvtirlifetables-implementation.md` (written 2026-08-14) task by task via `superpowers:subagent-driven-development` or `superpowers:executing-plans`. Do not start coding from this file — it is orientation, not a plan.
 
 ---
 
@@ -59,7 +61,7 @@ Steps 3–5 have no dependency on the share. Step 7 does.
 ## Open — needs John or someone else
 
 1. ~~Initial version digit.~~ Resolved 2026-08-13: `0.1.0`.
-2. ~~May these CCF-fitted parameter blocks live in a repo?~~ Resolved 2026-08-13: internal only, for now. Repo initialised locally on `main`, **no remote configured** — adding one is a deliberate act, not a default.
+2. ~~May these CCF-fitted parameter blocks live in a repo?~~ Partly resolved 2026-08-14: public repo, source `.sas7bdat` untracked. **Still open:** the derived `data/us_lifetable_models.rda` carries the same fitted numbers. If the *values* are not publishable, stripping the `.sas7bdat` files bought nothing and the data-distribution design needs to change. Worth one question to CCF before `data/` is populated.
 3. **`table2009`** is an empty directory on the share. Never populated, or lost? One question to Andrew Toth.
 4. **Provenance of the 1984 fit** — no recorded source, author or NCHS release found anywhere. Worth having before a published figure leans on it.
 

@@ -10,3 +10,11 @@ inst/doc/
 renv/library/
 renv/staging/
 .DS_Store
+
+# CCF's fitted life-table parameter blocks. Present on disk -- the local copies
+# are deliberate, because the /Volumes/qhsstudies share is unreliable and these
+# files exist nowhere else off it -- but NOT tracked, because this repo is
+# public. They were removed from history on 2026-08-14. What ships publicly is
+# the derived data/us_lifetable_models.rda, built from these by
+# data-raw/build-models.R.
+data-raw/uslife/

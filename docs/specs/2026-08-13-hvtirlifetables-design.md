@@ -20,7 +20,9 @@
 - **No PHI** in the package, its tests, or its fixtures. The parameter blocks are population life-table fits and contain none; the acceptance fixture does (see [Testing](#testing)).
 - **No literal study path in package code.** Vintage data is shipped *inside* the package, not read from `/studies` at runtime. `data-raw/` may reference the share; `R/` may not.
 - **Versioning:** initial version is **`0.1.0`** (decided 2026-08-13). Straight three digits, no `.9000`. Minor and major digits do not move without John; adding a vintage bumps the patch digit.
-- **Visibility: internal only** (decided 2026-08-13). The repo carries CCF-fitted parameter blocks. No public remote, no CRAN, no pkgdown published outside CCF. Anything that would push these artefacts outward is out of scope until that decision is revisited.
+- **Visibility: public repo, fits untracked** (decided 2026-08-14, superseding the 2026-08-13 "internal only" decision). `github.com/ehrlinger/hvtiRlifetables` is public. The source `.sas7bdat` parameter blocks under `data-raw/uslife/` are **not tracked** — they were removed from git history on 2026-08-14 and are `.gitignore`d, while remaining on disk because the share is unreliable and they exist nowhere else off it. What ships publicly is the derived `data/us_lifetable_models.rda`.
+
+  **Note the limit of this.** The `.rda` carries the same fitted numbers in a different container. Stripping the `.sas7bdat` files changes the format and the provenance trail, not the confidentiality of the values. If the fitted parameters themselves must not be public, the `.rda` cannot ship either and the package needs a different data-distribution design. That question is not settled by this decision.
 
 ---
 
@@ -71,6 +73,8 @@ The reason is structural, not a data disagreement: there is no table on the R si
 Nine strata per vintage, matching the macro's four `TABLE=` modes: `OVERALL` -> `all`; `SEX` -> `f`, `m`; `RACE` -> `w`, `o`/`b`; `SEXRACE` -> `wf`, `wm`, `of`/`bf`, `om`/`bm`. (`table84` also carries `hzall`, `hzcicall`; `table2008` also carries `hzicall_jr`, `hzicall_l`, `pemldall`, `pemlstro`. These are not referenced by any `%usmatchd` variant and do not ship.)
 
 Vintages are not interchangeable. Model *structure* differs, not just fitted values — white male `G1FLAG` 2 -> 6, `G3FLAG` 4 -> 3, `THALF` 0.0519 -> 0.00544, `NU` 4.595 -> -2.771.
+
+**Correction, 2026-08-14:** that arrow is `table84` -> **`table2008`**, which the original wording left unstated. `table2023` is structurally like 2008 — same flags, `THALF` 0.005437 — but its white-male `NU` is **-2.000**, not -2.771. All three are distinct fits. Verified directly against the shipped blocks; pinned by `test-vintage.R`.
 
 ### The vintage list grows
 
@@ -224,13 +228,48 @@ Tier 3 needs patient ages and so is PHI-adjacent. It does not ship in the packag
 
 - Confidence bands on the reference curve. The covariance blocks ship; nothing reads them.
 - Re-fitting new vintages from NCHS data. The package distributes CCF's existing fits; it does not reproduce the fitting.
-- `survexp.usr` interoperability or a translation layer. The spike closed this.
+- `survexp.usr` interoperability or a translation layer, **for v1**. Not closed as a direction - see Future work.
 - The 31 `uslife*.sas7bdat` stratum outputs in this study's `estimates/`. They are this study's `%usmatchd` results, reproducible from the package, and are not package data.
+
+## Future work - an ecosystem-based approximation
+
+The 2026-08-13 spike established that `survival::survexp.usr` **cannot reproduce
+`%usmatchd`**, and that finding stands: twelve vintage x interpolation
+combinations, best individual-curve error 0.09-0.11 in every one, with an age
+tilt (ratio 1.28 at age <= 50 falling to 0.89 at 85+) that no vintage removes.
+The reason is structural rather than a data disagreement - CCF's object is a
+fitted parametric three-phase hazard evaluated on the age axis, so there is no
+table on the R side of the comparison.
+
+**What that closed was substitution, not the direction.** Reopened as future
+work, because an approximation has uses exact reproduction does not:
+
+1. **A documented approximation mode** for anyone without access to CCF's fitted
+   `.sas7bdat` blocks - collaborators, external reviewers, or a public release of
+   downstream methods. It would carry the measured error as a stated bound, never
+   as a default.
+2. **Interoperability**, letting a curve produced here be compared against
+   `survexp` output on the same axes, which is what a reviewer asking "why not
+   just use `survexp`?" actually needs to see.
+3. **Revisiting if the ecosystem changes.** The gap is that R has no parametric
+   US reference fit. If one appears, the comparison is worth re-running.
+
+**Two traps for whoever picks this up.** Both cost the original spike time:
+
+- A **cohort-mean check passes and means nothing.** At 1975-2000 vintage with
+  step interpolation the cohort mean 10-year survival agrees to +0.0017 while
+  individual curves are off by up to 0.11. Validate per-curve, per-stratum.
+- The error is **not a constant offset** and cannot be calibrated away by
+  choosing a vintage. The median hazard ratio can be tuned to 1.000; the age
+  tilt remains.
+
+Scope, acceptance bounds, and whether an approximation belongs in this package
+at all are undecided. This is a direction, not a plan.
 
 ## Open questions
 
 1. ~~Initial version.~~ **Resolved 2026-08-13: `0.1.0`.**
-2. ~~Repo location and visibility.~~ **Resolved 2026-08-13: internal only, for now.** See Global constraints.
+2. ~~Repo location and visibility.~~ **Resolved 2026-08-14: public at `github.com/ehrlinger/hvtiRlifetables`, source `.sas7bdat` fits untracked.** Supersedes the 2026-08-13 "internal only" resolution. See Global constraints, including the caveat that this does not by itself make the fitted *values* publishable.
 3. **`table2009`.** Empty on disk. Whether a copy exists elsewhere, or the directory was never populated, is unresolved — worth one question to Andrew Toth before the package documents it as unavailable.
 4. **Provenance of each vintage's underlying NCHS release.** The fits are dated by directory name (`table84`, `table2008`, `table2023`) and the 2023 fit has a documented author and date. The 1984 fit's source and author are not recorded anywhere found. Citable provenance would be worth having before anyone publishes a figure that leans on it.
 
