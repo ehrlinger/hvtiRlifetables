@@ -60,6 +60,21 @@ risk-weighted average of Black, Asian, American Indian and Hispanic death
 rates, weighted by number at risk, stored under `B` only to keep the macro's
 naming consistent. This package does not propagate the macro's error.
 
+## `hmatched` is per year, always
+
+Whatever `scale=` you pass, `time` is in those units but `hmatched` is a
+hazard per **year**.
+
+This matches the macro's source. `usmatchd.sas:227` assigns `HMATCHED =
+_HAZARD` with no `SCALEF` multiplication, and `PROC HAZPRED` is evaluated at
+`AGE_YR` in years. The macro's own header comment at line 47 claims
+`HMATCHED` is "scaled by SCALE" and is wrong — but it has never mattered,
+because every job that consumes it uses `scale="years"`, where `SCALEF = 1`.
+
+This package reproduces the code, not the comment, because bit-fidelity to
+the macro is the acceptance criterion. If you need a per-month or per-day
+hazard, multiply by the corresponding `SCALEF` yourself.
+
 ## Installation
 
 ```r
