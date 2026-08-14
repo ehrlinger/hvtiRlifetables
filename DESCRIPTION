@@ -1,0 +1,46 @@
+Package: hvtiRlifetables
+Type: Package
+Title: Age, Sex and Race Matched US Reference Survival
+Version: 0.1.0
+Date: 2026-08-14
+Authors@R: c(
+    person(
+      "John", "Ehrlinger",
+      email = "john.ehrlinger@gmail.com",
+      role = c("aut", "cre"),
+      comment = c(ORCID = "0000-0002-5340-5154")
+    ),
+    person(
+      "The Cleveland Clinic Foundation",
+      role = "cph",
+      comment = "fitted US life-table hazard model parameters"
+    )
+  )
+Maintainer: John Ehrlinger <john.ehrlinger@gmail.com>
+License: GPL-3
+Encoding: UTF-8
+Language: en-US
+URL: https://github.com/ehrlinger/hvtiRlifetables
+BugReports: https://github.com/ehrlinger/hvtiRlifetables/issues
+Description: Age, sex and race matched United States reference survival, as
+    consumed by clinical outcomes reports within The Heart and Vascular
+    Institute at the Cleveland Clinic. Reproduces the 'SAS' macro
+    'usmatchd', which evaluates a stored three-phase parametric hazard fit
+    of Blackstone, Naftel and Turner (1986)
+    <doi:10.1080/01621459.1986.10478314> on the age axis rather than
+    interpolating a life table. Ships the fitted parameter blocks, one set
+    per vintage per stratum, together with a thin evaluator over the
+    'TemporalHazard' package. The reference vintage is never defaulted, so
+    an analysis must state which reference population it used.
+Depends:
+    R (>= 4.4.0)
+Imports:
+    TemporalHazard (>= 1.2.0)
+Suggests:
+    haven,
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
