@@ -750,10 +750,31 @@ test_that("cumulative hazard is non-negative and non-decreasing in age", {
 })
 
 test_that("hazard is strictly positive across the supported age range", {
+  # Range starts above 0. Exactly age 0 is a numerical singularity -- see the
+  # next test. Every age above it is finite and positive: verified 2026-08-14
+  # by sweeping all 27 shipped strata over 1e-12 to 110.
   m <- wm84()
-  h <- hzl_hazard(m$params, m$status, seq(0, 100, by = 0.5))
+  h <- hzl_hazard(m$params, m$status, seq(0.5, 100, by = 0.5))
   expect_true(all(h > 0))
   expect_true(all(is.finite(h)))
+})
+
+test_that("the hazard errors at exactly age 0 rather than returning NaN", {
+  # TemporalHazard's early phase is indeterminate at exactly 0: it computes
+  # G <- exp(-bt^(-1/nu)), which underflows to 0, then g <- G * bt^num1 where
+  # bt^num1 overflows to Inf -- so 0 * Inf = NaN. This hits 9 of the 27
+  # shipped strata (every one with an active early phase of this shape).
+  #
+  # H(0) is unaffected and is ~1.7e-311, which is why the cumulative-hazard
+  # test above passes.
+  #
+  # A silent NaN reaching a figure is exactly the "result-shaped nothing"
+  # failure this project keeps hitting, so the evaluator errors instead.
+  m <- wm84()
+  expect_error(hzl_hazard(m$params, m$status, 0), "not finite")
+  expect_error(hzl_hazard(m$params, m$status, c(0, 50)), "not finite")
+  # ...and the moment you step off 0, it is well behaved.
+  expect_true(all(is.finite(hzl_hazard(m$params, m$status, c(1e-12, 1e-6)))))
 })
 
 test_that("both evaluators are vectorised and length-preserving", {
@@ -858,6 +879,21 @@ Create `R/evaluate.R`:
 ## from the hzr_phase() documentation gives the wrong answer; they were
 ## confirmed with args().
 
+## A non-finite hazard or cumulative hazard silently poisons every downstream
+## survival number. Catch it here.
+hzl_assert_finite <- function(x, age, what) {
+  if (!all(is.finite(x))) {
+    bad <- age[!is.finite(x)]
+    stop(what, " is not finite at age ",
+         paste(utils::head(bad, 5), collapse = ", "),
+         if (length(bad) > 5) ", ..." else "",
+         ".\nTemporalHazard's early phase is indeterminate at exactly age 0 ",
+         "(0 * Inf); evaluate at a positive age. Any other age reaching this ",
+         "message means the fitted parameters are degenerate.", call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 hzl_check_model <- function(params, status) {
   if (!any(vapply(c("E0", "C0", "L0"),
                   function(n) isTRUE(status[[n]] == 1L), logical(1)))) {
@@ -899,6 +935,7 @@ hzl_cumhaz <- function(params, status, age) {
       eta   = params[["ETA"]]
     )$G3
   }
+  hzl_assert_finite(out, age, "the cumulative hazard")
   out
 }
 
@@ -933,6 +970,7 @@ hzl_hazard <- function(params, status, age) {
       eta   = params[["ETA"]]
     )$g3
   }
+  hzl_assert_finite(out, age, "the hazard")
   out
 }
 ```
@@ -943,7 +981,7 @@ hzl_hazard <- function(params, status, age) {
 Rscript -e 'devtools::test(filter = "evaluate")'
 ```
 
-Expected: PASS, 9 tests.
+Expected: PASS, 10 tests.
 
 - [ ] **Step 5: Commit**
 
