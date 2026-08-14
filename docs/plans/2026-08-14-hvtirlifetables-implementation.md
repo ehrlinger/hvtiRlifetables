@@ -1145,9 +1145,44 @@ test_that("non-binary male or other errors", {
   expect_error(us_matched(70, 1, 0.5, times = 5, vintage = "table84"), "other")
 })
 
-test_that("negative or unsorted times error", {
+test_that("negative times error", {
   expect_error(us_matched(70, 1, 0, times = c(-1, 5), vintage = "table84"),
                "negative")
+})
+
+test_that("unsorted times are rejected rather than silently returned", {
+  # Out-of-order input previously returned smatched = c(0.549, 1.000, 0.791):
+  # a survival curve that zigzags, breaking the package's own monotonicity
+  # invariant without any signal.
+  expect_error(us_matched(70, 1, 0, times = c(10, 0, 5), vintage = "table84"),
+               "non-decreasing")
+  # Ties are non-decreasing and stay legal.
+  expect_no_error(us_matched(70, 1, 0, times = c(0, 5, 5, 10),
+                             vintage = "table84"))
+})
+
+test_that("empty times error in the package's own words", {
+  # Previously leaked data.frame()'s internals:
+  # "arguments imply differing number of rows: 0, 1".
+  expect_error(us_matched(70, 1, 0, times = numeric(0), vintage = "table84"),
+               "must not be empty")
+})
+
+test_that("an empty cohort returns a zero-row data frame, not NULL", {
+  # A cohort filtered to nothing is legitimate input. Returning NULL would
+  # break nrow(), $ and rbind() downstream with no error at the call site.
+  r <- us_matched(numeric(0), numeric(0), numeric(0), times = c(0, 5),
+                  vintage = "table84")
+  expect_s3_class(r, "data.frame")
+  expect_equal(nrow(r), 0L)
+  expect_equal(names(r), c("id", "time", "agesurv", "smatched", "hmatched"))
+})
+
+test_that("an empty cohort emits no warning", {
+  # max(numeric(0)) warns and returns -Inf, which also silently defeated the
+  # 110-year support check.
+  expect_silent(us_matched(numeric(0), numeric(0), numeric(0),
+                           times = c(0, 5), vintage = "table84"))
 })
 
 test_that("ids are carried through", {
@@ -1198,6 +1233,22 @@ hzl_assign_stratum <- function(male, other, table, vintage) {
     sexrace = paste0(ifelse(other == 1, nw, "w"), ifelse(male == 1, "m", "f")),
     stop("unknown table \"", table, "\".", call. = FALSE)
   )
+}
+
+## A cohort filtered to nothing is a legitimate input, not an error. Return
+## the documented columns with zero rows so `nrow()`, `$` and `rbind()` all
+## behave -- returning NULL instead would be a wrong-typed value that only
+## fails downstream, which is exactly the silent-failure shape this package
+## exists to avoid. `id[0]` preserves the caller's id type.
+hzl_empty_result <- function(id, individual) {
+  if (isTRUE(individual)) {
+    data.frame(id = id[0], time = numeric(0), agesurv = numeric(0),
+               smatched = numeric(0), hmatched = numeric(0),
+               stringsAsFactors = FALSE)
+  } else {
+    data.frame(time = numeric(0), smatched = numeric(0),
+               hmatched = numeric(0), stringsAsFactors = FALSE)
+  }
 }
 
 ## The failure shape this study has now hit five times: a reference curve
@@ -1317,9 +1368,33 @@ us_matched <- function(age, male, other, times,
   if (any(times < 0)) {
     stop("`times` must not be negative.", call. = FALSE)
   }
+  if (length(times) == 0L) {
+    stop("`times` must not be empty.", call. = FALSE)
+  }
+  if (is.unsorted(times)) {
+    ## Rows follow `times` in the order given, so out-of-order input returns a
+    ## `smatched` column that is not monotone -- a survival curve that
+    ## zigzags. Reject rather than silently sorting: the caller's row order
+    ## may be meaningful to them, and quietly reordering it is its own bug.
+    ## Ties are fine; is.unsorted() tests non-decreasing.
+    stop("`times` must be in non-decreasing order; got ",
+         paste(utils::head(times, 5), collapse = ", "),
+         if (length(times) > 5) ", ..." else "",
+         ".\nSort `times` before calling.", call. = FALSE)
+  }
   if (any(age < 0)) {
     stop("`age` must not be negative; got a minimum of ", min(age), ".",
          call. = FALSE)
+  }
+
+  if (!isTRUE(individual)) {
+    stop("`individual = FALSE` is not yet implemented.", call. = FALSE)
+  }
+
+  ## Before max(): max(numeric(0)) is -Inf and warns, which would both
+  ## pollute output and silently defeat the support check below.
+  if (n == 0L) {
+    return(hzl_empty_result(id, individual))
   }
 
   scalef <- hzl_scalef(scale)
@@ -1329,10 +1404,6 @@ us_matched <- function(age, male, other, times,
     stop("age + follow-up reaches ", round(max_age, 1),
          " years, beyond the fits' support of 110. These models are not ",
          "extrapolated past the life table's range.", call. = FALSE)
-  }
-
-  if (!isTRUE(individual)) {
-    stop("`individual = FALSE` is not yet implemented.", call. = FALSE)
   }
 
   strata <- hzl_assign_stratum(male, other, table, vintage)
@@ -1371,7 +1442,7 @@ us_matched <- function(age, male, other, times,
 Rscript -e 'roxygen2::roxygenise("."); devtools::test(filter = "us-matched")'
 ```
 
-Expected: PASS, 16 tests.
+Expected: PASS, 20 tests.
 
 - [ ] **Step 5: Commit**
 
@@ -1454,6 +1525,16 @@ test_that("a single-patient cohort reduces to that patient's own curve", {
                     individual = FALSE)
   expect_equal(agg$smatched, ind$smatched, tolerance = 1e-14)
   expect_equal(agg$hmatched, ind$hmatched, tolerance = 1e-14)
+})
+
+test_that("an empty cohort returns a zero-row aggregate frame", {
+  # Removing the individual = FALSE stub lets the n == 0 early return serve
+  # both shapes. The aggregate shape has no `id` column.
+  r <- us_matched(numeric(0), numeric(0), numeric(0), times = c(0, 5),
+                  vintage = "table84", individual = FALSE)
+  expect_s3_class(r, "data.frame")
+  expect_equal(nrow(r), 0L)
+  expect_equal(names(r), c("time", "smatched", "hmatched"))
 })
 
 test_that("the mean curve keeps the survival invariants", {
