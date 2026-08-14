@@ -7,7 +7,7 @@
 
 **Known blocker:** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)`, but CRAN is still at `1.1.0`. No clean machine can install this package, and CI cannot go green, until `TemporalHazard 1.2.0` reaches CRAN. Do not "fix" this by relaxing the bound — the evaluator needs the 1.2.0 API.
 
-**Start here:** read `docs/specs/2026-08-13-hvtirlifetables-design.md` in full, then run `superpowers:writing-plans` against it to produce `docs/plans/2026-08-13-hvtirlifetables-implementation.md`. Do not start coding from this file — it is orientation, not a plan.
+**Start here:** read `docs/specs/2026-08-13-hvtirlifetables-design.md` in full, then execute `docs/plans/2026-08-14-hvtirlifetables-implementation.md` (written 2026-08-14) task by task via `superpowers:subagent-driven-development` or `superpowers:executing-plans`. Do not start coding from this file — it is orientation, not a plan.
 
 ---
 

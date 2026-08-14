@@ -74,6 +74,8 @@ Nine strata per vintage, matching the macro's four `TABLE=` modes: `OVERALL` -> 
 
 Vintages are not interchangeable. Model *structure* differs, not just fitted values — white male `G1FLAG` 2 -> 6, `G3FLAG` 4 -> 3, `THALF` 0.0519 -> 0.00544, `NU` 4.595 -> -2.771.
 
+**Correction, 2026-08-14:** that arrow is `table84` -> **`table2008`**, which the original wording left unstated. `table2023` is structurally like 2008 — same flags, `THALF` 0.005437 — but its white-male `NU` is **-2.000**, not -2.771. All three are distinct fits. Verified directly against the shipped blocks; pinned by `test-vintage.R`.
+
 ### The vintage list grows
 
 CCF refits the life tables periodically — `table2023` was added by Andrew Toth on 2025-12-23. New vintages will land, and each one changes data without touching code. **This is the property that justifies a separate package**, and it has two design consequences:
