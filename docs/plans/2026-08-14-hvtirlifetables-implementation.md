@@ -357,9 +357,10 @@ Create `R/data.R`:
 #' stored under `B` only to keep the macro's naming consistent. See
 #' [us_lifetable_vintages()], which reports this per vintage.
 #'
-#' @source Fitted by The Cleveland Clinic Foundation and read from
-#'   `/Volumes/qhsstudies/general/uslife/<vintage>/estimates/`. Built by
-#'   `data-raw/build-models.R`, which is not run at install time.
+#' @source Fitted by The Cleveland Clinic Foundation. Built into this package
+#'   by `data-raw/build-models.R`, which is not run at install time. That
+#'   script's header names the share location to restore the inputs from —
+#'   deliberately kept out of `R/`, which must carry no literal share path.
 "us_lifetable_models"
 ```
 
@@ -397,7 +398,7 @@ git commit -m "feat: build and ship the fitted US life-table parameter blocks"
 **Interfaces:**
 - Consumes: `us_lifetable_models` (Task 1).
 - Produces:
-  - `us_lifetable_vintages()` → data frame, columns `vintage`, `n_strata`, `nonwhite_code`, `nonwhite_meaning`, `added`, `source`.
+  - `us_lifetable_vintages()` → data frame, columns `vintage`, `n_strata`, `nonwhite_code`, `nonwhite_meaning`, `added`. **No `source` column** — see below.
   - `us_lifetable_model(vintage, stratum)` → list with `vintage`, `stratum`, `params`, `status`, `flags`, `vcov`.
   - `hzl_mu(params, status, name)` → numeric scalar (internal). `exp(params[[name]])` if `status[[name]] == 1L`, else `0`.
   - `hzl_nonwhite_code(vintage)` → `"o"` for `table84`, `"b"` otherwise (internal).
@@ -508,21 +509,18 @@ VINTAGE_META <- list(
     nonwhite_code    = "o",
     nonwhite_meaning = "Other (all non-white), named honestly by this vintage",
     added            = NA_character_,
-    source           = "/Volumes/qhsstudies/general/uslife/table84/estimates",
     usable           = TRUE
   ),
   table2008 = list(
     nonwhite_code    = "b",
     nonwhite_meaning = "Black, per the macro's documentation; not independently verified",
     added            = NA_character_,
-    source           = "/Volumes/qhsstudies/general/uslife/table2008/estimates",
     usable           = TRUE
   ),
   table2009 = list(
     nonwhite_code    = NA_character_,
     nonwhite_meaning = NA_character_,
     added            = NA_character_,
-    source           = "/Volumes/qhsstudies/general/uslife/table2009/estimates",
     usable           = FALSE
   ),
   table2023 = list(
@@ -533,7 +531,6 @@ VINTAGE_META <- list(
       "stratum code and despite the macro's own comment."
     ),
     added            = "2025-12-23",
-    source           = "/Volumes/qhsstudies/general/uslife/table2023/estimates",
     usable           = TRUE
   )
 )
@@ -582,8 +579,11 @@ hzl_nonwhite_code <- function(vintage) {
 #'   `nonwhite_code` (character, the stratum code this vintage uses for its
 #'   non-white category), `nonwhite_meaning` (character, what that category
 #'   actually contains), `added` (character date the fits were added, where
-#'   known, otherwise `NA`), and `source` (character path the fits were read
-#'   from).
+#'   known, otherwise `NA`).
+#'
+#'   There is deliberately no `source` column: `R/` carries no literal share
+#'   path. `data-raw/build-models.R` names the location the fits are restored
+#'   from.
 #'
 #' @section Read `nonwhite_meaning` before citing a stratum:
 #' The `table2023` non-white category is stored under code `b` but is a
@@ -607,8 +607,6 @@ us_lifetable_vintages <- function() {
                          VINTAGE_META[[x]]$nonwhite_meaning, character(1)),
     added            = vapply(v, function(x)
                          VINTAGE_META[[x]]$added, character(1)),
-    source           = vapply(v, function(x)
-                         VINTAGE_META[[x]]$source, character(1)),
     row.names        = NULL,
     stringsAsFactors = FALSE
   )
