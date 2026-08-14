@@ -2,4 +2,5 @@
 
 export(us_lifetable_model)
 export(us_lifetable_vintages)
+export(us_matched)
 importFrom(utils,globalVariables)
