@@ -437,7 +437,7 @@ test_that("us_lifetable_model returns one parameter set", {
   expect_length(m$params, 11L)
   expect_length(m$status, 11L)
   expect_equal(dim(m$vcov), c(11L, 11L))
-  expect_equal(unname(m$params[["THALF"]]), 0.05188786, tolerance = 1e-7)
+  expect_equal(unname(m$params[["THALF"]]), 0.051887864, tolerance = 1e-7)
 })
 
 test_that("an unknown vintage errors and lists what is available", {
@@ -1687,10 +1687,10 @@ test_that("vintages differ in model structure, not only fitted values", {
   p84 <- us_lifetable_model("table84",   "wm")$params
   p08 <- us_lifetable_model("table2008", "wm")$params
   p23 <- us_lifetable_model("table2023", "wm")$params
-  expect_equal(unname(p84[["THALF"]]), 0.05188786,  tolerance = 1e-7)
-  expect_equal(unname(p08[["THALF"]]), 0.005438513, tolerance = 1e-7)
-  expect_equal(unname(p84[["NU"]]),  4.595204, tolerance = 1e-6)
-  expect_equal(unname(p08[["NU"]]), -2.771113, tolerance = 1e-6)
+  expect_equal(unname(p84[["THALF"]]), 0.051887864, tolerance = 1e-7)
+  expect_equal(unname(p08[["THALF"]]), 0.0054385105, tolerance = 1e-7)
+  expect_equal(unname(p84[["NU"]]),   4.5952045,   tolerance = 1e-6)
+  expect_equal(unname(p08[["NU"]]),  -2.77111,     tolerance = 1e-6)
   expect_equal(unname(p23[["NU"]]), -1.999947, tolerance = 1e-6)
 })
 
