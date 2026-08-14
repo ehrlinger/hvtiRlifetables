@@ -30,9 +30,10 @@ A data frame with 27 rows and 6 columns:
 }
 }
 \source{
-Fitted by The Cleveland Clinic Foundation and read from
-  `/Volumes/qhsstudies/general/uslife/<vintage>/estimates/`. Built by
-  `data-raw/build-models.R`, which is not run at install time.
+Fitted by The Cleveland Clinic Foundation. Built into this package
+  by `data-raw/build-models.R`, which is not run at install time. That
+  script's header names the share location to restore the inputs from —
+  deliberately kept out of `R/`, which must carry no literal share path.
 }
 \usage{
 us_lifetable_models

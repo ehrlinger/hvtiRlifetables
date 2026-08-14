@@ -26,7 +26,10 @@ test_that("each record carries 11 parameters, 11 statuses, 6 flags, an 11x11 vco
   for (i in seq_len(nrow(us_lifetable_models))) {
     expect_equal(names(us_lifetable_models$params[[i]]), nm)
     expect_equal(names(us_lifetable_models$status[[i]]), nm)
-    expect_length(us_lifetable_models$flags[[i]], 6L)
+    expect_equal(
+      names(us_lifetable_models$flags[[i]]),
+      c("G1FLAG", "FIXDEL0", "FIXMNU1", "G3FLAG", "FIXGE2", "FIXGAE2")
+    )
     expect_equal(dim(us_lifetable_models$vcov[[i]]), c(11L, 11L))
     expect_equal(dimnames(us_lifetable_models$vcov[[i]]), list(nm, nm))
   }

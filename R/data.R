@@ -38,7 +38,8 @@
 #' stored under `B` only to keep the macro's naming consistent. See
 #' [us_lifetable_vintages()], which reports this per vintage.
 #'
-#' @source Fitted by The Cleveland Clinic Foundation and read from
-#'   `/Volumes/qhsstudies/general/uslife/<vintage>/estimates/`. Built by
-#'   `data-raw/build-models.R`, which is not run at install time.
+#' @source Fitted by The Cleveland Clinic Foundation. Built into this package
+#'   by `data-raw/build-models.R`, which is not run at install time. That
+#'   script's header names the share location to restore the inputs from —
+#'   deliberately kept out of `R/`, which must carry no literal share path.
 "us_lifetable_models"
