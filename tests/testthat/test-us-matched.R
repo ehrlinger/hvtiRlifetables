@@ -118,9 +118,44 @@ test_that("non-binary male or other errors", {
   expect_error(us_matched(70, 1, 0.5, times = 5, vintage = "table84"), "other")
 })
 
-test_that("negative or unsorted times error", {
+test_that("negative times error", {
   expect_error(us_matched(70, 1, 0, times = c(-1, 5), vintage = "table84"),
                "negative")
+})
+
+test_that("unsorted times are rejected rather than silently returned", {
+  # Out-of-order input previously returned smatched = c(0.549, 1.000, 0.791):
+  # a survival curve that zigzags, breaking the package's own monotonicity
+  # invariant without any signal.
+  expect_error(us_matched(70, 1, 0, times = c(10, 0, 5), vintage = "table84"),
+               "non-decreasing")
+  # Ties are non-decreasing and stay legal.
+  expect_no_error(us_matched(70, 1, 0, times = c(0, 5, 5, 10),
+                             vintage = "table84"))
+})
+
+test_that("empty times error in the package's own words", {
+  # Previously leaked data.frame()'s internals:
+  # "arguments imply differing number of rows: 0, 1".
+  expect_error(us_matched(70, 1, 0, times = numeric(0), vintage = "table84"),
+               "must not be empty")
+})
+
+test_that("an empty cohort returns a zero-row data frame, not NULL", {
+  # A cohort filtered to nothing is legitimate input. Returning NULL would
+  # break nrow(), $ and rbind() downstream with no error at the call site.
+  r <- us_matched(numeric(0), numeric(0), numeric(0), times = c(0, 5),
+                  vintage = "table84")
+  expect_s3_class(r, "data.frame")
+  expect_equal(nrow(r), 0L)
+  expect_equal(names(r), c("id", "time", "agesurv", "smatched", "hmatched"))
+})
+
+test_that("an empty cohort emits no warning", {
+  # max(numeric(0)) warns and returns -Inf, which also silently defeated the
+  # 110-year support check.
+  expect_silent(us_matched(numeric(0), numeric(0), numeric(0),
+                           times = c(0, 5), vintage = "table84"))
 })
 
 test_that("ids are carried through", {

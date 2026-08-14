@@ -24,6 +24,22 @@ hzl_assign_stratum <- function(male, other, table, vintage) {
   )
 }
 
+## A cohort filtered to nothing is a legitimate input, not an error. Return
+## the documented columns with zero rows so `nrow()`, `$` and `rbind()` all
+## behave -- returning NULL instead would be a wrong-typed value that only
+## fails downstream, which is exactly the silent-failure shape this package
+## exists to avoid. `id[0]` preserves the caller's id type.
+hzl_empty_result <- function(id, individual) {
+  if (isTRUE(individual)) {
+    data.frame(id = id[0], time = numeric(0), agesurv = numeric(0),
+               smatched = numeric(0), hmatched = numeric(0),
+               stringsAsFactors = FALSE)
+  } else {
+    data.frame(time = numeric(0), smatched = numeric(0),
+               hmatched = numeric(0), stringsAsFactors = FALSE)
+  }
+}
+
 ## The failure shape this study has now hit five times: a reference curve
 ## that does not move. Catch it here rather than in a figure.
 hzl_assert_varies <- function(smatched, times) {
@@ -141,9 +157,33 @@ us_matched <- function(age, male, other, times,
   if (any(times < 0)) {
     stop("`times` must not be negative.", call. = FALSE)
   }
+  if (length(times) == 0L) {
+    stop("`times` must not be empty.", call. = FALSE)
+  }
+  if (is.unsorted(times)) {
+    ## Rows follow `times` in the order given, so out-of-order input returns a
+    ## `smatched` column that is not monotone -- a survival curve that
+    ## zigzags. Reject rather than silently sorting: the caller's row order
+    ## may be meaningful to them, and quietly reordering it is its own bug.
+    ## Ties are fine; is.unsorted() tests non-decreasing.
+    stop("`times` must be in non-decreasing order; got ",
+         paste(utils::head(times, 5), collapse = ", "),
+         if (length(times) > 5) ", ..." else "",
+         ".\nSort `times` before calling.", call. = FALSE)
+  }
   if (any(age < 0)) {
     stop("`age` must not be negative; got a minimum of ", min(age), ".",
          call. = FALSE)
+  }
+
+  if (!isTRUE(individual)) {
+    stop("`individual = FALSE` is not yet implemented.", call. = FALSE)
+  }
+
+  ## Before max(): max(numeric(0)) is -Inf and warns, which would both
+  ## pollute output and silently defeat the support check below.
+  if (n == 0L) {
+    return(hzl_empty_result(id, individual))
   }
 
   scalef <- hzl_scalef(scale)
@@ -153,10 +193,6 @@ us_matched <- function(age, male, other, times,
     stop("age + follow-up reaches ", round(max_age, 1),
          " years, beyond the fits' support of 110. These models are not ",
          "extrapolated past the life table's range.", call. = FALSE)
-  }
-
-  if (!isTRUE(individual)) {
-    stop("`individual = FALSE` is not yet implemented.", call. = FALSE)
   }
 
   strata <- hzl_assign_stratum(male, other, table, vintage)
