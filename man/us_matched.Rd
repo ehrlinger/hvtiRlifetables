@@ -71,6 +71,12 @@ would be flat.
 **`hmatched` is per year regardless of `scale`.** This matches the macro's
 source, which assigns `_HAZARD` without applying `SCALEF`, notwithstanding
 the macro's own header comment to the contrary.
+
+When `individual = FALSE`, the cohort mean follows the macro's arithmetic:
+the hazard is converted to a density (`hmatched * smatched`), the cohort
+means of survival and of the density are taken at each time, and the mean
+hazard is recovered by division. It is deliberately **not** the mean of
+the individual hazards.
 }
 \section{Why `vintage` has no default}{
 

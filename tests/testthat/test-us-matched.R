@@ -163,10 +163,3 @@ test_that("ids are carried through", {
                   times = c(0, 5), id = c("a", "b"), vintage = "table84")
   expect_equal(r$id, c("a", "a", "b", "b"))
 })
-
-test_that("individual = FALSE is not yet implemented and says so", {
-  expect_error(
-    us_matched(70, 1, 0, times = 5, vintage = "table84", individual = FALSE),
-    "not yet implemented"
-  )
-})

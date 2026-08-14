@@ -105,6 +105,12 @@ hzl_assert_varies <- function(smatched, times) {
 #' source, which assigns `_HAZARD` without applying `SCALEF`, notwithstanding
 #' the macro's own header comment to the contrary.
 #'
+#' When `individual = FALSE`, the cohort mean follows the macro's arithmetic:
+#' the hazard is converted to a density (`hmatched * smatched`), the cohort
+#' means of survival and of the density are taken at each time, and the mean
+#' hazard is recovered by division. It is deliberately **not** the mean of
+#' the individual hazards.
+#'
 #' @section Why `vintage` has no default:
 #' The macro's default silently moved from `table84` to `table2023`, and every
 #' job re-run across that change got different numbers with no signal. An
@@ -176,10 +182,6 @@ us_matched <- function(age, male, other, times,
          call. = FALSE)
   }
 
-  if (!isTRUE(individual)) {
-    stop("`individual = FALSE` is not yet implemented.", call. = FALSE)
-  }
-
   ## Before max(): max(numeric(0)) is -Inf and warns, which would both
   ## pollute output and silently defeat the support check below.
   if (n == 0L) {
@@ -221,5 +223,31 @@ us_matched <- function(age, male, other, times,
 
   out <- do.call(rbind, parts)
   rownames(out) <- NULL
-  out
+
+  if (isTRUE(individual)) {
+    return(out)
+  }
+
+  hzl_mean_curve(out)
+}
+
+## The macro's mean-curve reduction, from usmatchd.sas:338-350.
+##
+## Convert hazard to a density, take the cohort mean of survival and of the
+## density at each time, then divide to recover a mean hazard. This is NOT
+## the mean of the hazards, and the difference is not cosmetic in a
+## heterogeneous cohort.
+hzl_mean_curve <- function(out) {
+  density  <- out$hmatched * out$smatched
+  by_time  <- factor(out$time, levels = unique(out$time))
+
+  mean_s <- tapply(out$smatched, by_time, mean)
+  mean_d <- tapply(density,      by_time, mean)
+
+  data.frame(
+    time     = as.numeric(levels(by_time)),
+    smatched = as.numeric(mean_s),
+    hmatched = as.numeric(mean_d / mean_s),
+    stringsAsFactors = FALSE
+  )
 }
