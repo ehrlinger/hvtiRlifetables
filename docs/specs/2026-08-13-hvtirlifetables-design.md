@@ -20,7 +20,9 @@
 - **No PHI** in the package, its tests, or its fixtures. The parameter blocks are population life-table fits and contain none; the acceptance fixture does (see [Testing](#testing)).
 - **No literal study path in package code.** Vintage data is shipped *inside* the package, not read from `/studies` at runtime. `data-raw/` may reference the share; `R/` may not.
 - **Versioning:** initial version is **`0.1.0`** (decided 2026-08-13). Straight three digits, no `.9000`. Minor and major digits do not move without John; adding a vintage bumps the patch digit.
-- **Visibility: internal only** (decided 2026-08-13). The repo carries CCF-fitted parameter blocks. No public remote, no CRAN, no pkgdown published outside CCF. Anything that would push these artefacts outward is out of scope until that decision is revisited.
+- **Visibility: public repo, fits untracked** (decided 2026-08-14, superseding the 2026-08-13 "internal only" decision). `github.com/ehrlinger/hvtiRlifetables` is public. The source `.sas7bdat` parameter blocks under `data-raw/uslife/` are **not tracked** — they were removed from git history on 2026-08-14 and are `.gitignore`d, while remaining on disk because the share is unreliable and they exist nowhere else off it. What ships publicly is the derived `data/us_lifetable_models.rda`.
+
+  **Note the limit of this.** The `.rda` carries the same fitted numbers in a different container. Stripping the `.sas7bdat` files changes the format and the provenance trail, not the confidentiality of the values. If the fitted parameters themselves must not be public, the `.rda` cannot ship either and the package needs a different data-distribution design. That question is not settled by this decision.
 
 ---
 
@@ -265,7 +267,7 @@ at all are undecided. This is a direction, not a plan.
 ## Open questions
 
 1. ~~Initial version.~~ **Resolved 2026-08-13: `0.1.0`.**
-2. ~~Repo location and visibility.~~ **Resolved 2026-08-13: internal only, for now.** See Global constraints.
+2. ~~Repo location and visibility.~~ **Resolved 2026-08-14: public at `github.com/ehrlinger/hvtiRlifetables`, source `.sas7bdat` fits untracked.** Supersedes the 2026-08-13 "internal only" resolution. See Global constraints, including the caveat that this does not by itself make the fitted *values* publishable.
 3. **`table2009`.** Empty on disk. Whether a copy exists elsewhere, or the directory was never populated, is unresolved — worth one question to Andrew Toth before the package documents it as unavailable.
 4. **Provenance of each vintage's underlying NCHS release.** The fits are dated by directory name (`table84`, `table2008`, `table2023`) and the 2023 fit has a documented author and date. The 1984 fit's source and author are not recorded anywhere found. Citable provenance would be worth having before anyone publishes a figure that leans on it.
 
