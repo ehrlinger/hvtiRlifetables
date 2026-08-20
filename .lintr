@@ -1,0 +1,35 @@
+# House lint configuration.
+#
+# line_length 100 rather than lintr's 80. The longest line in R/ is 90, and the
+# vintage table in us_lifetable_vintages() is column-aligned so the four
+# vapply() calls read down the page; 100 clears them without inviting drift.
+#
+# object_name_linter -- OFF. muE, muC and muL are the phase amplitudes of the
+# Blackstone multiphase hazard this package evaluates (E0, C0, L0 in the SAS
+# parameter table). Renaming them to mu_e would sever the correspondence with
+# the source notation and with TemporalHazard, which is the whole point of the
+# names.
+#
+# commented_code_linter -- OFF. What it flags in R/evaluate.R is mathematical
+# notation, not code:
+#     H(a) = muE * G(a) + muC * a + muL * G3(a)
+# That belongs beside the implementation and is not a commented-out statement.
+#
+# indentation_linter -- OFF. It fires on the aligned-argument style used in the
+# vintage table, matching hvtiPlotR and hvtiRpropensity, which disable it for
+# the same reason.
+#
+# Everything else is lintr's default and IS enforced -- braces, semicolons,
+# infix spaces, object usage. R/ and tests/ are at zero lints; keep them there.
+#
+# data-raw/ is excluded: it holds developer build scripts and the original SAS
+# sources, is .Rbuildignore'd, and is not package code. LINTR_ERROR_ON_LINT is
+# true in CI, so an unexcluded lint there would fail the build for a file that
+# never ships.
+linters: linters_with_defaults(
+    line_length_linter = line_length_linter(100L),
+    object_name_linter = NULL,
+    commented_code_linter = NULL,
+    indentation_linter = NULL
+  )
+exclusions: list("data-raw")

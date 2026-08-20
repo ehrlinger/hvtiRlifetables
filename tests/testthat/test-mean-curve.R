@@ -8,7 +8,9 @@ test_that("individual = FALSE returns one row per time", {
 })
 
 test_that("the mean curve reproduces the macro's density arithmetic exactly", {
-  age <- c(60, 70, 80); male <- c(1, 0, 1); other <- c(0, 0, 1)
+  age <- c(60, 70, 80)
+  male <- c(1, 0, 1)
+  other <- c(0, 0, 1)
   times <- c(0, 5, 10)
 
   ind <- us_matched(age, male, other, times, vintage = "table84")
@@ -27,7 +29,9 @@ test_that("the mean curve reproduces the macro's density arithmetic exactly", {
 test_that("the mean hazard is NOT the mean of the hazards", {
   # The distinction the macro is careful about. With a heterogeneous cohort
   # these differ; if they ever agree exactly, the reduction is wrong.
-  age <- c(50, 90); male <- c(1, 1); other <- c(0, 0)
+  age <- c(50, 90)
+  male <- c(1, 1)
+  other <- c(0, 0)
   times <- c(0, 10)
 
   agg <- us_matched(age, male, other, times, vintage = "table84",

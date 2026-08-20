@@ -17,3 +17,9 @@
 ^renv$
 ^renv\.lock$
 ^\.superpowers$
+^\.lintr$
+^\.remember$
+^\.github$
+^AGENTS\.md$
+^CLAUDE\.md$
+^docs$

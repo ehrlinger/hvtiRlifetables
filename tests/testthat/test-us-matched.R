@@ -26,7 +26,9 @@ test_that("hmatched is positive and agesurv is constant within a patient", {
 
 test_that("the conditioning identity holds", {
   # S(t1 + t2 | age) == S(t1 | age) * S(t2 | age + t1)
-  a <- 65; t1 <- 3; t2 <- 4
+  a <- 65
+  t1 <- 3
+  t2 <- 4
   s_both <- us_matched(a, 1, 0, t1 + t2, vintage = "table84")$smatched
   s_1    <- us_matched(a, 1, 0, t1, vintage = "table84")$smatched
   s_2    <- us_matched(a + t1, 1, 0, t2, vintage = "table84")$smatched
