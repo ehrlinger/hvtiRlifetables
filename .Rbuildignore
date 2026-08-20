@@ -17,3 +17,6 @@
 ^renv$
 ^renv\.lock$
 ^\.superpowers$
+^\.lintr$
+^\.remember$
+^AGENTS\.md$

@@ -97,14 +97,10 @@ us_lifetable_vintages <- function() {
   v <- usable_vintages()
   data.frame(
     vintage          = v,
-    n_strata         = vapply(v, function(x)
-                         sum(us_lifetable_models$vintage == x), integer(1)),
-    nonwhite_code    = vapply(v, function(x)
-                         VINTAGE_META[[x]]$nonwhite_code, character(1)),
-    nonwhite_meaning = vapply(v, function(x)
-                         VINTAGE_META[[x]]$nonwhite_meaning, character(1)),
-    added            = vapply(v, function(x)
-                         VINTAGE_META[[x]]$added, character(1)),
+    n_strata         = vapply(v, function(x) sum(us_lifetable_models$vintage == x), integer(1)),
+    nonwhite_code    = vapply(v, function(x) VINTAGE_META[[x]]$nonwhite_code, character(1)),
+    nonwhite_meaning = vapply(v, function(x) VINTAGE_META[[x]]$nonwhite_meaning, character(1)),
+    added            = vapply(v, function(x) VINTAGE_META[[x]]$added, character(1)),
     row.names        = NULL,
     stringsAsFactors = FALSE
   )

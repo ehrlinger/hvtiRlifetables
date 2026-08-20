@@ -10,6 +10,14 @@ url: https://ehrlinger.github.io/hvtiRlifetables/
 template:
   bootstrap: 5
 
+# `docs/` in this repo is PROSE -- docs/specs/ and docs/plans/ are tracked
+# design documents, not a generated site. pkgdown refuses to clean a directory
+# it did not build ("'.../docs' is non-empty and not built by pkgdown"), so the
+# site is built into pkgdown-site/ instead.
+#
+# ⚠️ This key alone is NOT enough. pkgdown::build_site_github_pages() takes
+# dest_dir = "docs" as its default and OVERRIDES this setting, so the workflow
+# must pass dest_dir explicitly and its deploy step must name the same folder.
 destination: pkgdown-site
 
 reference:
