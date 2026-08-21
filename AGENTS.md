@@ -105,12 +105,31 @@ exactly like what everyone expects.
 - **Never push to `main`.** Branch, then open a PR and let the maintainer merge.
 - **`main` is protected by a GitHub ruleset, and nothing in this repo records that.** A clone
   shows no trace of it, so it is stated here. The ruleset is named `protect main`, is
-  identical across all twelve repositories in the HVTI R package family, and enforces four
-  rules on the default branch: no deletion, no force-push, pull-request-only, and an
-  **automatic Copilot code review** on every PR. A rejected push comes from the server, not a
-  local hook.
-  ⚠️ It currently requires **zero approvals**. `require_code_owner_review` is set but inert
-  because no repository in the family has a `CODEOWNERS` file, so a PR can merge unreviewed.
+  identical across all twelve repositories in the HVTI R package family, and enforces **five**
+  rules on the default branch: no deletion, no force-push, pull-request-only, an **automatic
+  Copilot code review** on every PR, and **required review-thread resolution**. A rejected
+  push comes from the server, not a local hook.
+  ⚠️ It requires **zero approvals**, and `require_code_owner_review` is set but inert because
+  no repository in the family has a `CODEOWNERS` file — but that does **not** mean a PR can
+  merge unreviewed. `required_review_thread_resolution` is `true`, so **every review thread
+  must be resolved before the merge button unlocks**, Copilot's included.
+  🔴 **Replying to a thread does not resolve it, and neither does editing the line it points
+  at.** An addressed thread goes `isOutdated: true` and still blocks. Measured 2026-08-21 on
+  PR #6: nine green checks, `mergeable: MERGEABLE`, zero required approvals, and
+  `mergeStateStatus: BLOCKED` until two Copilot threads were explicitly resolved.
+  The state lives where neither `gh pr view` nor `gh pr checks` shows it by default:
+
+  ```
+  gh api graphql -f query='{repository(owner:"ehrlinger",name:"<repo>"){pullRequest(number:<n>){
+    reviewThreads(first:100){nodes{id isResolved isOutdated path}}}}}'
+  ```
+
+  `first:100` is the page maximum and is deliberate: a page size that silently truncates
+  would let this query report "all resolved" while an unresolved thread sat past the cut —
+  a false all-clear from the very diagnostic meant to prevent one.
+
+  Resolve with the `resolveReviewThread` mutation, passing the id as a typed variable
+  (`-F threadId=...`) — inlining a `PRRT_…` id in the query string fails to parse.
 - Versions are **straight three digits** (`0.1.0`). Never a `.9000` suffix or a fourth digit.
 - **Patch-digit bumps only**, as fixes land. Minor and major are the maintainer's decision.
 - Bump `DESCRIPTION`, refresh its `Date`, and add the matching `NEWS.md` entry in the same
