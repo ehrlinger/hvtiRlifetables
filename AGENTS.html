@@ -102,14 +102,17 @@
 </ul></div>
 <div class="section level2">
 <h2 id="git-and-versioning">Git and versioning<a class="anchor" aria-label="anchor" href="#git-and-versioning"></a></h2>
-<ul><li>
-<strong>Never push to <code>main</code>.</strong> Branch, then open a PR and let the maintainer merge.</li>
+<ul><li><p><strong>Never push to <code>main</code>.</strong> Branch, then open a PR and let the maintainer merge.</p></li>
 <li>
-<strong><code>main</code> is protected by a GitHub ruleset, and nothing in this repo records that.</strong> A clone shows no trace of it, so it is stated here. The ruleset is named <code>protect main</code>, is identical across all twelve repositories in the HVTI R package family, and enforces four rules on the default branch: no deletion, no force-push, pull-request-only, and an <strong>automatic Copilot code review</strong> on every PR. A rejected push comes from the server, not a local hook. ⚠️ It currently requires <strong>zero approvals</strong>. <code>require_code_owner_review</code> is set but inert because no repository in the family has a <code>CODEOWNERS</code> file, so a PR can merge unreviewed.</li>
-<li>Versions are <strong>straight three digits</strong> (<code>0.1.0</code>). Never a <code>.9000</code> suffix or a fourth digit.</li>
-<li>
-<strong>Patch-digit bumps only</strong>, as fixes land. Minor and major are the maintainer’s decision.</li>
-<li>Bump <code>DESCRIPTION</code>, refresh its <code>Date</code>, and add the matching <code>NEWS.md</code> entry in the same commit.</li>
+<p><strong><code>main</code> is protected by a GitHub ruleset, and nothing in this repo records that.</strong> A clone shows no trace of it, so it is stated here. The ruleset is named <code>protect main</code>, is identical across all twelve repositories in the HVTI R package family, and enforces <strong>five</strong> rules on the default branch: no deletion, no force-push, pull-request-only, an <strong>automatic Copilot code review</strong> on every PR, and <strong>required review-thread resolution</strong>. A rejected push comes from the server, not a local hook. ⚠️ It requires <strong>zero approvals</strong>, and <code>require_code_owner_review</code> is set but inert because no repository in the family has a <code>CODEOWNERS</code> file — but that does <strong>not</strong> mean a PR can merge unreviewed. <code>required_review_thread_resolution</code> is <code>true</code>, so <strong>every review thread must be resolved before the merge button unlocks</strong>, Copilot’s included. 🔴 <strong>Replying to a thread does not resolve it, and neither does editing the line it points at.</strong> An addressed thread goes <code>isOutdated: true</code> and still blocks. Measured 2026-08-21 on PR #6: nine green checks, <code>mergeable: MERGEABLE</code>, zero required approvals, and <code>mergeStateStatus: BLOCKED</code> until two Copilot threads were explicitly resolved. The state lives where neither <code>gh pr view</code> nor <code>gh pr checks</code> shows it by default:</p>
+<pre><code>gh api graphql -f query='{repository(owner:"ehrlinger",name:"&lt;repo&gt;"){pullRequest(number:&lt;n&gt;){
+  reviewThreads(first:100){nodes{id isResolved isOutdated path}}}}}'</code></pre>
+<p><code>first:100</code> is the page maximum and is deliberate: a page size that silently truncates would let this query report “all resolved” while an unresolved thread sat past the cut — a false all-clear from the very diagnostic meant to prevent one.</p>
+<p>Resolve with the <code>resolveReviewThread</code> mutation, passing the id as a typed variable (<code>-F threadId=...</code>) — inlining a <code>PRRT_…</code> id in the query string fails to parse.</p>
+</li>
+<li><p>Versions are <strong>straight three digits</strong> (<code>0.1.0</code>). Never a <code>.9000</code> suffix or a fourth digit.</p></li>
+<li><p><strong>Patch-digit bumps only</strong>, as fixes land. Minor and major are the maintainer’s decision.</p></li>
+<li><p>Bump <code>DESCRIPTION</code>, refresh its <code>Date</code>, and add the matching <code>NEWS.md</code> entry in the same commit.</p></li>
 </ul></div>
 <div class="section level2">
 <h2 id="change-discipline">Change discipline<a class="anchor" aria-label="anchor" href="#change-discipline"></a></h2>
