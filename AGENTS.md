@@ -121,8 +121,12 @@ exactly like what everyone expects.
 
   ```
   gh api graphql -f query='{repository(owner:"ehrlinger",name:"<repo>"){pullRequest(number:<n>){
-    reviewThreads(first:20){nodes{id isResolved isOutdated path}}}}}'
+    reviewThreads(first:100){nodes{id isResolved isOutdated path}}}}}'
   ```
+
+  `first:100` is the page maximum and is deliberate: a page size that silently truncates
+  would let this query report "all resolved" while an unresolved thread sat past the cut —
+  a false all-clear from the very diagnostic meant to prevent one.
 
   Resolve with the `resolveReviewThread` mutation, passing the id as a typed variable
   (`-F threadId=...`) — inlining a `PRRT_…` id in the query string fails to parse.
