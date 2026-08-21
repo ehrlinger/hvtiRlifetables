@@ -132,12 +132,13 @@ everyone expects.
 - **`main` is protected by a GitHub ruleset, and nothing in this repo
   records that.** A clone shows no trace of it, so it is stated here.
   The ruleset is named `protect main`, is identical across all twelve
-  hvtiverse repositories, and enforces four rules on the default branch:
-  no deletion, no force-push, pull-request-only, and an **automatic
-  Copilot code review** on every PR. A rejected push comes from the
-  server, not a local hook. ⚠️ It currently requires **zero approvals**.
-  `require_code_owner_review` is set but inert because no repository in
-  the family has a `CODEOWNERS` file, so a PR can merge unreviewed.
+  repositories in the HVTI R package family, and enforces four rules on
+  the default branch: no deletion, no force-push, pull-request-only, and
+  an **automatic Copilot code review** on every PR. A rejected push
+  comes from the server, not a local hook. ⚠️ It currently requires
+  **zero approvals**. `require_code_owner_review` is set but inert
+  because no repository in the family has a `CODEOWNERS` file, so a PR
+  can merge unreviewed.
 - Versions are **straight three digits** (`0.1.0`). Never a `.9000`
   suffix or a fourth digit.
 - **Patch-digit bumps only**, as fixes land. Minor and major are the
