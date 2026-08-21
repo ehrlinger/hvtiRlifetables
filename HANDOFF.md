@@ -1,15 +1,23 @@
 # hvtiRlifetables — session handoff
 
 **Created:** 2026-08-13, from the AVR/LV-function survival study session.
-**State:** implemented. `us_matched()`, `us_lifetable_vintages()` and
-`us_lifetable_model()` are complete, with Tier 1, 2 and 4 tests passing and
-`R CMD check --as-cran` at 0 errors, 0 warnings, and only the unavoidable
-`New submission` note, with the manual. Tier 3 SAS acceptance still needs
-writing, in the **study's** `R_parity` project, not here.
+**State:** implemented and, as of 2026-08-21, **verified against production SAS
+output**. `us_matched()`, `us_lifetable_vintages()` and `us_lifetable_model()` are
+complete, with Tier 1, 2 and 4 tests passing and `R CMD check --as-cran` at 0 errors,
+0 warnings, and only the unavoidable `New submission` note, with the manual.
+
+Tier 3's *criterion* is met: `us_matched()` reproduces **all 32 stored `%usmatchd`
+answers** across two production studies to **7.9e-15 worst case**, per stratum — 128
+cells, every one under the 1e-12 bar on `SMATCHED`, `HMATCHED` and `AGESURV`, zero
+gate failures. ⚠️ **That is evidence, not a test.** It ran once from a throwaway
+script; nothing re-runs it. Writing it as a repeatable test in the **study's**
+`R_parity` project, not here, is still open — see Task outline.
 
 **Version `0.1.0`** (decided 2026-08-13). **Public repo** at `github.com/ehrlinger/hvtiRlifetables` (decided 2026-08-14, superseding "internal only"). The source `.sas7bdat` fits under `data-raw/uslife/` were removed from git history and are `.gitignore`d — they remain on disk, because the share is unreliable and they exist nowhere else off it. The release gate applies in full: CRAN Cookbook audit and `R CMD check --as-cran` **with** the manual.
 
-**Known blocker:** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)`, but CRAN is still at `1.1.0`. No clean machine can install this package, and CI cannot go green, until `TemporalHazard 1.2.0` reaches CRAN. Do not "fix" this by relaxing the bound — the evaluator needs the 1.2.0 API.
+**Resolved blocker (2026-08-19):** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)` and CRAN carried `1.1.0`, which once meant no clean machine could install this package and CI could not go green. That is **no longer true**: `Remotes: TemporalHazard=ehrlinger/temporal_hazard` (PR #3) resolves the dependency from GitHub, `r-lib/actions` honours it, and CI landed 2026-08-20. Do not cite CRAN's `1.1.0` as a blocker for anything.
+
+⚠️ **Do not "fix" the bound by relaxing it** — that part still stands. The evaluator calls `hzr_decompos_g3()`, which does not exist in `1.1.0`. The fix was to change *where* the dependency resolves from, never *what* it requires.
 
 **Start here:** this is finished work, not a task queue. Read `docs/specs/2026-08-13-hvtirlifetables-design.md` for background on what the package is and why it exists, then `docs/plans/2026-08-14-hvtirlifetables-implementation.md` (written 2026-08-14) for what was built and why. See "Task outline" below for what actually remains.
 
@@ -34,6 +42,35 @@ The one-sentence surprise, established 2026-08-13: **`%usmatchd` is not a life-t
 
 `data-raw/uslife/` carries three files the package does not need — `table2008/hzicall_jr`, `hzicall_l`, and `table84` extras are absent by design (`hzall`, `hzcicall` were not copied). Only the nine `hzic{all,f,m,w,o|b,wf,wm,of|bf,om|bm}` per vintage are in scope. The manifest in `data-raw/build-models.R` names them explicitly rather than globbing, because `table2008` also carries `hzicall_jr` and `hzicall_l`, which no `%usmatchd` variant references.
 
+## The parity fixtures (2026-08-21)
+
+⚠️ **Paths are deliberately not written here — this repo is public.** The inventory,
+with full locations, is in the vault note `Projects/hvtiRlifetables.md` under "Parity
+fixtures". What follows is only what a reader needs to know exists.
+
+Two of the three production studies carry stored `%usmatchd` answers; the third
+(`resilia`) carries none at all — no fits, no `hs.*` job, no R parity tree — so do not
+go looking there again. **None of the three contains any R lifetables code.** What they
+hold is stored SAS output, which is the half you cannot write yourself.
+
+- The AVR/LV-function study holds **31** stored answers from 9 jobs run 2006 → 2010,
+  all `table84`.
+- The aortic-dissection root study holds **1**, from a job run in 2024 — and it is
+  **`table2008`**. It is the only second-vintage evidence in existence.
+
+**Every one of those jobs calls the macro with no vintage argument**, so each inherited
+the default of its day. The default moved `table84` → `table2008` between 2010 and
+2024, then `table2008` → `table2023` on 2025-12-23. Two moves, no signal at either. That is the
+measurement behind the "`vintage` has no default" decision below, and it is no longer
+an argument — it is 32 files.
+
+**To settle a vintage question:** recompute at all three and compare. The right one
+lands at ~1e-15, the wrong ones at 0.015–0.23. There is no ambiguous middle, because
+the vintages are structurally different fits, not perturbations of each other.
+⚠️ But note the **0.015**: the near vintages are the dangerous ones. Numerically that
+is still 13 orders above the match; clinically it is 1.5 percentage points of survival,
+which is exactly the size of error that survives review.
+
 ## The three things that will bite
 
 1. **`_STATUS_` gates each phase.** `mu = exp(E0|C0|L0)` **only** when that row's `_STATUS_ == 1`. `_STATUS_ == 0` means the phase is absent, not `log mu = 0`. `table84`'s `hzicom`/`hzicof` have `C0 = 0, _STATUS_ = 0`; reading that as `mu = 1` gives a 1/yr hazard and zeroes those patients' survival. Cost me a full debug cycle, and its cohort-level signature reads as "wrong vintage" rather than "one stratum is broken".
@@ -45,12 +82,23 @@ The one-sentence surprise, established 2026-08-13: **`%usmatchd` is not a life-t
 Steps 1-6 and 8 are **done** — see
 `docs/plans/2026-08-14-hvtirlifetables-implementation.md`. Remaining:
 
-1. **Tier 3 SAS acceptance**, in the study's `R_parity`: `us_matched()`
-   against `estimates/uslife.sas7bdat` to 1e-12 on both `SMATCHED` and
-   `HMATCHED`, reported **per stratum**, skipping when the share is absent.
-   A cohort-wide maximum hid the `_STATUS_` bug behind a plausible
-   near-miss; do not report one.
-2. **CI**, once `TemporalHazard 1.2.0` reaches CRAN. Blocked until then.
+1. ~~**Tier 3 SAS acceptance**~~ — **installed 2026-08-21** in the
+   aortic-dissection root study, as a parity document beside that study's
+   existing ones. It gates the cohort against the `.lst`'s own printed counts,
+   recovers the vintage by evaluating all three, asserts 1e-12 on `SMATCHED`,
+   `HMATCHED` and `AGESURV` **per stratum**, and skips — loudly, as a skip and
+   not a pass — when the share is absent. A cohort-wide maximum hid the
+   `_STATUS_` bug behind a plausible near-miss; it does not report one.
+   ⚠️ That study has **no `R_parity` directory** — its parity work lives under
+   `R_hazard/parity/`, so the document follows the study's own layout rather
+   than the AVR/LV-function convention named elsewhere in this file.
+   Still open: the AVR/LV-function study's **31** `table84` answers have no
+   installed test. They are that study's to add.
+2. ~~**CI**, once `TemporalHazard 1.2.0` reaches CRAN. Blocked until then.~~
+   **Done 2026-08-20** — five workflows, see `AGENTS.md`. The CRAN bound was never
+   the real blocker: `Remotes: TemporalHazard=ehrlinger/temporal_hazard` (PR #3,
+   2026-08-19) resolves the dependency from GitHub. Do not cite CRAN's 1.1.0 as a
+   reason for anything.
 3. **The `hs.*` job template** that consumes `us_matched()`. Belongs in
    `hvtiRtemplates` / `~/Documents/template/`, not here.
 
@@ -72,7 +120,7 @@ maintainer shouldn't have to rediscover them.
 ## Decisions already made — do not relitigate
 
 - Separate package, not a `hvtiRutilities` function. It versions on the life tables' cadence: a CCF refit changes data without touching code, and reproducing a 2008 paper means pinning that paper's vintage.
-- `vintage` has **no default**. `%usmatchd`'s default silently moved `table84` -> `table2023`; jobs re-run across that change got different numbers with no signal. The package refuses to guess.
+- `vintage` has **no default**. `%usmatchd`'s default silently moved in **two** hops — `table84` -> `table2008` (between 2010 and 2024), then `table2008` -> `table2023` (2025-12-23) — not the single `table84` -> `table2023` jump this bullet used to describe. Jobs re-run across either move got different numbers with no signal, and a job re-run across *both* has two candidate provenances rather than one. The package refuses to guess.
 - This study (AVR/LV-function) is `table84`, confirmed to 6.2e-15. `table2008` and `table2023` are excluded by two orders of magnitude.
 - Covariance blocks ship in v1 but nothing reads them. Deliberate mild YAGNI violation — they are the only route to a confidence band later, and they cost bytes.
 
