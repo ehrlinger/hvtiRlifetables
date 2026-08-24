@@ -1,10 +1,12 @@
-# The site is not published yet, and there is no CI to publish it (see the
-# TemporalHazard 1.2.0 blocker in README). Until it is live this url must NOT
-# also be added to DESCRIPTION: R CMD check --as-cran fetches every
-# DESCRIPTION URL and would report a 404, which is the check that actually
-# gates a release. pkgdown::check_pkgdown() will abort with "URL is missing
-# package url" until then -- accepted deliberately, developer-facing only.
-# When the site goes live, add this URL to DESCRIPTION in the same commit.
+# This URL is also in DESCRIPTION, and the two must stay in sync. It was
+# deliberately held out of DESCRIPTION until the site actually served: R CMD
+# check --as-cran fetches every DESCRIPTION URL, so listing an unpublished
+# site reports a 404 in the check that gates a release. GitHub Pages was
+# enabled on the gh-pages branch on 2026-08-24 -- the pkgdown workflow had
+# been deploying successfully since 2026-08-20, but nothing was serving what
+# it pushed, so the site 404'd while every run stayed green. If the site ever
+# stops answering, remove the URL from DESCRIPTION before the next release
+# rather than letting --as-cran find it.
 url: https://ehrlinger.github.io/hvtiRlifetables/
 
 template:

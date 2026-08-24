@@ -1,3 +1,14 @@
+# hvtiRlifetables 0.1.1
+
+Documentation and metadata only. No change to `us_matched()`, the vintages, or
+the shipped fitted models — results are identical to 0.1.0.
+
+- The pkgdown site is live at <https://ehrlinger.github.io/hvtiRlifetables/> and
+  is now listed in `DESCRIPTION`. GitHub Pages had never been enabled on this
+  repository, so the site 404'd even though the `pkgdown` workflow had been
+  deploying to the `gh-pages` branch successfully since 2026-08-20. A green
+  deploy is not evidence that a site serves.
+
 # hvtiRlifetables 0.1.0
 
 First release. Reproduces the Cleveland Clinic SAS macro `%usmatchd` in R.

@@ -1,8 +1,8 @@
 Package: hvtiRlifetables
 Type: Package
 Title: Age, Sex and Race Matched US Reference Survival
-Version: 0.1.0
-Date: 2026-08-14
+Version: 0.1.1
+Date: 2026-08-24
 Authors@R: c(
     person(
       "John", "Ehrlinger",
@@ -20,7 +20,8 @@ Maintainer: John Ehrlinger <john.ehrlinger@gmail.com>
 License: GPL-3
 Encoding: UTF-8
 Language: en-US
-URL: https://github.com/ehrlinger/hvtiRlifetables
+URL: https://ehrlinger.github.io/hvtiRlifetables/,
+    https://github.com/ehrlinger/hvtiRlifetables
 BugReports: https://github.com/ehrlinger/hvtiRlifetables/issues
 Description: Age, sex and race matched United States reference survival, as
     consumed by clinical outcomes reports within The Heart and Vascular

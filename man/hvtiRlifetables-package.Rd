@@ -24,6 +24,7 @@ vintage per stratum, and evaluates them through \pkg{TemporalHazard}.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://ehrlinger.github.io/hvtiRlifetables/}
   \item \url{https://github.com/ehrlinger/hvtiRlifetables}
   \item Report bugs at \url{https://github.com/ehrlinger/hvtiRlifetables/issues}
 }
