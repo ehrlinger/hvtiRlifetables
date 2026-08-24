@@ -163,12 +163,15 @@ everyone expects.
   `hvtiRdatasets`, `hvtiBoostmtree` and `temporal_hazard` have
   `require_code_owner_review` `false` where the rest have `true` — inert
   either way. `ggRandomForests` alone adds a fifth rule type,
-  `required_status_checks`, gating on the three `R CMD check` platforms.
-  And **`bypass_actors` is not empty everywhere**: `temporal_hazard` and
-  `hvtiRtemplates` grant repository admins `bypass_mode: always`, so on
-  those two the maintainer *can* push straight to `main`. On this
-  repository `bypass_actors` is empty and `current_user_can_bypass` is
-  `never`.
+  `required_status_checks`, gating on the three `R CMD check` platforms
+  — kept deliberately, as that package’s CRAN merge gate.
+  **`bypass_actors` is now empty in all fourteen**,
+  `current_user_can_bypass` is `never`, and nobody can push through the
+  ruleset — maintainer included. That is a *change*, not a standing
+  fact: `temporal_hazard` and `hvtiRtemplates` granted repository admins
+  `bypass_mode: always` until 2026-08-24, when both were cleared to
+  match the other twelve. Restoring either means re-adding
+  `{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}`.
 
   If a review thread ever does need resolving — the setting can come
   back — the state lives where neither `gh pr view` nor `gh pr checks`
