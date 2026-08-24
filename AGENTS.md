@@ -136,23 +136,43 @@ everyone expects.
 
 - **`main` is protected by a GitHub ruleset, and nothing in this repo
   records that.** A clone shows no trace of it, so it is stated here.
-  The ruleset is named `protect main`, is identical across all twelve
-  repositories in the HVTI R package family, and enforces **five** rules
-  on the default branch: no deletion, no force-push, pull-request-only,
-  an **automatic Copilot code review** on every PR, and **required
-  review-thread resolution**. A rejected push comes from the server, not
-  a local hook. ⚠️ It requires **zero approvals**, and
+  The ruleset is named `protect main` and enforces **four** rules on the
+  default branch: no deletion, no force-push, pull-request-only, and an
+  **automatic Copilot code review** on every PR. A rejected push comes
+  from the server, not a local hook. It requires **zero approvals**, and
   `require_code_owner_review` is set but inert because no repository in
-  the family has a `CODEOWNERS` file — but that does **not** mean a PR
-  can merge unreviewed. `required_review_thread_resolution` is `true`,
-  so **every review thread must be resolved before the merge button
-  unlocks**, Copilot’s included. 🔴 **Replying to a thread does not
-  resolve it, and neither does editing the line it points at.** An
-  addressed thread goes `isOutdated: true` and still blocks. Measured
-  2026-08-21 on PR \#6: nine green checks, `mergeable: MERGEABLE`, zero
-  required approvals, and `mergeStateStatus: BLOCKED` until two Copilot
-  threads were explicitly resolved. The state lives where neither
-  `gh pr view` nor `gh pr checks` shows it by default:
+  the family has a `CODEOWNERS` file.
+  `require_extra_approval_for_unattributed_changes` is `true`; a
+  `Co-Authored-By:` trailer does not trip it (measured on PR \#9). ⚠️
+  **`required_review_thread_resolution` was `true` until 2026-08-21 and
+  is now `false`.** Do not reason from an older note that says otherwise
+  — including this file’s own earlier wording, and the “five rules”
+  phrasing that went with it. While it was on, a PR with nine green
+  checks, `mergeable: MERGEABLE` and zero required approvals still sat
+  at `mergeStateStatus: BLOCKED` until two Copilot threads were
+  explicitly resolved (measured on PR \#6), and replying to a thread did
+  not resolve it. That failure mode is currently switched off
+  family-wide. Re-read the live ruleset rather than trusting this
+  paragraph if a merge is blocked for no visible reason:
+
+      gh api repos/ehrlinger/<repo>/rulesets --jq '.[]|select(.name=="protect main")|.id'
+
+  🔴 **The family is not uniform, despite what this file used to
+  claim.** Measured 2026-08-24 across the **fourteen** repositories
+  carrying `protect main` (not twelve): `hvtiPlotR`, `hvtiRtables`,
+  `hvtiRdatasets`, `hvtiBoostmtree` and `temporal_hazard` have
+  `require_code_owner_review` `false` where the rest have `true` — inert
+  either way. `ggRandomForests` alone adds a fifth rule type,
+  `required_status_checks`, gating on the three `R CMD check` platforms.
+  And **`bypass_actors` is not empty everywhere**: `temporal_hazard` and
+  `hvtiRtemplates` grant repository admins `bypass_mode: always`, so on
+  those two the maintainer *can* push straight to `main`. On this
+  repository `bypass_actors` is empty and `current_user_can_bypass` is
+  `never`.
+
+  If a review thread ever does need resolving — the setting can come
+  back — the state lives where neither `gh pr view` nor `gh pr checks`
+  shows it by default:
 
       gh api graphql -f query='{repository(owner:"ehrlinger",name:"<repo>"){pullRequest(number:<n>){
         reviewThreads(first:100){nodes{id isResolved isOutdated path}}}}}'
