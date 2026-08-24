@@ -21,6 +21,8 @@ vintage per stratum, and evaluates them through TemporalHazard.
 
 Useful links:
 
+- <https://ehrlinger.github.io/hvtiRlifetables/>
+
 - <https://github.com/ehrlinger/hvtiRlifetables>
 
 - Report bugs at <https://github.com/ehrlinger/hvtiRlifetables/issues>

@@ -109,19 +109,23 @@ everyone expects.
 
 ## Gotchas
 
-- **The pkgdown URL is deliberately absent from `DESCRIPTION`.**
-  `_pkgdown.yml` explains why: `R CMD check --as-cran` fetches every
-  `DESCRIPTION` URL and would report a 404 while the site is
-  unpublished. 🔴 **CI to publish it now exists (2026-08-20).** Once the
-  first deploy lands and the site returns 200, add the URL to
-  `DESCRIPTION` — `_pkgdown.yml` says to do it in the same commit. Until
-  then
-  [`pkgdown::check_pkgdown()`](https://pkgdown.r-lib.org/reference/check_pkgdown.html)
-  aborts with “URL is missing package url”, which is accepted
-  deliberately.
+- **The pkgdown site is live and its URL is in `DESCRIPTION`**
+  (2026-08-24, 0.1.1). It was held out until then because
+  `R CMD check --as-cran` fetches every `DESCRIPTION` URL and would
+  report a 404 while the site was unpublished. `_pkgdown.yml` carries
+  the same URL and the two must stay in sync. ⚠️ **A green `pkgdown` run
+  is not evidence that the site serves.** The workflow deploys to the
+  `gh-pages` branch and succeeds whether or not GitHub Pages is
+  configured to serve it. Pages had never been enabled here, so every
+  run was green from 2026-08-20 while the site returned 404 for four
+  days. Check the site itself, not the workflow:
+
+      curl -s -o /dev/null -w '%{http_code}\n' https://ehrlinger.github.io/hvtiRlifetables/
+
 - **`object_usage_linter` over-reports until the package is installed.**
   22 such lints disappeared once it was; CI installs, so they are an
   artifact locally rather than a defect.
+
 - The package is **0.x** — the API is not frozen, but the vintage
   semantics above are not an API question.
 

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,10 +95,11 @@
 <div class="section level2">
 <h2 id="gotchas">Gotchas<a class="anchor" aria-label="anchor" href="#gotchas"></a></h2>
 <ul><li>
-<strong>The pkgdown URL is deliberately absent from <code>DESCRIPTION</code>.</strong> <code>_pkgdown.yml</code> explains why: <code>R CMD check --as-cran</code> fetches every <code>DESCRIPTION</code> URL and would report a 404 while the site is unpublished. 🔴 <strong>CI to publish it now exists (2026-08-20).</strong> Once the first deploy lands and the site returns 200, add the URL to <code>DESCRIPTION</code> — <code>_pkgdown.yml</code> says to do it in the same commit. Until then <code><a href="https://pkgdown.r-lib.org/reference/check_pkgdown.html" class="external-link">pkgdown::check_pkgdown()</a></code> aborts with “URL is missing package url”, which is accepted deliberately.</li>
-<li>
-<strong><code>object_usage_linter</code> over-reports until the package is installed.</strong> 22 such lints disappeared once it was; CI installs, so they are an artifact locally rather than a defect.</li>
-<li>The package is <strong>0.x</strong> — the API is not frozen, but the vintage semantics above are not an API question.</li>
+<p><strong>The pkgdown site is live and its URL is in <code>DESCRIPTION</code></strong> (2026-08-24, 0.1.1). It was held out until then because <code>R CMD check --as-cran</code> fetches every <code>DESCRIPTION</code> URL and would report a 404 while the site was unpublished. <code>_pkgdown.yml</code> carries the same URL and the two must stay in sync. ⚠️ <strong>A green <code>pkgdown</code> run is not evidence that the site serves.</strong> The workflow deploys to the <code>gh-pages</code> branch and succeeds whether or not GitHub Pages is configured to serve it. Pages had never been enabled here, so every run was green from 2026-08-20 while the site returned 404 for four days. Check the site itself, not the workflow:</p>
+<pre><code>curl -s -o /dev/null -w '%{http_code}\n' https://ehrlinger.github.io/hvtiRlifetables/</code></pre>
+</li>
+<li><p><strong><code>object_usage_linter</code> over-reports until the package is installed.</strong> 22 such lints disappeared once it was; CI installs, so they are an artifact locally rather than a defect.</p></li>
+<li><p>The package is <strong>0.x</strong> — the API is not frozen, but the vintage semantics above are not an API question.</p></li>
 </ul></div>
 <div class="section level2">
 <h2 id="git-and-versioning">Git and versioning<a class="anchor" aria-label="anchor" href="#git-and-versioning"></a></h2>
