@@ -50,7 +50,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
-            github::ehrlinger/temporal_hazard
+            github::ehrlinger/TemporalHazard
           needs: check
 
       - uses: r-lib/actions/setup-tinytex@v2

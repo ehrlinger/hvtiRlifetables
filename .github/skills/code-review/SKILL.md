@@ -63,8 +63,8 @@ stratum set moved.
 
 - **`TemporalHazard` resolves from GitHub, not CRAN.** This package Imports `>= 1.2.0` and
   CRAN carries an older release. `DESCRIPTION` needs
-  `Remotes: TemporalHazard=ehrlinger/temporal_hazard` and every workflow needs its explicit
-  `github::ehrlinger/temporal_hazard` pull. Flag removal of either — it breaks resolution.
+  `Remotes: TemporalHazard=ehrlinger/TemporalHazard` and every workflow needs its explicit
+  `github::ehrlinger/TemporalHazard` pull. Flag removal of either — it breaks resolution.
 - **`docs/` is tracked prose here** (`docs/specs/`, `docs/plans/`), not a generated site.
   pkgdown builds to `pkgdown-site/`, and `dest_dir` must be passed explicitly because
   `build_site_github_pages()` overrides `destination:` in `_pkgdown.yml`. Flag any change
