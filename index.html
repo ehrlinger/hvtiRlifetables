@@ -55,7 +55,7 @@
 <h2 id="what-this-is">What this is<a class="anchor" aria-label="anchor" href="#what-this-is"></a>
 </h2>
 <p>An R replacement for the Cleveland Clinic SAS macro <code>%usmatchd</code>.</p>
-<p>The surprise that shapes the whole package: <strong><code>%usmatchd</code> is not a life-table lookup.</strong> It is <code>PROC HAZPRED</code> evaluating a stored three-phase parametric hazard fit on the <em>age</em> axis — time origin is birth, not surgery. So this is not a data package carrying life tables. It ships ~27 small fitted-parameter blocks and a thin evaluator over <a href="https://github.com/ehrlinger/temporal_hazard" class="external-link">TemporalHazard</a>.</p>
+<p>The surprise that shapes the whole package: <strong><code>%usmatchd</code> is not a life-table lookup.</strong> It is <code>PROC HAZPRED</code> evaluating a stored three-phase parametric hazard fit on the <em>age</em> axis — time origin is birth, not surgery. So this is not a data package carrying life tables. It ships ~27 small fitted-parameter blocks and a thin evaluator over <a href="https://github.com/ehrlinger/TemporalHazard" class="external-link">TemporalHazard</a>.</p>
 <p><code><a href="https://rdrr.io/pkg/survival/man/survexp.us.html" class="external-link">survival::survexp.usr</a></code> cannot substitute. Twelve vintage × interpolation combinations were tested; the best individual-curve error in every one was 0.09–0.11, with an age tilt no vintage removes. The reason is structural — there is no table on the R side of that comparison.</p>
 </div>
 <div class="section level2">
@@ -129,7 +129,7 @@
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/hvtiRlifetables"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>This will not resolve its dependency yet.</strong> The package requires <code>TemporalHazard (&gt;= 1.2.0)</code>, and CRAN currently carries <strong>1.1.0</strong>. The <code>&gt;= 1.2.0</code> bound is real, not defensive — the evaluator calls <code>hzr_decompos_g3()</code>, which 1.1.0 does not provide — so until 1.2.0 reaches CRAN you need it from source:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/temporal_hazard"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/TemporalHazard"</span><span class="op">)</span></span></code></pre></div>
 <p>This is also why the repository has no CI workflow: any run would fail at the dependency-install step.</p>
 </div>
 <div class="section level2">

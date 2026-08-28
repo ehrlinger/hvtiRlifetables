@@ -80,8 +80,8 @@ everyone expects.
   explicitly in the PR, and check whether a vintage’s stratum set moved.
 - **`TemporalHazard` comes from GitHub, not CRAN.** This package Imports
   `>= 1.2.0` and CRAN carries an older release, so `DESCRIPTION` has
-  `Remotes: TemporalHazard=ehrlinger/temporal_hazard` and every workflow
-  pulls `github::ehrlinger/temporal_hazard` explicitly. Removing either
+  `Remotes: TemporalHazard=ehrlinger/TemporalHazard` and every workflow
+  pulls `github::ehrlinger/TemporalHazard` explicitly. Removing either
   breaks CI resolution.
 - **`docs/` is PROSE here** — `docs/specs/` and `docs/plans/` are
   tracked design documents, not a generated site. ⚠️ **pkgdown’s site
@@ -160,7 +160,7 @@ everyone expects.
   🔴 **The family is not uniform, despite what this file used to
   claim.** Measured 2026-08-24 across the **fourteen** repositories
   carrying `protect main` (not twelve): `hvtiPlotR`, `hvtiRtables`,
-  `hvtiRdatasets`, `hvtiBoostmtree` and `temporal_hazard` have
+  `hvtiRdatabuild`, `hvtiBoostmtree` and `TemporalHazard` have
   `require_code_owner_review` `false` where the rest have `true` — inert
   either way. `ggRandomForests` alone adds a fifth rule type,
   `required_status_checks`, gating on the three `R CMD check` platforms
@@ -168,7 +168,7 @@ everyone expects.
   **`bypass_actors` is now empty in all fourteen**,
   `current_user_can_bypass` is `never`, and nobody can push through the
   ruleset — maintainer included. That is a *change*, not a standing
-  fact: `temporal_hazard` and `hvtiRtemplates` granted repository admins
+  fact: `TemporalHazard` and `hvtiRtemplates` granted repository admins
   `bypass_mode: always` until 2026-08-24, when both were cleared to
   match the other twelve. Restoring either means re-adding
   `{"actor_id": 5, "actor_type": "RepositoryRole", "bypass_mode": "always"}`.

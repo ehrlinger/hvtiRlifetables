@@ -33,8 +33,8 @@ it. The release gate applies in full: CRAN Cookbook audit and
 `TemporalHazard (>= 1.2.0)` and CRAN carried `1.1.0`, which once meant
 no clean machine could install this package and CI could not go green.
 That is **no longer true**:
-`Remotes: TemporalHazard=ehrlinger/temporal_hazard` (PR \#3) resolves
-the dependency from GitHub, `r-lib/actions` honours it, and CI landed
+`Remotes: TemporalHazard=ehrlinger/TemporalHazard` (PR \#3) resolves the
+dependency from GitHub, `r-lib/actions` honours it, and CI landed
 2026-08-20. Do not cite CRAN’s `1.1.0` as a blocker for anything.
 
 ⚠️ **Do not “fix” the bound by relaxing it** — that part still stands.
@@ -169,7 +169,7 @@ Steps 1-6 and 8 are **done** — see
 2.  ~~**CI**, once `TemporalHazard 1.2.0` reaches CRAN. Blocked until
     then.~~ **Done 2026-08-20** — five workflows, see `AGENTS.md`. The
     CRAN bound was never the real blocker:
-    `Remotes: TemporalHazard=ehrlinger/temporal_hazard` (PR \#3,
+    `Remotes: TemporalHazard=ehrlinger/TemporalHazard` (PR \#3,
     2026-08-19) resolves the dependency from GitHub. Do not cite CRAN’s
     1.1.0 as a reason for anything.
 3.  **The `hs.*` job template** that consumes
