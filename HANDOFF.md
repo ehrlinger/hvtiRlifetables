@@ -15,7 +15,7 @@ script; nothing re-runs it. Writing it as a repeatable test in the **study's**
 
 **Version `0.1.0`** (decided 2026-08-13). **Public repo** at `github.com/ehrlinger/hvtiRlifetables` (decided 2026-08-14, superseding "internal only"). The source `.sas7bdat` fits under `data-raw/uslife/` were removed from git history and are `.gitignore`d — they remain on disk, because the share is unreliable and they exist nowhere else off it. The release gate applies in full: CRAN Cookbook audit and `R CMD check --as-cran` **with** the manual.
 
-**Resolved blocker (2026-08-19):** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)` and CRAN carried `1.1.0`, which once meant no clean machine could install this package and CI could not go green. That is **no longer true**: `Remotes: TemporalHazard=ehrlinger/temporal_hazard` (PR #3) resolves the dependency from GitHub, `r-lib/actions` honours it, and CI landed 2026-08-20. Do not cite CRAN's `1.1.0` as a blocker for anything.
+**Resolved blocker (2026-08-19):** `DESCRIPTION` requires `TemporalHazard (>= 1.2.0)` and CRAN carried `1.1.0`, which once meant no clean machine could install this package and CI could not go green. That is **no longer true**: `Remotes: TemporalHazard=ehrlinger/TemporalHazard` (PR #3) resolves the dependency from GitHub, `r-lib/actions` honours it, and CI landed 2026-08-20. Do not cite CRAN's `1.1.0` as a blocker for anything.
 
 ⚠️ **Do not "fix" the bound by relaxing it** — that part still stands. The evaluator calls `hzr_decompos_g3()`, which does not exist in `1.1.0`. The fix was to change *where* the dependency resolves from, never *what* it requires.
 
@@ -96,7 +96,7 @@ Steps 1-6 and 8 are **done** — see
    installed test. They are that study's to add.
 2. ~~**CI**, once `TemporalHazard 1.2.0` reaches CRAN. Blocked until then.~~
    **Done 2026-08-20** — five workflows, see `AGENTS.md`. The CRAN bound was never
-   the real blocker: `Remotes: TemporalHazard=ehrlinger/temporal_hazard` (PR #3,
+   the real blocker: `Remotes: TemporalHazard=ehrlinger/TemporalHazard` (PR #3,
    2026-08-19) resolves the dependency from GitHub. Do not cite CRAN's 1.1.0 as a
    reason for anything.
 3. **The `hs.*` job template** that consumes `us_matched()`. Belongs in

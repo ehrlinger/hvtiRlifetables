@@ -31,7 +31,7 @@ jobs:
           extra-packages: |
             any::lintr
             local::.
-            github::ehrlinger/temporal_hazard
+            github::ehrlinger/TemporalHazard
           needs: lint
 
       - name: Lint
@@ -70,7 +70,7 @@ jobs:
           extra-packages: |
             any::roxygen2@8.1.0
             local::.
-            github::ehrlinger/temporal_hazard
+            github::ehrlinger/TemporalHazard
           # roxygenise() only needs this package's Imports loadable. The
           # action defaults to dependencies: "all", which additionally pulls
           # every Suggests -- arrow, dplyr, quarto -- and their system

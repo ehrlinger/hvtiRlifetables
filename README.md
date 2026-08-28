@@ -19,7 +19,7 @@ lookup.** It is `PROC HAZPRED` evaluating a stored three-phase parametric
 hazard fit on the *age* axis — time origin is birth, not surgery. So this is
 not a data package carrying life tables. It ships ~27 small fitted-parameter
 blocks and a thin evaluator over
-[TemporalHazard](https://github.com/ehrlinger/temporal_hazard).
+[TemporalHazard](https://github.com/ehrlinger/TemporalHazard).
 
 `survival::survexp.usr` cannot substitute. Twelve vintage × interpolation
 combinations were tested; the best individual-curve error in every one was
@@ -130,7 +130,7 @@ remotes::install_github("ehrlinger/hvtiRlifetables")
 CRAN you need it from source:
 
 ```r
-remotes::install_github("ehrlinger/temporal_hazard")
+remotes::install_github("ehrlinger/TemporalHazard")
 ```
 
 This is also why the repository has no CI workflow: any run would fail at the

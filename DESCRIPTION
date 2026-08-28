@@ -45,7 +45,7 @@ Suggests:
     testthat (>= 3.0.0),
     withr
 Remotes:
-    TemporalHazard=ehrlinger/temporal_hazard
+    TemporalHazard=ehrlinger/TemporalHazard
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.1.0
 LazyData: true

@@ -51,7 +51,7 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
-            github::ehrlinger/temporal_hazard
+            github::ehrlinger/TemporalHazard
           needs: website
 
       - name: Build site
