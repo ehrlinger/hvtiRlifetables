@@ -1,3 +1,21 @@
+# hvtiRlifetables 0.1.3
+
+## Bug fixes
+
+- **The `::` regression tests could report a result they could not stand
+  behind.** The tests added in 0.1.2 run in a subprocess, which is the only
+  way to catch the issue #18 defect — but a fresh R loads the *installed*
+  copy of the package, never the source under development. Under
+  `devtools::test()` the parent is a `load_all()` session, so the two can
+  differ, and both directions mislead: a stale install fails against correct
+  source, and a good install passes against source someone has just broken.
+  The second is the same shape of defect as issue #18 itself — a test that
+  looks like it covers the code while reporting on something else. Each
+  subprocess now reports the version it loaded, and the test skips, with the
+  two versions named, when that is not the source version. `R CMD check`
+  installs the package before testing, so the two always agree there and
+  nothing skips.
+
 # hvtiRlifetables 0.1.2
 
 ## Bug fixes
