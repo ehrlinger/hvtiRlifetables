@@ -15,16 +15,16 @@
 #'
 #' `vintage` is never defaulted. See the package README for why.
 #'
-#' @importFrom utils globalVariables
+#' @importFrom utils data
 "_PACKAGE"
 
-## `us_lifetable_models` is this package's own lazy-loaded dataset. codetools
-## analyses statically and cannot see lazy-load bindings, so R CMD check
-## reports every reference to it in R/models.R as an undefined global. It is
-## not one.
+## `us_lifetable_models` is lazy-loaded, so package code cannot see it by bare
+## name -- see the note in R/data.R, where hzl_models() reads it explicitly.
+## There is therefore no undefined-global to declare here any more; the
+## globalVariables("us_lifetable_models") call that stood in this place has
+## gone with the bare references it covered.
 ##
-## Called unqualified, against an explicit @importFrom above, rather than as
-## `utils::globalVariables()`: a top-level `::` call does not register as a
-## use of the namespace, so the qualified form leaves `utils` sitting in the
-## "Namespace in Imports field not imported from" NOTE.
-globalVariables("us_lifetable_models")
+## The `@importFrom utils data` above replaces the `@importFrom utils
+## globalVariables` it displaced, and keeps `utils` demonstrably imported from
+## rather than merely declared -- `data()` in R/data.R is called unqualified
+## against it, as `globalVariables()` was.

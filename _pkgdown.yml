@@ -26,6 +26,7 @@ reference:
   - title: Reference survival
     contents:
       - us_matched
+      - us_cohort_curve
   - title: Vintages and fitted models
     contents:
       - us_lifetable_vintages

@@ -5,7 +5,8 @@ test_that("the documented public API is exported", {
   # therefore tests nothing.
   expect_setequal(
     getNamespaceExports("hvtiRlifetables"),
-    c("us_matched", "us_lifetable_vintages", "us_lifetable_model")
+    c("us_matched", "us_cohort_curve", "us_lifetable_vintages",
+      "us_lifetable_model")
   )
 })
 
