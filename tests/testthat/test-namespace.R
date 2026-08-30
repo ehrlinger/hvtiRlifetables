@@ -8,13 +8,20 @@
 ## this directory runs with the package ATTACHED -- and the broken code passes
 ## when attached. A test written here in the ordinary way would have proved
 ## nothing, which is exactly how the defect survived to 0.1.1.
+##
+## The code handed to the child is written with single quotes inside
+## double-quoted R strings. `quotes_linter` wants the outer string
+## double-quoted, and escaping the inner ones instead would make the child's
+## code unreadable for no gain -- R parses 'table84' and "table84" alike.
 
 ## Run `code` in a fresh R with this session's library path and nothing
 ## attached. Returns the child's combined output, with its exit status in the
 ## "status" attribute.
 detached_r <- function(code) {
   rscript <- file.path(R.home("bin"), "Rscript")
-  skip_if_not(file.exists(rscript), "no Rscript in R.home('bin')")
+  ## Qualified: object_usage_linter analyses function bodies, and testthat is
+  ## not on the search path it reasons about.
+  testthat::skip_if_not(file.exists(rscript), "no Rscript in R.home('bin')")
   libs <- paste(.libPaths(), collapse = .Platform$path.sep)
   suppressWarnings(
     system2(rscript, c("--vanilla", "-e", shQuote(code)),
@@ -30,18 +37,18 @@ detached_call <- function(expr) {
   paste(
     ## One element, not two: joining with "; " between the condition and the
     ## body would emit `if (cond); stop(...)`, which is not the guard.
-    paste0('if ("package:hvtiRlifetables" %in% search()) ',
-           'stop("the child attached the package, so this test cannot ',
-           'detect the bug")'),
+    paste0("if ('package:hvtiRlifetables' %in% search()) ",
+           "stop('the child attached the package, so this test cannot ",
+           "detect the bug')"),
     expr,
-    'cat("HVTI_OK")',
+    "cat('HVTI_OK')",
     sep = "; "
   )
 }
 
 test_that("us_lifetable_vintages() works through :: without library()", {
   out <- detached_r(detached_call(
-    'v <- hvtiRlifetables::us_lifetable_vintages(); stopifnot(nrow(v) == 3L)'
+    "v <- hvtiRlifetables::us_lifetable_vintages(); stopifnot(nrow(v) == 3L)"
   ))
   expect_true("HVTI_OK" %in% out, info = paste(out, collapse = "\n"))
   expect_no_match(paste(out, collapse = "\n"), "not found")
@@ -49,8 +56,8 @@ test_that("us_lifetable_vintages() works through :: without library()", {
 
 test_that("us_lifetable_model() works through :: without library()", {
   out <- detached_r(detached_call(paste0(
-    'm <- hvtiRlifetables::us_lifetable_model(vintage = "table84", ',
-    'stratum = "wm"); stopifnot(length(m$params) == 11L)'
+    "m <- hvtiRlifetables::us_lifetable_model(vintage = 'table84', ",
+    "stratum = 'wm'); stopifnot(length(m$params) == 11L)"
   )))
   expect_true("HVTI_OK" %in% out, info = paste(out, collapse = "\n"))
   expect_no_match(paste(out, collapse = "\n"), "not found")
@@ -58,9 +65,9 @@ test_that("us_lifetable_model() works through :: without library()", {
 
 test_that("us_matched() works through :: without library()", {
   out <- detached_r(detached_call(paste0(
-    'r <- hvtiRlifetables::us_matched(age = 60, male = 1, other = 0, ',
-    'times = c(1, 5), vintage = "table84"); stopifnot(nrow(r) == 2L, ',
-    'all(r$smatched > 0 & r$smatched <= 1))'
+    "r <- hvtiRlifetables::us_matched(age = 60, male = 1, other = 0, ",
+    "times = c(1, 5), vintage = 'table84'); stopifnot(nrow(r) == 2L, ",
+    "all(r$smatched > 0 & r$smatched <= 1))"
   )))
   expect_true("HVTI_OK" %in% out, info = paste(out, collapse = "\n"))
   expect_no_match(paste(out, collapse = "\n"), "not found")
@@ -68,9 +75,9 @@ test_that("us_matched() works through :: without library()", {
 
 test_that("us_cohort_curve() works through :: without library()", {
   out <- detached_r(detached_call(paste0(
-    'x <- hvtiRlifetables::us_matched(age = c(60, 70), male = c(1, 0), ',
-    'other = c(0, 0), times = c(1, 5), vintage = "table84"); ',
-    'g <- hvtiRlifetables::us_cohort_curve(x); stopifnot(nrow(g) == 2L)'
+    "x <- hvtiRlifetables::us_matched(age = c(60, 70), male = c(1, 0), ",
+    "other = c(0, 0), times = c(1, 5), vintage = 'table84'); ",
+    "g <- hvtiRlifetables::us_cohort_curve(x); stopifnot(nrow(g) == 2L)"
   )))
   expect_true("HVTI_OK" %in% out, info = paste(out, collapse = "\n"))
   expect_no_match(paste(out, collapse = "\n"), "not found")
@@ -80,7 +87,7 @@ test_that("the dataset is still user-visible under ::", {
   ## The fix loads the data explicitly rather than moving it to
   ## R/sysdata.rda, so it must remain a browsable dataset.
   out <- detached_r(detached_call(
-    'd <- hvtiRlifetables::us_lifetable_models; stopifnot(nrow(d) == 27L)'
+    "d <- hvtiRlifetables::us_lifetable_models; stopifnot(nrow(d) == 27L)"
   ))
   expect_true("HVTI_OK" %in% out, info = paste(out, collapse = "\n"))
 })
