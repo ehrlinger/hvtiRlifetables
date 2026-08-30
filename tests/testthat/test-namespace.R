@@ -83,6 +83,13 @@ detached_call <- function(expr) {
 ## bookkeeping rather than the package's own objects -- so the `.__` prefix is
 ## dropped and the remaining 20 names match exactly.
 ##
+## `.hzl_data` is a mutable cache and is deliberately left in the walk.
+## `deparse()` renders an environment as the opaque "<environment>" rather than
+## descending into it, so a warm cache and a cold one hash alike -- measured,
+## and relied on by the suite, which warms it in test-models.R before this file
+## runs. Its NAME still contributes, so renaming or dropping the cache does
+## move the fingerprint, which is the behaviour worth keeping.
+##
 ## The dataset is fingerprinted separately because it is NOT in the namespace:
 ## a lazy-loaded dataset is promised into the package environment, which is the
 ## whole of issue #18. The package environment is not walked instead, because
@@ -111,15 +118,21 @@ package_fingerprint <- function() {
 
 ## Skip unless the copy the child loaded is the code under test. `out` is a
 ## finished child's output, so the fingerprint is read back rather than probed
-## for -- and NA when the child never got that far, which is what an
-## uninstalled package looks like from here.
+## for -- and NA when the child never got that far.
 skip_unless_install_is_source <- function(out) {
   line <- grep("^HVTI_FP:", out, value = TRUE)
   child <- if (length(line) == 1L) sub("^HVTI_FP:", "", line) else NA_character_
   here <- package_fingerprint()
   reason <- if (is.na(child)) {
-    paste0("the subprocess could not load hvtiRlifetables at all, so there is ",
-           "nothing for these tests to report on; install the package")
+    ## No fingerprint means the child died before printing one, and WHY is not
+    ## knowable from here: the package missing from its library is the most
+    ## common cause but not the only one -- an installed package whose dataset
+    ## is unreadable fails here too, and reads identically. Naming a cause that
+    ## has not been established, and discarding the evidence for it, is the
+    ## error these tests exist to prevent, so the child's own output is handed
+    ## over instead of a guess.
+    paste0("the subprocess printed no fingerprint, so there is no way to tell ",
+           "what it loaded. Its own output was:\n", paste(out, collapse = "\n"))
   } else {
     paste0("the installed hvtiRlifetables is not the code under test ",
            "(subprocess ", substr(child, 1, 10), ", source ",
