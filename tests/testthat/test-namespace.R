@@ -40,11 +40,29 @@ detached_r <- function(code) {
   ## Qualified: object_usage_linter analyses function bodies, and testthat is
   ## not on the search path it reasons about.
   testthat::skip_if_not(file.exists(rscript), paste0("no ", exe, " in R.home('bin')"))
+
+  ## Handed over as a FILE, not as `-e`. The payload is a deparsed function
+  ## full of quotes and newlines; shQuote() defaults to sh quoting, which is
+  ## not cmd's, and cmd caps a command line at 8191 characters. Measured: with
+  ## the `.exe` guard fixed, the Windows child launched and died producing no
+  ## output at all. A script file has neither problem and reads the same on
+  ## every platform.
+  script <- tempfile(fileext = ".R")
+  on.exit(unlink(script), add = TRUE)
+  writeLines(code, script, useBytes = TRUE)
+
+  ## R_LIBS is set on THIS process and inherited, rather than passed through
+  ## system2(env=), which is documented as not supported on Windows -- the
+  ## child would silently get the runner's library instead of the one under
+  ## test, which is precisely the confusion these tests exist to remove.
   libs <- paste(.libPaths(), collapse = .Platform$path.sep)
+  old_libs <- Sys.getenv("R_LIBS", unset = NA)
+  Sys.setenv(R_LIBS = libs)
+  on.exit(if (is.na(old_libs)) Sys.unsetenv("R_LIBS") else Sys.setenv(R_LIBS = old_libs),
+          add = TRUE)
+
   suppressWarnings(
-    system2(rscript, c("--vanilla", "-e", shQuote(code)),
-            stdout = TRUE, stderr = TRUE,
-            env = paste0("R_LIBS=", shQuote(libs)))
+    system2(rscript, c("--vanilla", shQuote(script)), stdout = TRUE, stderr = TRUE)
   )
 }
 
@@ -118,12 +136,24 @@ detached_call <- function(expr) {
 package_fingerprint <- function() {
   ns <- asNamespace("hvtiRlifetables")
   nms <- ls(ns, all.names = TRUE)
-  nms <- sort(nms[!startsWith(nms, ".__")])
+  ## method = "radix" sorts by byte, never by the collation locale. R CMD check
+  ## forces LC_COLLATE=C on the parent while a --vanilla child inherits the
+  ## machine's own locale, and the two orders differ: VINTAGE_META sorts third
+  ## under C and last under en_US, because that collation ignores case. Same
+  ## objects, different concatenation, different hash -- which is why this
+  ## skipped on the macOS runner and not on Linux.
+  nms <- sort(nms[!startsWith(nms, ".__")], method = "radix")
   code <- unlist(lapply(nms, function(n) c(n, deparse(get(n, ns)))))
   ## compress = FALSE: the bytes only have to be reproducible, not small, and
   ## a compressor is one more thing that could differ between two R builds.
   data_file <- tempfile()
-  saveRDS(hvtiRlifetables::us_lifetable_models, data_file, compress = FALSE)
+  ## version = 2 for the same reason. RDS 3 writes the session's NATIVE
+  ## ENCODING into its header, so identical data serialises to different bytes
+  ## under C and under en_US. Version 2 has no such header. This is the second,
+  ## independent locale dependency here -- fixing the sort alone left the
+  ## fingerprints still disagreeing, which is how it was found.
+  saveRDS(hvtiRlifetables::us_lifetable_models, data_file, compress = FALSE,
+          version = 2)
   both <- tempfile()
   writeLines(c(code, unname(tools::md5sum(data_file))), both, useBytes = TRUE)
   unname(tools::md5sum(both))

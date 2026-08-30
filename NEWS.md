@@ -18,21 +18,30 @@
   version string, so source edited *without* a version bump is caught too,
   which is the case that produced a false pass.
 
-- **The `::` tests never ran on Windows.** `detached_r()` looked for
-  `Rscript` in `R.home("bin")`, where Windows has `Rscript.exe`, so
-  `file.exists()` was FALSE on every Windows machine and all five tests
-  skipped. Green, and inert, since 0.1.2 — a skip is the one failure mode a
-  passing check cannot show you. The extension is now chosen per platform.
+- **The `::` tests ran on Linux only, and nothing said so.** They skipped on
+  every macOS and Windows CI job — `SKIP 5 | PASS 474` against Linux's
+  `SKIP 0 | PASS 483` — while all ten checks stayed green. A skip is the one
+  failure mode a passing check cannot show you, and on Windows the issue #18
+  guard had never run at all since 0.1.2. Three causes, found in that order:
 
-  ⚠️ **They also skip on the macOS CI runner**, where the subprocess's
-  fingerprint does not match the copy under check. This does **not** reproduce
-  under `R CMD check` on a local macOS machine, where all five run, so it is
-  specific to that runner's library layout rather than to the platform. The
-  likeliest cause is the subprocess resolving `hvtiRlifetables` from a library
-  other than the one being checked, so the skip now names the library the
-  child loaded from. Until that is settled, treat the issue #18 guard as
-  covering **Linux only**, and do not read a green macOS or Windows check as
-  evidence about `::`.
+  - `detached_r()` looked for `Rscript` in `R.home("bin")`, where Windows has
+    `Rscript.exe`. The extension is now chosen per platform.
+  - The child was then launched via `-e` with an `shQuote()` payload. That
+    quoting is `sh`'s, not `cmd`'s, and `cmd` caps a command line at 8191
+    characters; with the guard above fixed, the Windows child launched and
+    produced no output at all. The code is handed over as a script file now,
+    and `R_LIBS` is set on the parent and inherited rather than passed through
+    `system2(env=)`, which Windows does not support.
+  - The fingerprint was **locale-dependent, in two independent ways**.
+    `R CMD check` forces `LC_COLLATE=C` on the parent while a `--vanilla`
+    child inherits the machine's locale: `sort()` then orders the namespace
+    differently — `VINTAGE_META` sorts third under `C` and last under `en_US`,
+    which ignores case — and `saveRDS()` version 3 writes the session's native
+    encoding into its header, so identical data serialises to different bytes.
+    Same package, two fingerprints. Now `sort(method = "radix")` and
+    `saveRDS(version = 2)`, both byte-ordered and neither locale-aware.
+
+  The fingerprint is now identical under `C`, `en_US.UTF-8` and `de_DE.UTF-8`.
 
 # hvtiRlifetables 0.1.2
 
