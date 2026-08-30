@@ -16,16 +16,11 @@
 ## stale install fails against correct source, and -- the dangerous one -- a
 ## good install passes against source someone has just broken. That is the same
 ## shape of defect as issue #18 itself: a test that looks like it covers the
-## code while reporting on something else. So each test asks the child which
-## version it holds and skips when that is not the source version, rather than
-## reporting a result it cannot stand behind. Under `R CMD check` the package
-## is installed before the tests run, the two always agree, and nothing skips.
-##
-## The check is version equality, which is a proxy for code identity rather
-## than a proof of it: source edited without a version bump still reads as a
-## match. `AGENTS.md` ("Git and versioning") requires the patch digit and a
-## `NEWS.md` entry to move with every change, which is what makes the proxy
-## hold here.
+## code while reporting on something else. So each test makes the child
+## fingerprint what it actually loaded and skips unless that is the code under
+## test, rather than reporting a result it cannot stand behind. Under
+## `R CMD check` the package is installed before the tests run, the two
+## fingerprints agree by construction, and nothing skips.
 ##
 ## The code handed to the child is written with single quotes inside
 ## double-quoted R strings. `quotes_linter` wants the outer string
@@ -58,37 +53,80 @@ detached_call <- function(expr) {
     paste0("if ('package:hvtiRlifetables' %in% search()) ",
            "stop('the child attached the package, so this test cannot ",
            "detect the bug')"),
-    ## Printed before `expr` so it survives an expr that errors, and free:
-    ## the child is already running, so this costs no extra subprocess.
-    paste0("cat('HVTI_VERSION:', ",
-           "as.character(utils::packageVersion('hvtiRlifetables')), ",
-           "'\\n', sep = '')"),
+    ## The child is handed `package_fingerprint()` verbatim rather than a
+    ## second copy of it, so the two sessions cannot drift into measuring
+    ## different things. Printed before `expr` so it survives an expr that
+    ## errors, and free: the child is already running, so it costs no extra
+    ## subprocess.
+    paste0("hvti_fp <- ", paste(deparse(package_fingerprint), collapse = "\n")),
+    "cat('HVTI_FP:', hvti_fp(), '\\n', sep = '')",
     expr,
     "cat('HVTI_OK')",
     sep = "; "
   )
 }
 
-## Skip unless the copy the child loaded is the source being tested. `out` is
-## a finished child's output, so the version is read back rather than probed
+## One md5 over everything the package puts into a session: every object in
+## the namespace, deparsed, plus the shipped dataset. Two sessions running the
+## same package code agree on it; two running different code do not. A version
+## string cannot do this job -- source edited without a version bump reads as a
+## match, which is the exact case that produces a false pass.
+##
+## Deparsed rather than hashed directly, because the objects themselves differ
+## between the two load paths where their text does not: an installed package
+## is byte-compiled and a `load_all()` one is not. `deparse()` sees through
+## that, and ignores `srcref` too, so a source-kept install and a stripped one
+## still agree. Both measured against this package, not assumed.
+##
+## `.__DEVTOOLS__`, `.__NAMESPACE__.` and `.__S3MethodsTable__.` are the only
+## names that differ between the two namespaces -- R's and pkgload's
+## bookkeeping rather than the package's own objects -- so the `.__` prefix is
+## dropped and the remaining 20 names match exactly.
+##
+## The dataset is fingerprinted separately because it is NOT in the namespace:
+## a lazy-loaded dataset is promised into the package environment, which is the
+## whole of issue #18. The package environment is not walked instead, because
+## `load_all()` defaults to `export_all = TRUE` and fills it with every
+## internal object, where an installed package holds only the exports.
+##
+## ⚠️ In the child this runs BEFORE the assertion body and reaches the dataset
+## through `::`, which forces the lazy-data promise. Measured against the
+## pre-fix 0.1.1 package: that does NOT mask the issue #18 defect, because
+## forcing the promise populates the package environment while package code
+## resolves against the namespace. Should that ever stop holding, this file
+## silently stops testing anything -- so re-measure it rather than assuming.
+package_fingerprint <- function() {
+  ns <- asNamespace("hvtiRlifetables")
+  nms <- ls(ns, all.names = TRUE)
+  nms <- sort(nms[!startsWith(nms, ".__")])
+  code <- unlist(lapply(nms, function(n) c(n, deparse(get(n, ns)))))
+  ## compress = FALSE: the bytes only have to be reproducible, not small, and
+  ## a compressor is one more thing that could differ between two R builds.
+  data_file <- tempfile()
+  saveRDS(hvtiRlifetables::us_lifetable_models, data_file, compress = FALSE)
+  both <- tempfile()
+  writeLines(c(code, unname(tools::md5sum(data_file))), both, useBytes = TRUE)
+  unname(tools::md5sum(both))
+}
+
+## Skip unless the copy the child loaded is the code under test. `out` is a
+## finished child's output, so the fingerprint is read back rather than probed
 ## for -- and NA when the child never got that far, which is what an
 ## uninstalled package looks like from here.
 skip_unless_install_is_source <- function(out) {
-  line <- grep("^HVTI_VERSION:", out, value = TRUE)
-  child <- if (length(line) == 1L) sub("^HVTI_VERSION:", "", line) else NA_character_
-  ## Under `load_all()` this reads the source DESCRIPTION; under `R CMD check`
-  ## it reads the installed one, which is the copy the child loads.
-  source_version <- as.character(utils::packageVersion("hvtiRlifetables"))
+  line <- grep("^HVTI_FP:", out, value = TRUE)
+  child <- if (length(line) == 1L) sub("^HVTI_FP:", "", line) else NA_character_
+  here <- package_fingerprint()
   reason <- if (is.na(child)) {
-    paste0("hvtiRlifetables ", source_version, " is not installed in the ",
-           "library the subprocess sees, so these tests have nothing to check")
+    paste0("the subprocess could not load hvtiRlifetables at all, so there is ",
+           "nothing for these tests to report on; install the package")
   } else {
-    paste0("installed hvtiRlifetables is ", child, " but the source is ",
-           source_version, "; the subprocess can only report on the installed ",
-           "copy, so install the source (devtools::install()) before trusting ",
-           "these tests")
+    paste0("the installed hvtiRlifetables is not the code under test ",
+           "(subprocess ", substr(child, 1, 10), ", source ",
+           substr(here, 1, 10), "); the subprocess can only report on the ",
+           "installed copy, so run devtools::install() first")
   }
-  testthat::skip_if_not(identical(child, source_version), reason)
+  testthat::skip_if_not(identical(child, here), reason)
 }
 
 test_that("us_lifetable_vintages() works through :: without library()", {

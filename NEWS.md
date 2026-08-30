@@ -10,11 +10,15 @@
   differ, and both directions mislead: a stale install fails against correct
   source, and a good install passes against source someone has just broken.
   The second is the same shape of defect as issue #18 itself — a test that
-  looks like it covers the code while reporting on something else. Each
-  subprocess now reports the version it loaded, and the test skips, with the
-  two versions named, when that is not the source version. `R CMD check`
-  installs the package before testing, so the two always agree there and
-  nothing skips.
+  looks like it covers the code while reporting on something else.
+
+  Each subprocess now fingerprints what it loaded — every object in the
+  namespace, deparsed, plus the shipped dataset — and the test skips unless
+  that is the code under test. The fingerprint is code identity rather than a
+  version string, so source edited *without* a version bump is caught too,
+  which is the case that produced a false pass. `R CMD check` installs the
+  package before testing, so the two agree by construction, nothing skips,
+  and a real regression still fails loudly.
 
 # hvtiRlifetables 0.1.2
 
