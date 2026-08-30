@@ -11,7 +11,7 @@ hazard. This is the dashed comparison line on a clinical survival figure."></hea
 
     <a class="navbar-brand me-2" href="../index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -108,7 +108,9 @@ against the vintage's non-white category, `"sex"` uses male and female,
 
 <dt id="arg-individual">individual<a class="anchor" aria-label="anchor" href="#arg-individual"></a></dt>
 <dd><p>If `TRUE` (default), one row per patient per time. If
-`FALSE`, the cohort mean curve, one row per time.</p></dd>
+`FALSE`, the cohort mean curve, one row per time – the ungrouped case of
+<code><a href="us_cohort_curve.html">us_cohort_curve</a></code>, which is what to use for a curve within
+groups of the caller's own choosing.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -147,7 +149,9 @@ this package refuses to guess. State it literally in analysis code.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>[us_lifetable_vintages()] for the available vintages and what
+    <div class="dont-index"><p><code><a href="us_cohort_curve.html">us_cohort_curve</a></code> to reduce the individual output to a
+  cohort curve, or to one curve per group;
+  [us_lifetable_vintages()] for the available vintages and what
   their non-white stratum actually contains; [us_lifetable_model()] for the
   raw fitted parameters.</p></div>
     </div>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,24 @@
       <small>Source: <a href="https://github.com/ehrlinger/hvtiRlifetables/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.2" id="hvtirlifetables-012">hvtiRlifetables 0.1.2<a class="anchor" aria-label="anchor" href="#hvtirlifetables-012"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-2"></a></h3>
+<ul><li>
+<p><strong>Every export failed when called with <code>::</code>.</strong> <code><a href="../reference/us_matched.html">hvtiRlifetables::us_matched()</a></code> and its two siblings errored with <code>object 'us_lifetable_models' not found</code> unless the package had first been attached with <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>. The functions referenced the shipped dataset by bare name, and a lazy-loaded dataset is promised into the <em>package</em> environment rather than the <em>namespace</em> — which is not on the parent chain package code resolves against. It worked only because every caller so far happened to attach the package first. The dataset is now loaded explicitly by an internal accessor and stays user-visible; nothing about the fitted models or the numbers changes. (<a href="https://github.com/ehrlinger/hvtiRlifetables/issues/18" class="external-link">#18</a>)</p>
+<p>The regression test runs in a <strong>subprocess with the package unattached</strong>. <code>tests/testthat.R</code> calls <code><a href="https://ehrlinger.github.io/hvtiRlifetables/">library(hvtiRlifetables)</a></code> before <code>test_check()</code>, so an ordinary test in <code>tests/testthat/</code> runs attached and passes against the broken code — which is how this survived to 0.1.1.</p>
+</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-1-2">New features<a class="anchor" aria-label="anchor" href="#new-features-0-1-2"></a></h3>
+<ul><li>
+<p><code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code> reduces the per-patient output of <code><a href="../reference/us_matched.html">us_matched()</a></code> to the cohort curve a figure actually carries, and with <code>by</code> gives one curve per group of the caller’s own choosing — age band, treatment arm, era. (<a href="https://github.com/ehrlinger/hvtiRlifetables/issues/16" class="external-link">#16</a>, <a href="https://github.com/ehrlinger/hvtiRlifetables/issues/17" class="external-link">#17</a>)</p>
+<p><code>by</code> is a <strong>reporting</strong> grouping and is independent of <code>table=</code>, which chooses which strata the life table itself is built from. A report broken down by age band is normally still matched on <code>"sexrace"</code>.</p>
+<p>The cohort average already existed as <code>us_matched(individual = FALSE)</code>, and its arithmetic is unchanged — that call now routes through <code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code>, so the two cannot drift into two different averages. What is new is that the reduction is reachable without recomputing the curves, and that it takes a grouping. Studies deriving the average inline can now call it instead, which is the point: the choice of what to average is made once, here, and documented.</p>
+</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.1" id="hvtirlifetables-011">hvtiRlifetables 0.1.1<a class="anchor" aria-label="anchor" href="#hvtirlifetables-011"></a></h2>
 <p>Documentation and metadata only. No change to <code><a href="../reference/us_matched.html">us_matched()</a></code>, the vintages, or the shipped fitted models — results are identical to 0.1.0.</p>

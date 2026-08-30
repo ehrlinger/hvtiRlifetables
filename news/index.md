@@ -1,5 +1,55 @@
 # Changelog
 
+## hvtiRlifetables 0.1.2
+
+### Bug fixes
+
+- **Every export failed when called with `::`.**
+  [`hvtiRlifetables::us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+  and its two siblings errored with
+  `object 'us_lifetable_models' not found` unless the package had first
+  been attached with [`library()`](https://rdrr.io/r/base/library.html).
+  The functions referenced the shipped dataset by bare name, and a
+  lazy-loaded dataset is promised into the *package* environment rather
+  than the *namespace* — which is not on the parent chain package code
+  resolves against. It worked only because every caller so far happened
+  to attach the package first. The dataset is now loaded explicitly by
+  an internal accessor and stays user-visible; nothing about the fitted
+  models or the numbers changes.
+  ([\#18](https://github.com/ehrlinger/hvtiRlifetables/issues/18))
+
+  The regression test runs in a **subprocess with the package
+  unattached**. `tests/testthat.R` calls
+  [`library(hvtiRlifetables)`](https://ehrlinger.github.io/hvtiRlifetables/)
+  before `test_check()`, so an ordinary test in `tests/testthat/` runs
+  attached and passes against the broken code — which is how this
+  survived to 0.1.1.
+
+### New features
+
+- [`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md)
+  reduces the per-patient output of
+  [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+  to the cohort curve a figure actually carries, and with `by` gives one
+  curve per group of the caller’s own choosing — age band, treatment
+  arm, era.
+  ([\#16](https://github.com/ehrlinger/hvtiRlifetables/issues/16),
+  [\#17](https://github.com/ehrlinger/hvtiRlifetables/issues/17))
+
+  `by` is a **reporting** grouping and is independent of `table=`, which
+  chooses which strata the life table itself is built from. A report
+  broken down by age band is normally still matched on `"sexrace"`.
+
+  The cohort average already existed as
+  `us_matched(individual = FALSE)`, and its arithmetic is unchanged —
+  that call now routes through
+  [`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
+  so the two cannot drift into two different averages. What is new is
+  that the reduction is reachable without recomputing the curves, and
+  that it takes a grouping. Studies deriving the average inline can now
+  call it instead, which is the point: the choice of what to average is
+  made once, here, and documented.
+
 ## hvtiRlifetables 0.1.1
 
 Documentation and metadata only. No change to

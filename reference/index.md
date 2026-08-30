@@ -4,6 +4,8 @@
 
 - [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
   : Age, sex and race matched US reference survival
+- [`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md)
+  : Cohort expected-survival curve, optionally within groups
 
 ## Vintages and fitted models
 

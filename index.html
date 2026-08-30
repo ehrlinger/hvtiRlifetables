@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,7 @@
 <div class="page-header"><h1 id="hvtirlifetables">hvtiRlifetables<a class="anchor" aria-label="anchor" href="#hvtirlifetables"></a>
 </h1></div>
 <p>Age, sex and race matched US reference survival — the dashed comparison line on a clinical survival figure — computed in R.</p>
-<p><strong>Status: working.</strong> <code><a href="reference/us_matched.html">us_matched()</a></code>, <code><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages()</a></code> and <code><a href="reference/us_lifetable_model.html">us_lifetable_model()</a></code> are implemented and tested against the fitted blocks. What is not yet done is the SAS acceptance check — reproducing a real <code>%usmatchd</code> run to 1e-12 — which is PHI-adjacent and so lives in the study’s own <code>R_parity</code> project rather than here. See <a href="docs/specs/2026-08-13-hvtirlifetables-design.html">the design spec</a>.</p>
+<p><strong>Status: working.</strong> <code><a href="reference/us_matched.html">us_matched()</a></code>, <code><a href="reference/us_cohort_curve.html">us_cohort_curve()</a></code>, <code><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages()</a></code> and <code><a href="reference/us_lifetable_model.html">us_lifetable_model()</a></code> are implemented and tested against the fitted blocks. What is not yet done is the SAS acceptance check — reproducing a real <code>%usmatchd</code> run to 1e-12 — which is PHI-adjacent and so lives in the study’s own <code>R_parity</code> project rather than here. See <a href="docs/specs/2026-08-13-hvtirlifetables-design.html">the design spec</a>.</p>
 <div class="section level2">
 <h2 id="what-this-is">What this is<a class="anchor" aria-label="anchor" href="#what-this-is"></a>
 </h2>
@@ -70,7 +70,9 @@
 <span>           scale      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"years"</span>, <span class="st">"months"</span>, <span class="st">"days"</span><span class="op">)</span>,</span>
 <span>           individual <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages</a></span><span class="op">(</span><span class="op">)</span>                <span class="co"># vintages, provenance, race semantics</span></span>
+<span><span class="fu"><a href="reference/us_cohort_curve.html">us_cohort_curve</a></span><span class="op">(</span><span class="va">x</span>, by <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>           <span class="co"># the cohort curve, or one per group</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages</a></span><span class="op">(</span><span class="op">)</span>                 <span class="co"># vintages, provenance, race semantics</span></span>
 <span><span class="fu"><a href="reference/us_lifetable_model.html">us_lifetable_model</a></span><span class="op">(</span><span class="va">vintage</span>, <span class="va">stratum</span><span class="op">)</span>    <span class="co"># the raw parameter set</span></span></code></pre></div>
 <p>Argument names mirror the macro so a SAS job translates by inspection.</p>
 </div>
@@ -94,8 +96,30 @@
 <span><span class="co">#&gt; 5  2    5 0.7773741 0.8640873 0.03736907</span></span>
 <span><span class="co">#&gt; 6  2   10 0.7773741 0.6758045 0.06334817</span></span></code></pre></div>
 <p><code>agesurv</code> is survival from birth to the patient’s current age; <code>smatched</code> is conditional on having reached it, so it starts at 1. Add <code>individual = FALSE</code> for the cohort mean curve, which is what a figure’s dashed line usually needs.</p>
-<p>Omitting <code>vintage</code> is an error, deliberately:</p>
+</div>
+<div class="section level2">
+<h2 id="the-cohort-curve-and-reporting-by-group">The cohort curve, and reporting by group<a class="anchor" aria-label="anchor" href="#the-cohort-curve-and-reporting-by-group"></a>
+</h2>
+<p><code><a href="reference/us_cohort_curve.html">us_cohort_curve()</a></code> reduces the per-patient frame to that dashed line, and with <code>by</code> gives one line per group of your own choosing:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/us_matched.html">us_matched</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">62</span>, <span class="fl">71</span>, <span class="fl">84</span>, <span class="fl">88</span><span class="op">)</span>, male <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>                other <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span>, <span class="fl">0</span><span class="op">)</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">10</span>, by <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
+<span>                vintage <span class="op">=</span> <span class="st">"table84"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">band</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"&lt;80"</span>, <span class="st">"&lt;80"</span>, <span class="st">"80+"</span>, <span class="st">"80+"</span><span class="op">)</span><span class="op">[</span><span class="va">x</span><span class="op">$</span><span class="va">id</span><span class="op">]</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"&lt;80"</span>, <span class="st">"80+"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/us_cohort_curve.html">us_cohort_curve</a></span><span class="op">(</span><span class="va">x</span>, by <span class="op">=</span> <span class="va">band</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   group time  smatched   hmatched</span></span>
+<span><span class="co">#&gt; 1   &lt;80    0 1.0000000 0.02033920</span></span>
+<span><span class="co">#&gt; 2   &lt;80    5 0.8777925 0.03283308</span></span>
+<span><span class="co">#&gt; 3   &lt;80   10 0.7105637 0.05340550</span></span>
+<span><span class="co">#&gt; 4   80+    0 1.0000000 0.13316718</span></span>
+<span><span class="co">#&gt; 5   80+    5 0.4201996 0.22110436</span></span>
+<span><span class="co">#&gt; 6   80+   10 0.1001218 0.36277801</span></span></code></pre></div>
+<p><code>x</code> holds one row per patient per time, so a patient-level grouping is expanded to it by <code>id</code> — that is what <code>band[x$id]</code> is doing above.</p>
+<p><strong><code>by</code> is not <code>table</code>.</strong> <code>table</code> chooses which strata the life table itself is built from; <code>by</code> chooses how the resulting curves are grouped for reporting. The two axes are independent, and a report broken down by age band is normally still matched on <code>"sexrace"</code>.</p>
+<p>The averaging is the macro’s, and it is made in one place so that two studies cannot average differently without noticing: survival and the density <code>hmatched * smatched</code> are averaged across patients at each time, unweighted, and the mean hazard is recovered by dividing. It is <strong>not</strong> the mean of the individual hazards.</p>
+<p>Omitting <code>vintage</code> is an error, deliberately:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/us_matched.html">us_matched</a></span><span class="op">(</span><span class="fl">70</span>, <span class="fl">1</span>, <span class="fl">0</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error: `vintage` has no default and must be given.</span></span>
 <span><span class="co">#&gt; Available: table84, table2008, table2023.</span></span></code></pre></div>
@@ -124,11 +148,11 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/hvtiRlifetables"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>This will not resolve its dependency yet.</strong> The package requires <code>TemporalHazard (&gt;= 1.2.0)</code>, and CRAN currently carries <strong>1.1.0</strong>. The <code>&gt;= 1.2.0</code> bound is real, not defensive — the evaluator calls <code>hzr_decompos_g3()</code>, which 1.1.0 does not provide — so until 1.2.0 reaches CRAN you need it from source:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/TemporalHazard"</span><span class="op">)</span></span></code></pre></div>
 <p>This is also why the repository has no CI workflow: any run would fail at the dependency-install step.</p>
 </div>

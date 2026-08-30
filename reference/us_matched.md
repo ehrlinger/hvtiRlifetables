@@ -69,7 +69,10 @@ us_matched(
 - individual:
 
   If \`TRUE\` (default), one row per patient per time. If \`FALSE\`, the
-  cohort mean curve, one row per time.
+  cohort mean curve, one row per time – the ungrouped case of
+  [`us_cohort_curve`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
+  which is what to use for a curve within groups of the caller's own
+  choosing.
 
 ## Value
 
@@ -108,9 +111,11 @@ analysis code.
 
 ## See also
 
-\[us_lifetable_vintages()\] for the available vintages and what their
-non-white stratum actually contains; \[us_lifetable_model()\] for the
-raw fitted parameters.
+[`us_cohort_curve`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md)
+to reduce the individual output to a cohort curve, or to one curve per
+group; \[us_lifetable_vintages()\] for the available vintages and what
+their non-white stratum actually contains; \[us_lifetable_model()\] for
+the raw fitted parameters.
 
 ## Examples
 
