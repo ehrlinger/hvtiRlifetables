@@ -16,9 +16,23 @@
   namespace, deparsed, plus the shipped dataset — and the test skips unless
   that is the code under test. The fingerprint is code identity rather than a
   version string, so source edited *without* a version bump is caught too,
-  which is the case that produced a false pass. `R CMD check` installs the
-  package before testing, so the two agree by construction, nothing skips,
-  and a real regression still fails loudly.
+  which is the case that produced a false pass.
+
+- **The `::` tests never ran on Windows.** `detached_r()` looked for
+  `Rscript` in `R.home("bin")`, where Windows has `Rscript.exe`, so
+  `file.exists()` was FALSE on every Windows machine and all five tests
+  skipped. Green, and inert, since 0.1.2 — a skip is the one failure mode a
+  passing check cannot show you. The extension is now chosen per platform.
+
+  ⚠️ **They also skip on the macOS CI runner**, where the subprocess's
+  fingerprint does not match the copy under check. This does **not** reproduce
+  under `R CMD check` on a local macOS machine, where all five run, so it is
+  specific to that runner's library layout rather than to the platform. The
+  likeliest cause is the subprocess resolving `hvtiRlifetables` from a library
+  other than the one being checked, so the skip now names the library the
+  child loaded from. Until that is settled, treat the issue #18 guard as
+  covering **Linux only**, and do not read a green macOS or Windows check as
+  evidence about `::`.
 
 # hvtiRlifetables 0.1.2
 

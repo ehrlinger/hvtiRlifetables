@@ -31,10 +31,15 @@
 ## attached. Returns the child's combined output, with its exit status in the
 ## "status" attribute.
 detached_r <- function(code) {
-  rscript <- file.path(R.home("bin"), "Rscript")
+  ## `.exe` on Windows, bare elsewhere. Without the extension file.exists() is
+  ## FALSE on every Windows machine, so all five tests skipped there and the
+  ## issue #18 guard has never once run on that platform -- green, and inert
+  ## since 0.1.2. A skip is the one failure mode a passing check cannot show.
+  exe <- if (.Platform$OS.type == "windows") "Rscript.exe" else "Rscript"
+  rscript <- file.path(R.home("bin"), exe)
   ## Qualified: object_usage_linter analyses function bodies, and testthat is
   ## not on the search path it reasons about.
-  testthat::skip_if_not(file.exists(rscript), "no Rscript in R.home('bin')")
+  testthat::skip_if_not(file.exists(rscript), paste0("no ", exe, " in R.home('bin')"))
   libs <- paste(.libPaths(), collapse = .Platform$path.sep)
   suppressWarnings(
     system2(rscript, c("--vanilla", "-e", shQuote(code)),
@@ -60,6 +65,14 @@ detached_call <- function(expr) {
     ## subprocess.
     paste0("hvti_fp <- ", paste(deparse(package_fingerprint), collapse = "\n")),
     "cat('HVTI_FP:', hvti_fp(), '\\n', sep = '')",
+    ## Which copy the child actually loaded. A fingerprint mismatch establishes
+    ## that the install is not the source; it does not establish WHY, and on
+    ## the macOS CI runner -- where this skips and a local R CMD check does not
+    ## -- the open question is whether the child resolved a different library
+    ## than the one under check. Reported so the answer is in the failure
+    ## rather than waiting to be reproduced.
+    paste0("cat('HVTI_LIB:', dirname(find.package('hvtiRlifetables')), ",
+           "'\\n', sep = '')"),
     expr,
     "cat('HVTI_OK')",
     sep = "; "
@@ -134,10 +147,17 @@ skip_unless_install_is_source <- function(out) {
     paste0("the subprocess printed no fingerprint, so there is no way to tell ",
            "what it loaded. Its own output was:\n", paste(out, collapse = "\n"))
   } else {
+    ## The library is named, not guessed at: "run devtools::install()" is the
+    ## right advice only when the child read the library under test, and the
+    ## macOS runner is the case where that may not hold.
+    lib_line <- grep("^HVTI_LIB:", out, value = TRUE)
+    child_lib <- if (length(lib_line) == 1L) sub("^HVTI_LIB:", "", lib_line) else "unknown"
     paste0("the installed hvtiRlifetables is not the code under test ",
            "(subprocess ", substr(child, 1, 10), ", source ",
-           substr(here, 1, 10), "); the subprocess can only report on the ",
-           "installed copy, so run devtools::install() first")
+           substr(here, 1, 10), "); the subprocess loaded it from ", child_lib,
+           " and can only report on that copy. If that is the library under ",
+           "test, run devtools::install(); if it is not, the subprocess is ",
+           "resolving the wrong one")
   }
   testthat::skip_if_not(identical(child, here), reason)
 }
