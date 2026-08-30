@@ -43,3 +43,68 @@
 #'   script's header names the share location to restore the inputs from —
 #'   deliberately kept out of `R/`, which must carry no literal share path.
 "us_lifetable_models"
+
+## Reaching this package's own dataset from package code.
+##
+## `us_lifetable_models` is lazy-loaded, and a lazy-loaded dataset is promised
+## into the PACKAGE environment, never into the namespace. A function's
+## enclosing environment is the namespace, whose parents run namespace ->
+## imports -> base -> global; the package environment is not on that chain. So
+## a bare `us_lifetable_models` anywhere in R/ resolves only while the
+## package happens to be ATTACHED, and every export failed under `::` -- with
+## "object 'us_lifetable_models' not found", naming an internal object the
+## caller has never heard of. It went unseen because every caller so far had
+## run library() first.
+##
+## The dataset stays user-visible rather than moving to R/sysdata.rda: it is
+## documented above, it is what someone inspects when a stratum looks wrong,
+## and demoting it would remove a public object to fix an internal bug.
+##
+## Cached because the lookup below is not free and us_matched() reaches for
+## the models once per distinct stratum. parent = emptyenv() so a failed
+## lookup here cannot fall through to something else with the same name.
+.hzl_data <- new.env(parent = emptyenv())
+
+hzl_models <- function() {
+  if (is.null(.hzl_data$us_lifetable_models)) {
+    .hzl_data$us_lifetable_models <- hzl_load_models()
+  }
+  .hzl_data$us_lifetable_models
+}
+
+## Three places the dataset can be, and the package must work in all three:
+## installed (attached or not), and loaded by devtools::load_all() during
+## development. The development case is not hypothetical politeness -- it is
+## the case in which this whole class of bug is INVISIBLE, because load_all()
+## makes the data reachable by bare name and an installed package does not.
+## A fix that only worked when installed would break `devtools::test()`.
+hzl_load_models <- function() {
+  ns <- asNamespace("hvtiRlifetables")
+
+  ## Where an installed package's lazy-load database is bound. Reachable from
+  ## here by asking for it, but NOT on the parent chain a bare name resolves
+  ## against -- which is the whole of issue #18.
+  lazy <- tryCatch(getNamespaceInfo(ns, "lazydata"), error = function(e) NULL)
+  if (is.environment(lazy) &&
+        exists("us_lifetable_models", envir = lazy, inherits = FALSE)) {
+    return(get("us_lifetable_models", envir = lazy, inherits = FALSE))
+  }
+
+  ## load_all() binds data/ into the namespace itself in some versions.
+  if (exists("us_lifetable_models", envir = ns, inherits = FALSE)) {
+    return(get("us_lifetable_models", envir = ns, inherits = FALSE))
+  }
+
+  ## An installed package whose lazy-load database was not consulted above --
+  ## LazyData off, say. data() warns rather than errors when it finds
+  ## nothing, which would leave NULL to fail further down as "$ on NULL", so
+  ## the miss is named here instead.
+  found <- new.env(parent = emptyenv())
+  data("us_lifetable_models", package = "hvtiRlifetables", envir = found)
+  if (!exists("us_lifetable_models", envir = found, inherits = FALSE)) {
+    stop("the fitted models dataset could not be loaded from the installed ",
+         "package. Reinstall hvtiRlifetables; data/us_lifetable_models.rda ",
+         "is missing or unreadable.", call. = FALSE)
+  }
+  get("us_lifetable_models", envir = found, inherits = FALSE)
+}

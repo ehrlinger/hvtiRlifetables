@@ -85,7 +85,9 @@ hzl_assert_varies <- function(smatched, times) {
 #' @param scale Units of `times`. Applies the macro's `SCALEF` of `1`,
 #'   `1/12` and `1/365.2425` respectively.
 #' @param individual If `TRUE` (default), one row per patient per time. If
-#'   `FALSE`, the cohort mean curve, one row per time.
+#'   `FALSE`, the cohort mean curve, one row per time -- the ungrouped case of
+#'   \code{\link{us_cohort_curve}}, which is what to use for a curve within
+#'   groups of the caller's own choosing.
 #'
 #' @return A data frame. When `individual = TRUE`, columns `id`, `time`,
 #'   `agesurv` (survival from birth to the patient's current age),
@@ -117,7 +119,9 @@ hzl_assert_varies <- function(smatched, times) {
 #' analysis that does not state its reference vintage is not reproducible, so
 #' this package refuses to guess. State it literally in analysis code.
 #'
-#' @seealso [us_lifetable_vintages()] for the available vintages and what
+#' @seealso \code{\link{us_cohort_curve}} to reduce the individual output to a
+#'   cohort curve, or to one curve per group;
+#'   [us_lifetable_vintages()] for the available vintages and what
 #'   their non-white stratum actually contains; [us_lifetable_model()] for the
 #'   raw fitted parameters.
 #'
@@ -228,7 +232,10 @@ us_matched <- function(age, male, other, times,
     return(out)
   }
 
-  hzl_mean_curve(out)
+  ## Routed through the export rather than calling hzl_mean_curve() directly,
+  ## so `individual = FALSE` and us_cohort_curve() cannot drift into two
+  ## different cohort averages.
+  us_cohort_curve(out)
 }
 
 ## The macro's mean-curve reduction, from usmatchd.sas:338-350.

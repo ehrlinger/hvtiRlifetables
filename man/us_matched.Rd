@@ -46,7 +46,9 @@ against the vintage's non-white category, `"sex"` uses male and female,
 `1/12` and `1/365.2425` respectively.}
 
 \item{individual}{If `TRUE` (default), one row per patient per time. If
-`FALSE`, the cohort mean curve, one row per time.}
+`FALSE`, the cohort mean curve, one row per time -- the ungrouped case of
+\code{\link{us_cohort_curve}}, which is what to use for a curve within
+groups of the caller's own choosing.}
 }
 \value{
 A data frame. When `individual = TRUE`, columns `id`, `time`,
@@ -94,7 +96,9 @@ r[, c("time", "smatched", "hmatched")]
 
 }
 \seealso{
-[us_lifetable_vintages()] for the available vintages and what
+\code{\link{us_cohort_curve}} to reduce the individual output to a
+  cohort curve, or to one curve per group;
+  [us_lifetable_vintages()] for the available vintages and what
   their non-white stratum actually contains; [us_lifetable_model()] for the
   raw fitted parameters.
 }

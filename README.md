@@ -3,8 +3,9 @@
 Age, sex and race matched US reference survival — the dashed comparison line on
 a clinical survival figure — computed in R.
 
-**Status: working.** `us_matched()`, `us_lifetable_vintages()` and
-`us_lifetable_model()` are implemented and tested against the fitted blocks.
+**Status: working.** `us_matched()`, `us_cohort_curve()`,
+`us_lifetable_vintages()` and `us_lifetable_model()` are implemented and tested
+against the fitted blocks.
 What is not yet done is the SAS acceptance check — reproducing a real
 `%usmatchd` run to 1e-12 — which is PHI-adjacent and so lives in the study's
 own `R_parity` project rather than here. See
@@ -39,7 +40,9 @@ us_matched(age, male, other, times,
            scale      = c("years", "months", "days"),
            individual = TRUE)
 
-us_lifetable_vintages()                # vintages, provenance, race semantics
+us_cohort_curve(x, by = NULL)           # the cohort curve, or one per group
+
+us_lifetable_vintages()                 # vintages, provenance, race semantics
 us_lifetable_model(vintage, stratum)    # the raw parameter set
 ```
 
@@ -71,6 +74,41 @@ us_matched(age   = c(62, 71),
 conditional on having reached it, so it starts at 1. Add
 `individual = FALSE` for the cohort mean curve, which is what a figure's
 dashed line usually needs.
+
+## The cohort curve, and reporting by group
+
+`us_cohort_curve()` reduces the per-patient frame to that dashed line, and with
+`by` gives one line per group of your own choosing:
+
+```r
+x <- us_matched(age = c(62, 71, 84, 88), male = c(1, 0, 1, 0),
+                other = c(0, 0, 0, 0), times = seq(0, 10, by = 5),
+                vintage = "table84")
+
+band <- factor(c("<80", "<80", "80+", "80+")[x$id], levels = c("<80", "80+"))
+us_cohort_curve(x, by = band)
+#>   group time  smatched   hmatched
+#> 1   <80    0 1.0000000 0.02033920
+#> 2   <80    5 0.8777925 0.03283308
+#> 3   <80   10 0.7105637 0.05340550
+#> 4   80+    0 1.0000000 0.13316718
+#> 5   80+    5 0.4201996 0.22110436
+#> 6   80+   10 0.1001218 0.36277801
+```
+
+`x` holds one row per patient per time, so a patient-level grouping is expanded
+to it by `id` — that is what `band[x$id]` is doing above.
+
+**`by` is not `table`.** `table` chooses which strata the life table itself is
+built from; `by` chooses how the resulting curves are grouped for reporting.
+The two axes are independent, and a report broken down by age band is normally
+still matched on `"sexrace"`.
+
+The averaging is the macro's, and it is made in one place so that two studies
+cannot average differently without noticing: survival and the density
+`hmatched * smatched` are averaged across patients at each time, unweighted,
+and the mean hazard is recovered by dividing. It is **not** the mean of the
+individual hazards.
 
 Omitting `vintage` is an error, deliberately:
 

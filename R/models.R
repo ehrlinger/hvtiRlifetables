@@ -95,9 +95,10 @@ hzl_nonwhite_code <- function(vintage) {
 #' @export
 us_lifetable_vintages <- function() {
   v <- usable_vintages()
+  models <- hzl_models()
   data.frame(
     vintage          = v,
-    n_strata         = vapply(v, function(x) sum(us_lifetable_models$vintage == x), integer(1)),
+    n_strata         = vapply(v, function(x) sum(models$vintage == x), integer(1)),
     nonwhite_code    = vapply(v, function(x) VINTAGE_META[[x]]$nonwhite_code, character(1)),
     nonwhite_meaning = vapply(v, function(x) VINTAGE_META[[x]]$nonwhite_meaning, character(1)),
     added            = vapply(v, function(x) VINTAGE_META[[x]]$added, character(1)),
@@ -140,11 +141,12 @@ us_lifetable_model <- function(vintage, stratum) {
     stop("`stratum` must be a single character string.", call. = FALSE)
   }
 
-  in_vintage <- us_lifetable_models$vintage == vintage
-  i <- which(in_vintage & us_lifetable_models$stratum == stratum)
+  models     <- hzl_models()
+  in_vintage <- models$vintage == vintage
+  i <- which(in_vintage & models$stratum == stratum)
 
   if (length(i) != 1L) {
-    available <- sort(us_lifetable_models$stratum[in_vintage])
+    available <- sort(models$stratum[in_vintage])
     stop("vintage \"", vintage, "\" has no stratum \"", stratum,
          "\". Available: ", paste(available, collapse = ", "),
          ".\nNote that vintages differ in how they name the non-white ",
@@ -155,10 +157,10 @@ us_lifetable_model <- function(vintage, stratum) {
   list(
     vintage = vintage,
     stratum = stratum,
-    params  = us_lifetable_models$params[[i]],
-    status  = us_lifetable_models$status[[i]],
-    flags   = us_lifetable_models$flags[[i]],
-    vcov    = us_lifetable_models$vcov[[i]]
+    params  = models$params[[i]],
+    status  = models$status[[i]],
+    flags   = models$flags[[i]],
+    vcov    = models$vcov[[i]]
   )
 }
 
