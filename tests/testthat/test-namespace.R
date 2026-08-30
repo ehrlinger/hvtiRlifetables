@@ -41,12 +41,20 @@ detached_r <- function(code) {
   ## not on the search path it reasons about.
   testthat::skip_if_not(file.exists(rscript), paste0("no ", exe, " in R.home('bin')"))
 
-  ## Handed over as a FILE, not as `-e`. The payload is a deparsed function
-  ## full of quotes and newlines; shQuote() defaults to sh quoting, which is
-  ## not cmd's, and cmd caps a command line at 8191 characters. Measured: with
-  ## the `.exe` guard fixed, the Windows child launched and died producing no
-  ## output at all. A script file has neither problem and reads the same on
-  ## every platform.
+  ## Handed over as a FILE, not as `-e`. Measured: with the `.exe` guard
+  ## fixed, the Windows child launched and died producing no output at all.
+  ##
+  ## Two causes were proposed for that and BOTH are false, measured rather
+  ## than reasoned: shQuote() already defaults to type = "cmd" on Windows --
+  ## `if (missing(type) && .Platform$OS.type == "windows")` is the first line
+  ## of its body -- and the payload is 860 characters against cmd's 8191-char
+  ## cap. The likely mechanism is instead that the payload carries 14 literal
+  ## NEWLINES, because it is a deparsed function, and a Windows command line
+  ## cannot carry one; it started doing so when package_fingerprint() began
+  ## being deparsed into the `-e` argument. That last is the best available
+  ## explanation and is NOT itself measured -- no Windows machine here. What
+  ## is measured is the fix: the file form reads the same on every platform,
+  ## and the Windows CI job went from SKIP 5 to SKIP 0 | PASS 483 on it.
   script <- tempfile(fileext = ".R")
   on.exit(unlink(script), add = TRUE)
   writeLines(code, script, useBytes = TRUE)
