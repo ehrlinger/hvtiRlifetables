@@ -74,9 +74,11 @@ detached_r <- function(code) {
   )
 }
 
-## Written as one `;`-joined line: the child receives it as a single -e
-## argument, and a literal newline inside shQuote() is portable but harder to
-## read in a failure message than the flat form.
+## Still written as one `;`-joined line, though the reason has changed. It was
+## required when the child received this as a single `-e` argument;
+## detached_r() writes it to a script file now, so newlines would be legal.
+## Kept flat because this string is echoed back in the skip and failure
+## messages, where one line reads better than fourteen.
 detached_call <- function(expr) {
   paste(
     ## One element, not two: joining with "; " between the condition and the
