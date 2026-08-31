@@ -154,7 +154,11 @@ package_fingerprint <- function() {
   code <- unlist(lapply(nms, function(n) c(n, deparse(get(n, ns)))))
   ## compress = FALSE: the bytes only have to be reproducible, not small, and
   ## a compressor is one more thing that could differ between two R builds.
+  ## Both temp files are unlinked. This runs once per test and again in every
+  ## child, so the litter accumulates fastest during exactly the repeated CI
+  ## debugging runs where it is least wanted.
   data_file <- tempfile()
+  on.exit(unlink(data_file), add = TRUE)
   ## version = 2 for the same reason. RDS 3 writes the session's NATIVE
   ## ENCODING into its header, so identical data serialises to different bytes
   ## under C and under en_US. Version 2 has no such header. This is the second,
@@ -163,6 +167,7 @@ package_fingerprint <- function() {
   saveRDS(hvtiRlifetables::us_lifetable_models, data_file, compress = FALSE,
           version = 2)
   both <- tempfile()
+  on.exit(unlink(both), add = TRUE)
   writeLines(c(code, unname(tools::md5sum(data_file))), both, useBytes = TRUE)
   unname(tools::md5sum(both))
 }
