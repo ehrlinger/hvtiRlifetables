@@ -14,13 +14,13 @@ Source:
 [`DESCRIPTION`](https://github.com/ehrlinger/hvtiRlifetables/blob/main/DESCRIPTION)
 
 Ehrlinger J (2026). *hvtiRlifetables: Age, Sex and Race Matched US
-Reference Survival*. R package version 0.1.2,
+Reference Survival*. R package version 0.1.3,
 <https://ehrlinger.github.io/hvtiRlifetables/>.
 
     @Manual{,
       title = {hvtiRlifetables: Age, Sex and Race Matched US Reference Survival},
       author = {John Ehrlinger},
       year = {2026},
-      note = {R package version 0.1.2},
+      note = {R package version 0.1.3},
       url = {https://ehrlinger.github.io/hvtiRlifetables/},
     }

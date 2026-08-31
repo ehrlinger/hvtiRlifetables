@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,24 @@
       <small>Source: <a href="https://github.com/ehrlinger/hvtiRlifetables/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.3" id="hvtirlifetables-013">hvtiRlifetables 0.1.3<a class="anchor" aria-label="anchor" href="#hvtirlifetables-013"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-1-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-3"></a></h3>
+<ul><li>
+<p><strong>The <code>::</code> regression tests could report a result they could not stand behind.</strong> The tests added in 0.1.2 run in a subprocess, which is the only way to catch the issue <a href="https://github.com/ehrlinger/hvtiRlifetables/issues/18" class="external-link">#18</a> defect — but a fresh R loads the <em>installed</em> copy of the package, never the source under development. Under <code>devtools::test()</code> the parent is a <code>load_all()</code> session, so the two can differ, and both directions mislead: a stale install fails against correct source, and a good install passes against source someone has just broken. The second is the same shape of defect as issue <a href="https://github.com/ehrlinger/hvtiRlifetables/issues/18" class="external-link">#18</a> itself — a test that looks like it covers the code while reporting on something else.</p>
+<p>Each subprocess now fingerprints what it loaded — every object in the namespace, deparsed, plus the shipped dataset — and the test skips unless that is the code under test. The fingerprint is code identity rather than a version string, so source edited <em>without</em> a version bump is caught too, which is the case that produced a false pass.</p>
+</li>
+<li>
+<p><strong>The <code>::</code> tests ran on Linux only, and nothing said so.</strong> They skipped on every macOS and Windows CI job — <code>SKIP 5 | PASS 474</code> against Linux’s <code>SKIP 0 | PASS 483</code> — while all ten checks stayed green. A skip is the one failure mode a passing check cannot show you, and on Windows the issue <a href="https://github.com/ehrlinger/hvtiRlifetables/issues/18" class="external-link">#18</a> guard had never run at all since 0.1.2. Three causes, found in that order:</p>
+<ul><li>
+<code>detached_r()</code> looked for <code>Rscript</code> in <code>R.home("bin")</code>, where Windows has <code>Rscript.exe</code>. The extension is now chosen per platform.</li>
+<li>The child was then launched via <code>-e</code>, and with the guard above fixed it launched and produced no output at all. Two causes were proposed for that and both are false, measured rather than reasoned: <code><a href="https://rdrr.io/r/base/shQuote.html" class="external-link">shQuote()</a></code> already defaults to <code>type = "cmd"</code> on Windows, and the payload is 860 characters against <code>cmd</code>’s 8191-char cap. What the payload does carry is 14 literal newlines — it is a deparsed function — and a Windows command line cannot carry one; that is the best available explanation and is <em>not</em> itself measured, no Windows machine being to hand. The code is handed over as a script file now, which is platform-neutral regardless of which of those was the mechanism, and <code>R_LIBS</code> is set on the parent and inherited rather than passed through <code>system2(env=)</code>, which Windows does not support.</li>
+<li>The fingerprint was <strong>locale-dependent, in two independent ways</strong>. <code>R CMD check</code> forces <code>LC_COLLATE=C</code> on the parent while a <code>--vanilla</code> child inherits the machine’s locale: <code><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort()</a></code> then orders the namespace differently — <code>VINTAGE_META</code> sorts third under <code>C</code> and last under <code>en_US</code>, which ignores case — and <code><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS()</a></code> version 3 writes the session’s native encoding into its header, so identical data serialises to different bytes. Same package, two fingerprints. Now <code>sort(method = "radix")</code> and <code>saveRDS(version = 2)</code>, both byte-ordered and neither locale-aware.</li>
+</ul><p>The fingerprint is now identical under <code>C</code>, <code>en_US.UTF-8</code> and <code>de_DE.UTF-8</code>.</p>
+</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.2" id="hvtirlifetables-012">hvtiRlifetables 0.1.2<a class="anchor" aria-label="anchor" href="#hvtirlifetables-012"></a></h2>
 <div class="section level3">
