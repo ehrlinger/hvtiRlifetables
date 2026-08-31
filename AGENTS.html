@@ -42,7 +42,7 @@
 <ul><li>
 <code>devtools::test()</code> passes. The runner is <code>tests/testthat.R</code>.</li>
 <li>
-<code>devtools::check()</code> is <strong>0 errors, 0 warnings, 0 notes</strong>. Verified 2026-08-20 at 0.1.0.</li>
+<code>devtools::check()</code> is <strong>0 errors, 0 warnings</strong>. Verified 2026-08-31 at 0.1.3, with the manual, from a clean <code>git archive</code> export. ⚠️ <strong>Not 0 notes, and it never will be.</strong> <code>--as-cran</code> emits one NOTE from the CRAN incoming-feasibility check, carrying <code>New submission</code> and <code>Unknown, possibly misspelled, fields in DESCRIPTION: 'Remotes'</code>. That NOTE is the price of the <code>Remotes:</code> line that resolves <code>TemporalHazard</code> from GitHub, which must not be removed — see “Rules for this repo”. And <strong>this package is not going to CRAN</strong> (maintainer’s decision, recorded 2026-08-31), so <code>New submission</code> will not clear either. The bar is therefore <em>that one NOTE and no other</em>: a second note, or a different one, is the failure. An earlier version of this line claimed 0 notes at 0.1.0; do not restore it.</li>
 <li>
 <code><a href="https://lintr.r-lib.org/reference/lint.html" class="external-link">lintr::lint_package()</a></code> returns <strong>zero</strong> lints. CI runs with <code>LINTR_ERROR_ON_LINT: true</code>, so any lint fails the build. <code>R/</code> and <code>tests/</code> were brought to zero on 2026-08-20; keep them there.</li>
 <li>
