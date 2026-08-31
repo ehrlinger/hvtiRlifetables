@@ -26,12 +26,17 @@
 
   - `detached_r()` looked for `Rscript` in `R.home("bin")`, where Windows has
     `Rscript.exe`. The extension is now chosen per platform.
-  - The child was then launched via `-e` with an `shQuote()` payload. That
-    quoting is `sh`'s, not `cmd`'s, and `cmd` caps a command line at 8191
-    characters; with the guard above fixed, the Windows child launched and
-    produced no output at all. The code is handed over as a script file now,
-    and `R_LIBS` is set on the parent and inherited rather than passed through
-    `system2(env=)`, which Windows does not support.
+  - The child was then launched via `-e`, and with the guard above fixed it
+    launched and produced no output at all. Two causes were proposed for that
+    and both are false, measured rather than reasoned: `shQuote()` already
+    defaults to `type = "cmd"` on Windows, and the payload is 860 characters
+    against `cmd`'s 8191-char cap. What the payload does carry is 14 literal
+    newlines — it is a deparsed function — and a Windows command line cannot
+    carry one; that is the best available explanation and is *not* itself
+    measured, no Windows machine being to hand. The code is handed over as a
+    script file now, which is platform-neutral regardless of which of those
+    was the mechanism, and `R_LIBS` is set on the parent and inherited rather
+    than passed through `system2(env=)`, which Windows does not support.
   - The fingerprint was **locale-dependent, in two independent ways**.
     `R CMD check` forces `LC_COLLATE=C` on the parent while a `--vanilla`
     child inherits the machine's locale: `sort()` then orders the namespace
