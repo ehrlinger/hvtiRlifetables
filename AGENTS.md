@@ -26,16 +26,49 @@ is restated here.
 
 ## The automated gates
 
-Five workflows, adopted 2026-08-20. `house-style` is **deliberately absent**: it needs
-`.claude/house-style.md` and a `repos.yml` registration this repo does not have.
+Six workflow files. Five were adopted 2026-08-20; `house-style` came later. Verified
+2026-08-30 against the live repo and PR #21, where the `house-style` check ran and passed.
 
-| workflow | fails on |
+⚠️ **`house-style` is no longer absent.** It used to be, deliberately — it needs
+`.claude/house-style.md` and a `repos.yml` registration, and this repo had neither. Both
+have since landed: the file is committed here, and the workflow asserts this repo's entry is
+still present in the registry it checks out. An older note calling the gate deliberately
+absent is stale.
+
+| workflow | fails on | runs on |
+|---|---|---|
+| `R-CMD-check.yaml` | `R CMD check` across platforms | push to `main`, PR |
+| `check-manual.yaml` | the PDF manual build | push to `main`, release, dispatch — **not PRs** |
+| `house-style.yaml` | `.claude/house-style.md` drifting from the vault sources it was composed from | push to `main`, PR |
+| `lint.yaml` | any lint at all (`LINTR_ERROR_ON_LINT: true`), and generated docs drifting from their roxygen sources | push to `main`, PR |
+| `pkgdown.yaml` | the site build, and deploy on `main` | push to `main`, PR, release, dispatch |
+| `test-coverage.yaml` | coverage upload | push to `main`, PR |
+
+⚠️ **`check-manual` does not gate pull requests.** It has no `pull_request:` trigger, so it
+runs post-merge on `main`, on a published release, and on `workflow_dispatch`. That is
+deliberate and the file's own header comment explains it — do not "fix" the trigger. The
+consequence is what matters: a PR green across every check is **not** evidence that the PDF
+manual builds, and the raw-Unicode-in-`.Rd` failure this workflow exists to catch will
+surface after the merge, not before it. Dispatch it by hand if you need that assurance first.
+
+⚠️ **Check names do not map one-to-one onto workflow filenames.** Six files produce ten check
+runs on a PR, because GitHub names a check run after the *job*, not the file:
+
+| file | check runs on a PR |
 |---|---|
-| `R-CMD-check.yaml` | `R CMD check` across platforms |
-| `check-manual.yaml` | the PDF manual build |
-| `lint.yaml` | any lint at all (`LINTR_ERROR_ON_LINT: true`) |
-| `pkgdown.yaml` | the site build, and deploy on `main` |
-| `test-coverage.yaml` | coverage upload |
+| `R-CMD-check.yaml` | `macos-latest (release)`, `windows-latest (release)`, `ubuntu-latest (devel)`, `ubuntu-latest (release)`, `ubuntu-latest (oldrel-1)` — five matrix legs, and **nothing named `R-CMD-check`** |
+| `check-manual.yaml` | none, per the trigger above |
+| `house-style.yaml` | `house-style` |
+| `lint.yaml` | `lint` **and** `docs-current` — two jobs sharing one workflow run id |
+| `pkgdown.yaml` | `pkgdown` |
+| `test-coverage.yaml` | `test-coverage` |
+
+`docs-current` is `pull_request`-only: it regenerates the roxygen output and fails on the
+diff, so a push to `main` gets only `lint` from `lint.yaml`. Two practical consequences.
+Searching the Actions UI for a check named after a workflow file will not find it. And a
+`required_status_checks` rule — the fifth rule type `ggRandomForests` carries, described
+below — has to name the **job**, so gating "R CMD check" there means naming the five matrix
+legs individually.
 
 ## The rule that matters most
 
