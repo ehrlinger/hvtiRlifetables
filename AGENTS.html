@@ -50,22 +50,54 @@
 </ul></div>
 <div class="section level2">
 <h2 id="the-automated-gates">The automated gates<a class="anchor" aria-label="anchor" href="#the-automated-gates"></a></h2>
-<p>Five workflows, adopted 2026-08-20. <code>house-style</code> is <strong>deliberately absent</strong>: it needs <code>.claude/house-style.md</code> and a <code>repos.yml</code> registration this repo does not have.</p>
-<table class="table"><thead><tr><th>workflow</th>
+<p>Six workflow files. Five were adopted 2026-08-20; <code>house-style</code> came later. Verified 2026-08-30 against the live repo and PR #21, where the <code>house-style</code> check ran and passed.</p>
+<p>⚠️ <strong><code>house-style</code> is no longer absent.</strong> It used to be, deliberately — it needs <code>.claude/house-style.md</code> and a <code>repos.yml</code> registration, and this repo had neither. Both have since landed: the file is committed here, and the workflow asserts this repo’s entry is still present in the registry it checks out. An older note calling the gate deliberately absent is stale.</p>
+<table class="table"><colgroup><col width="33%"><col width="33%"><col width="33%"></colgroup><thead><tr><th>workflow</th>
 <th>fails on</th>
+<th>runs on</th>
 </tr></thead><tbody><tr><td><code>R-CMD-check.yaml</code></td>
 <td>
 <code>R CMD check</code> across platforms</td>
+<td>push to <code>main</code>, PR</td>
 </tr><tr><td><code>check-manual.yaml</code></td>
 <td>the PDF manual build</td>
+<td>push to <code>main</code>, release, dispatch — <strong>not PRs</strong>
+</td>
+</tr><tr><td><code>house-style.yaml</code></td>
+<td>
+<code>.claude/house-style.md</code> drifting from the vault sources it was composed from</td>
+<td>push to <code>main</code>, PR</td>
 </tr><tr><td><code>lint.yaml</code></td>
-<td>any lint at all (<code>LINTR_ERROR_ON_LINT: true</code>)</td>
+<td>any lint at all (<code>LINTR_ERROR_ON_LINT: true</code>), and generated docs drifting from their roxygen sources</td>
+<td>push to <code>main</code>, PR</td>
 </tr><tr><td><code>pkgdown.yaml</code></td>
 <td>the site build, and deploy on <code>main</code>
 </td>
+<td>push to <code>main</code>, PR, release, dispatch</td>
 </tr><tr><td><code>test-coverage.yaml</code></td>
 <td>coverage upload</td>
-</tr></tbody></table></div>
+<td>push to <code>main</code>, PR</td>
+</tr></tbody></table><p>⚠️ <strong><code>check-manual</code> does not gate pull requests.</strong> It has no <code>pull_request:</code> trigger, so it runs post-merge on <code>main</code>, on a published release, and on <code>workflow_dispatch</code>. That is deliberate and the file’s own header comment explains it — do not “fix” the trigger. The consequence is what matters: a PR green across every check is <strong>not</strong> evidence that the PDF manual builds, and the raw-Unicode-in-<code>.Rd</code> failure this workflow exists to catch will surface after the merge, not before it. Dispatch it by hand if you need that assurance first.</p>
+<p>⚠️ <strong>Check names do not map one-to-one onto workflow filenames.</strong> Six files produce ten check runs on a PR, because GitHub names a check run after the <em>job</em>, not the file:</p>
+<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>file</th>
+<th>check runs on a PR</th>
+</tr></thead><tbody><tr><td><code>R-CMD-check.yaml</code></td>
+<td>
+<code>macos-latest (release)</code>, <code>windows-latest (release)</code>, <code>ubuntu-latest (devel)</code>, <code>ubuntu-latest (release)</code>, <code>ubuntu-latest (oldrel-1)</code> — five matrix legs, and <strong>nothing named <code>R-CMD-check</code></strong>
+</td>
+</tr><tr><td><code>check-manual.yaml</code></td>
+<td>none, per the trigger above</td>
+</tr><tr><td><code>house-style.yaml</code></td>
+<td><code>house-style</code></td>
+</tr><tr><td><code>lint.yaml</code></td>
+<td>
+<code>lint</code> <strong>and</strong> <code>docs-current</code> — two jobs sharing one workflow run id</td>
+</tr><tr><td><code>pkgdown.yaml</code></td>
+<td><code>pkgdown</code></td>
+</tr><tr><td><code>test-coverage.yaml</code></td>
+<td><code>test-coverage</code></td>
+</tr></tbody></table><p><code>docs-current</code> is <code>pull_request</code>-only: it regenerates the roxygen output and fails on the diff, so a push to <code>main</code> gets only <code>lint</code> from <code>lint.yaml</code>. Two practical consequences. Searching the Actions UI for a check named after a workflow file will not find it. And a <code>required_status_checks</code> rule — the fifth rule type <code>ggRandomForests</code> carries, described below — has to name the <strong>job</strong>, so gating “R CMD check” there means naming the five matrix legs individually.</p>
+</div>
 <div class="section level2">
 <h2 id="the-rule-that-matters-most">The rule that matters most<a class="anchor" aria-label="anchor" href="#the-rule-that-matters-most"></a></h2>
 <p>⚠️ <strong>In the <code>table2023</code> vintage, the stratum code <code>"b"</code> does NOT mean Black.</strong> It is a risk-weighted average of Black, Asian, American Indian and Hispanic death rates, weighted by number at risk — <em>despite the stratum code, and despite the macro’s own comment saying otherwise</em>. <code>VINTAGE_META</code> records this in <code>nonwhite_meaning</code>, and <code><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages()</a></code> surfaces it.</p>
