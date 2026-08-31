@@ -17,7 +17,16 @@ is restated here.
 ## Definition of done
 
 - `devtools::test()` passes. The runner is `tests/testthat.R`.
-- `devtools::check()` is **0 errors, 0 warnings, 0 notes**. Verified 2026-08-20 at 0.1.0.
+- `devtools::check()` is **0 errors, 0 warnings**. Verified 2026-08-31 at 0.1.3, with the
+  manual, from a clean `git archive` export.
+  ⚠️ **Not 0 notes, and it never will be.** `--as-cran` emits one NOTE from the CRAN
+  incoming-feasibility check, carrying `New submission` and `Unknown, possibly misspelled,
+  fields in DESCRIPTION: 'Remotes'`. That NOTE is the price of the `Remotes:` line that
+  resolves `TemporalHazard` from GitHub, which must not be removed — see "Rules for this
+  repo". And **this package is not going to CRAN** (maintainer's decision, recorded
+  2026-08-31), so `New submission` will not clear either. The bar is therefore *that one
+  NOTE and no other*: a second note, or a different one, is the failure. An earlier version
+  of this line claimed 0 notes at 0.1.0; do not restore it.
 - `lintr::lint_package()` returns **zero** lints. CI runs with `LINTR_ERROR_ON_LINT: true`,
   so any lint fails the build. `R/` and `tests/` were brought to zero on 2026-08-20; keep
   them there.
