@@ -1,3 +1,53 @@
+# hvtiRlifetables 0.1.3
+
+## Bug fixes
+
+- **The `::` regression tests could report a result they could not stand
+  behind.** The tests added in 0.1.2 run in a subprocess, which is the only
+  way to catch the issue #18 defect — but a fresh R loads the *installed*
+  copy of the package, never the source under development. Under
+  `devtools::test()` the parent is a `load_all()` session, so the two can
+  differ, and both directions mislead: a stale install fails against correct
+  source, and a good install passes against source someone has just broken.
+  The second is the same shape of defect as issue #18 itself — a test that
+  looks like it covers the code while reporting on something else.
+
+  Each subprocess now fingerprints what it loaded — every object in the
+  namespace, deparsed, plus the shipped dataset — and the test skips unless
+  that is the code under test. The fingerprint is code identity rather than a
+  version string, so source edited *without* a version bump is caught too,
+  which is the case that produced a false pass.
+
+- **The `::` tests ran on Linux only, and nothing said so.** They skipped on
+  every macOS and Windows CI job — `SKIP 5 | PASS 474` against Linux's
+  `SKIP 0 | PASS 483` — while all ten checks stayed green. A skip is the one
+  failure mode a passing check cannot show you, and on Windows the issue #18
+  guard had never run at all since 0.1.2. Three causes, found in that order:
+
+  - `detached_r()` looked for `Rscript` in `R.home("bin")`, where Windows has
+    `Rscript.exe`. The extension is now chosen per platform.
+  - The child was then launched via `-e`, and with the guard above fixed it
+    launched and produced no output at all. Two causes were proposed for that
+    and both are false, measured rather than reasoned: `shQuote()` already
+    defaults to `type = "cmd"` on Windows, and the payload is 860 characters
+    against `cmd`'s 8191-char cap. What the payload does carry is 14 literal
+    newlines — it is a deparsed function — and a Windows command line cannot
+    carry one; that is the best available explanation and is *not* itself
+    measured, no Windows machine being to hand. The code is handed over as a
+    script file now, which is platform-neutral regardless of which of those
+    was the mechanism, and `R_LIBS` is set on the parent and inherited rather
+    than passed through `system2(env=)`, which Windows does not support.
+  - The fingerprint was **locale-dependent, in two independent ways**.
+    `R CMD check` forces `LC_COLLATE=C` on the parent while a `--vanilla`
+    child inherits the machine's locale: `sort()` then orders the namespace
+    differently — `VINTAGE_META` sorts third under `C` and last under `en_US`,
+    which ignores case — and `saveRDS()` version 3 writes the session's native
+    encoding into its header, so identical data serialises to different bytes.
+    Same package, two fingerprints. Now `sort(method = "radix")` and
+    `saveRDS(version = 2)`, both byte-ordered and neither locale-aware.
+
+  The fingerprint is now identical under `C`, `en_US.UTF-8` and `de_DE.UTF-8`.
+
 # hvtiRlifetables 0.1.2
 
 ## Bug fixes
