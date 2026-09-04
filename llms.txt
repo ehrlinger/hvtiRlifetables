@@ -1,5 +1,10 @@
 # hvtiRlifetables
 
+[![R package
+version](https://img.shields.io/github/r-package/v/ehrlinger/hvtiRlifetables)](https://github.com/ehrlinger/hvtiRlifetables)
+
+[![lint](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/lint.yaml/badge.svg)](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/lint.yaml)
+
 Age, sex and race matched US reference survival — the dashed comparison
 line on a clinical survival figure — computed in R.
 
