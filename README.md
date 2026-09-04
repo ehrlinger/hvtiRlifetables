@@ -1,5 +1,16 @@
 # hvtiRlifetables
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/ehrlinger/hvtiRlifetables/graph/badge.svg)](https://app.codecov.io/gh/ehrlinger/hvtiRlifetables)
+[![active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/badges/latest/active.svg)
+[![pkgdown](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/pkgdown.yaml)
+
+[![R package version](https://img.shields.io/github/r-package/v/ehrlinger/hvtiRlifetables)](https://github.com/ehrlinger/hvtiRlifetables)
+
+[![lint](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/lint.yaml/badge.svg)](https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/lint.yaml)
+<!-- badges: end -->
+
 Age, sex and race matched US reference survival — the dashed comparison line on
 a clinical survival figure — computed in R.
 
