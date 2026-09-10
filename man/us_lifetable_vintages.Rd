@@ -8,24 +8,24 @@ us_lifetable_vintages()
 }
 \value{
 A data frame with one row per usable vintage and columns:
-  `vintage` (character identifier), `n_strata` (integer, always 9),
-  `nonwhite_code` (character, the stratum code this vintage uses for its
-  non-white category), `nonwhite_meaning` (character, what that category
-  actually contains), `added` (character date the fits were added, where
-  known, otherwise `NA`).
+\code{vintage} (character identifier), \code{n_strata} (integer, always 9),
+\code{nonwhite_code} (character, the stratum code this vintage uses for its
+non-white category), \code{nonwhite_meaning} (character, what that category
+actually contains), \code{added} (character date the fits were added, where
+known, otherwise \code{NA}).
 
-  There is deliberately no `source` column: `R/` carries no literal share
-  path. `data-raw/build-models.R` names the location the fits are restored
-  from.
+There is deliberately no \code{source} column: \verb{R/} carries no literal share
+path. \code{data-raw/build-models.R} names the location the fits are restored
+from.
 }
 \description{
 Reports the fitted-model vintages this package ships, with the provenance
-and race semantics needed to choose one. Vintages are **not**
+and race semantics needed to choose one. Vintages are \strong{not}
 interchangeable — model structure differs, not only fitted values.
 }
-\section{Read `nonwhite_meaning` before citing a stratum}{
+\section{Read \code{nonwhite_meaning} before citing a stratum}{
 
-The `table2023` non-white category is stored under code `b` but is a
+The \code{table2023} non-white category is stored under code \code{b} but is a
 risk-weighted average of Black, Asian, American Indian and Hispanic death
 rates. It is not Black. The macro's own comment says otherwise and is
 wrong.

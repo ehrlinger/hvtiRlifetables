@@ -1,3 +1,19 @@
+# hvtiRlifetables (unreleased)
+
+## Documentation
+
+- **Roxygen markdown is now enabled, so the help pages render as written.**
+  Without `Roxygen: list(markdown = TRUE)`, 129 backtick spans, 10 bold
+  spans and 6 `[fn()]` cross-references reached `man/` as literal text, in
+  `?us_matched`, the PDF manual and the pkgdown site. Four of the six dead
+  links pointed at `us_lifetable_vintages()`, the page that says what a
+  stratum code actually means. All six now link.
+  ([#20](https://github.com/ehrlinger/hvtiRlifetables/issues/20))
+
+  Nothing caught it: literal backticks are legal Rd, so `R CMD check`,
+  pkgdown and `docs-current` all passed. `lint.yaml` now fails when a
+  backtick, `**` or `[fn()]` reaches `man/`.
+
 # hvtiRlifetables 0.1.3
 
 ## Bug fixes

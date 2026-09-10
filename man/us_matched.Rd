@@ -17,72 +17,72 @@ us_matched(
 )
 }
 \arguments{
-\item{age}{Numeric vector of ages **in years**, always in years regardless
-of `scale`.}
+\item{age}{Numeric vector of ages \strong{in years}, always in years regardless
+of \code{scale}.}
 
-\item{male}{Numeric vector, `1` male, `0` female. The macro's coding,
+\item{male}{Numeric vector, \code{1} male, \code{0} female. The macro's coding,
 unchanged.}
 
-\item{other}{Numeric vector, `1` non-white, `0` white. The macro's coding,
+\item{other}{Numeric vector, \code{1} non-white, \code{0} white. The macro's coding,
 unchanged. What "non-white" contains differs by vintage -- see
-[us_lifetable_vintages()].}
+\code{\link[=us_lifetable_vintages]{us_lifetable_vintages()}}.}
 
-\item{times}{Numeric vector of follow-up times in the units of `scale`,
+\item{times}{Numeric vector of follow-up times in the units of \code{scale},
 non-negative.}
 
 \item{id}{Optional vector of patient identifiers, recycled into the output.
-Defaults to `seq_along(age)`.}
+Defaults to \code{seq_along(age)}.}
 
-\item{vintage}{Character scalar naming the fitted-model vintage. **There is
-no default.** Omitting it is an error. See Details.}
+\item{vintage}{Character scalar naming the fitted-model vintage. \strong{There is
+no default.} Omitting it is an error. See Details.}
 
 \item{table}{How finely to stratify patients, mirroring the macro's
-`TABLE=` modes. `"sexrace"` uses all four crossings, `"race"` uses white
-against the vintage's non-white category, `"sex"` uses male and female,
-`"overall"` sends every patient to the combined stratum and ignores
-`male` and `other`.}
+\verb{TABLE=} modes. \code{"sexrace"} uses all four crossings, \code{"race"} uses white
+against the vintage's non-white category, \code{"sex"} uses male and female,
+\code{"overall"} sends every patient to the combined stratum and ignores
+\code{male} and \code{other}.}
 
-\item{scale}{Units of `times`. Applies the macro's `SCALEF` of `1`,
-`1/12` and `1/365.2425` respectively.}
+\item{scale}{Units of \code{times}. Applies the macro's \code{SCALEF} of \code{1},
+\code{1/12} and \code{1/365.2425} respectively.}
 
-\item{individual}{If `TRUE` (default), one row per patient per time. If
-`FALSE`, the cohort mean curve, one row per time -- the ungrouped case of
+\item{individual}{If \code{TRUE} (default), one row per patient per time. If
+\code{FALSE}, the cohort mean curve, one row per time -- the ungrouped case of
 \code{\link{us_cohort_curve}}, which is what to use for a curve within
 groups of the caller's own choosing.}
 }
 \value{
-A data frame. When `individual = TRUE`, columns `id`, `time`,
-  `agesurv` (survival from birth to the patient's current age),
-  `smatched` (reference survival over `times`, conditional on having
-  reached `age`) and `hmatched` (the reference hazard), with one row per
-  patient per time. When `individual = FALSE`, columns `time`, `smatched`
-  and `hmatched` only, with one row per time.
+A data frame. When \code{individual = TRUE}, columns \code{id}, \code{time},
+\code{agesurv} (survival from birth to the patient's current age),
+\code{smatched} (reference survival over \code{times}, conditional on having
+reached \code{age}) and \code{hmatched} (the reference hazard), with one row per
+patient per time. When \code{individual = FALSE}, columns \code{time}, \code{smatched}
+and \code{hmatched} only, with one row per time.
 }
 \description{
-Reproduces the Cleveland Clinic SAS macro `%usmatchd`: for each patient, a
+Reproduces the Cleveland Clinic SAS macro \verb{\%usmatchd}: for each patient, a
 US reference survival curve matched on age, sex and race, together with its
 hazard. This is the dashed comparison line on a clinical survival figure.
 }
 \details{
-`%usmatchd` is not a life-table lookup. It evaluates a stored three-phase
-parametric hazard fit on the **age** axis, time origin birth, and reads
+\verb{\%usmatchd} is not a life-table lookup. It evaluates a stored three-phase
+parametric hazard fit on the \strong{age} axis, time origin birth, and reads
 conditional survival off that one smooth curve twice. That is why the
-resulting hazard is smooth *within* a one-year age bin where a life table
+resulting hazard is smooth \emph{within} a one-year age bin where a life table
 would be flat.
 
-**`hmatched` is per year regardless of `scale`.** This matches the macro's
-source, which assigns `_HAZARD` without applying `SCALEF`, notwithstanding
+\strong{\code{hmatched} is per year regardless of \code{scale}.} This matches the macro's
+source, which assigns \verb{_HAZARD} without applying \code{SCALEF}, notwithstanding
 the macro's own header comment to the contrary.
 
-When `individual = FALSE`, the cohort mean follows the macro's arithmetic:
-the hazard is converted to a density (`hmatched * smatched`), the cohort
+When \code{individual = FALSE}, the cohort mean follows the macro's arithmetic:
+the hazard is converted to a density (\code{hmatched * smatched}), the cohort
 means of survival and of the density are taken at each time, and the mean
-hazard is recovered by division. It is deliberately **not** the mean of
+hazard is recovered by division. It is deliberately \strong{not} the mean of
 the individual hazards.
 }
-\section{Why `vintage` has no default}{
+\section{Why \code{vintage} has no default}{
 
-The macro's default silently moved from `table84` to `table2023`, and every
+The macro's default silently moved from \code{table84} to \code{table2023}, and every
 job re-run across that change got different numbers with no signal. An
 analysis that does not state its reference vintage is not reproducible, so
 this package refuses to guess. State it literally in analysis code.
@@ -97,8 +97,8 @@ r[, c("time", "smatched", "hmatched")]
 }
 \seealso{
 \code{\link{us_cohort_curve}} to reduce the individual output to a
-  cohort curve, or to one curve per group;
-  [us_lifetable_vintages()] for the available vintages and what
-  their non-white stratum actually contains; [us_lifetable_model()] for the
-  raw fitted parameters.
+cohort curve, or to one curve per group;
+\code{\link[=us_lifetable_vintages]{us_lifetable_vintages()}} for the available vintages and what
+their non-white stratum actually contains; \code{\link[=us_lifetable_model]{us_lifetable_model()}} for the
+raw fitted parameters.
 }
