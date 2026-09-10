@@ -8,22 +8,22 @@ us_lifetable_model(vintage, stratum)
 }
 \arguments{
 \item{vintage}{Character scalar. One of the identifiers returned by
-[us_lifetable_vintages()]. **There is no default**; omitting it is an
+\code{\link[=us_lifetable_vintages]{us_lifetable_vintages()}}. \strong{There is no default}; omitting it is an
 error.}
 
-\item{stratum}{Character scalar. One of `"all"`, `"f"`, `"m"`, `"w"`,
-`"wf"`, `"wm"`, or the vintage's non-white codes — `"o"`, `"of"`, `"om"`
-for `table84`, `"b"`, `"bf"`, `"bm"` otherwise.}
+\item{stratum}{Character scalar. One of \code{"all"}, \code{"f"}, \code{"m"}, \code{"w"},
+\code{"wf"}, \code{"wm"}, or the vintage's non-white codes — \code{"o"}, \code{"of"}, \code{"om"}
+for \code{table84}, \code{"b"}, \code{"bf"}, \code{"bm"} otherwise.}
 }
 \value{
-A list with elements `vintage` (character), `stratum` (character),
-  `params` (named numeric of length 11), `status` (named integer of length
-  11, the `_STATUS_` gate), `flags` (named numeric of length 6, metadata
-  only), and `vcov` (11 by 11 numeric matrix, unused in this version).
+A list with elements \code{vintage} (character), \code{stratum} (character),
+\code{params} (named numeric of length 11), \code{status} (named integer of length
+11, the \verb{_STATUS_} gate), \code{flags} (named numeric of length 6, metadata
+only), and \code{vcov} (11 by 11 numeric matrix, unused in this version).
 }
 \description{
 Returns the raw fitted model for a single vintage and stratum, for
-inspection. [us_matched()] is the function most callers want.
+inspection. \code{\link[=us_matched]{us_matched()}} is the function most callers want.
 }
 \examples{
 m <- us_lifetable_model("table84", "wm")

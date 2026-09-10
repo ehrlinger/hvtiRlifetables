@@ -47,5 +47,6 @@ Suggests:
 Remotes:
     TemporalHazard=ehrlinger/TemporalHazard
 Config/testthat/edition: 3
+Roxygen: list(markdown = TRUE)
 Config/roxygen2/version: 8.1.0
 LazyData: true

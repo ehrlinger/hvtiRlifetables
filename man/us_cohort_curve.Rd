@@ -14,11 +14,11 @@ rejected rather than averaged twice.}
 
 \item{by}{How to group the result. One of:
 \itemize{
-  \item \code{NULL} (default), for a single cohort-wide curve;
-  \item a vector or factor with one value per \emph{row} of \code{x},
-    reported in a column called \code{group};
-  \item a named list or data frame of such vectors, for a crossed
-    grouping, reported under its own names.
+\item \code{NULL} (default), for a single cohort-wide curve;
+\item a vector or factor with one value per \emph{row} of \code{x},
+reported in a column called \code{group};
+\item a named list or data frame of such vectors, for a crossed
+grouping, reported under its own names.
 }
 It carries values, not column names: group by a column of \code{x} with
 \code{by = x$arm}. Because \code{x} holds one row per patient per time,
@@ -26,10 +26,10 @@ a patient-level grouping must be expanded to it -- see the examples.}
 }
 \value{
 A data frame with columns \code{time}, \code{smatched} and
-  \code{hmatched}, one row per time -- or, with \code{by}, the grouping
-  columns first and one row per group per time. Groups and times appear in
-  order of first appearance in \code{x}, so a factor grouping does not
-  reorder to its levels.
+\code{hmatched}, one row per time -- or, with \code{by}, the grouping
+columns first and one row per group per time. Groups and times appear in
+order of first appearance in \code{x}, so a factor grouping does not
+reorder to its levels.
 }
 \description{
 Reduces the per-patient output of \code{\link{us_matched}} to the curve a
@@ -79,5 +79,5 @@ us_cohort_curve(x, by = factor(band[x$id], levels = c("55-79", "80+")))
 }
 \seealso{
 \code{\link{us_matched}}, whose \code{individual = FALSE} is the
-  ungrouped case of this function.
+ungrouped case of this function.
 }

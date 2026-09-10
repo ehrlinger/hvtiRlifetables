@@ -83,3 +83,14 @@ jobs:
         run: |
           Rscript -e 'roxygen2::roxygenise()'
           git diff --exit-code man/ NAMESPACE DESCRIPTION
+
+      # The step above cannot see markdown that was never rendered: it
+      # certifies man/ matches its sources, and a literal backtick is legal Rd
+      # text. Issue #20 shipped 129 backtick spans and 6 dead [fn()] links past
+      # it, R CMD check and pkgdown. Fail if any reaches man/ again.
+      - name: No literal markdown in man/
+        run: |
+          if grep -nE '`|\[[A-Za-z_.][A-Za-z0-9_.]*\(\)\]|\*\*' man/*.Rd; then
+            echo "::error::Literal markdown in man/. Is Roxygen markdown still enabled in DESCRIPTION?"
+            exit 1
+          fi
