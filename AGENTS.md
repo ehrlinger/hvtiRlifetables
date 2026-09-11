@@ -54,7 +54,7 @@ absent is stale.
 | `test-coverage.yaml` | coverage upload | push to `main`, PR |
 
 ⚠️ **`check-manual` does not gate pull requests.** It has no `pull_request:` trigger, so it
-runs post-merge on `main` and on `workflow_dispatch`. That is
+runs post-merge on `main`, and on demand via `workflow_dispatch`. That is
 deliberate and the file's own header comment explains it — do not "fix" the trigger. The
 consequence is what matters: a PR green across every check is **not** evidence that the PDF
 manual builds, and the raw-Unicode-in-`.Rd` failure this workflow exists to catch will
