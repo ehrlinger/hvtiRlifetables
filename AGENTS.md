@@ -59,7 +59,7 @@ absent is stale.
 | `check-manual.yaml` | the PDF manual build | push to `main`, release, dispatch — **not PRs** |
 | `house-style.yaml` | `.claude/house-style.md` drifting from the vault sources it was composed from | push to `main`, PR |
 | `lint.yaml` | any lint at all (`LINTR_ERROR_ON_LINT: true`), and generated docs drifting from their roxygen sources | push to `main`, PR |
-| `pkgdown.yaml` | the site build, and deploy on `main` | push to `main`, PR, release, dispatch |
+| `pkgdown.yaml` | the site build, and deploy on `main` | push to `main`, PR, dispatch — **not releases** (the workflow’s comment says why) |
 | `test-coverage.yaml` | coverage upload | push to `main`, PR |
 
 ⚠️ **`check-manual` does not gate pull requests.** It has no
