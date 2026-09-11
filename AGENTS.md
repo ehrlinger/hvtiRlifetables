@@ -141,9 +141,18 @@ everyone expects.
   the same folder; the two must agree. Getting this wrong deletes
   tracked design documents, which is why pkgdown refuses and errors
   instead.
-- **Roxygen markdown is NOT enabled** — no
-  `Roxygen: list(markdown = TRUE)` in `DESCRIPTION`, so use `\code{}`,
-  `\strong{}`, `\emph{}` and `\link{}`.
+- **Roxygen markdown IS enabled**: `DESCRIPTION` carries
+  `Roxygen: list(markdown = TRUE)`, so backticks, `**bold**` and
+  `[fn()]` links render. Rd macros such as `\code{}` still work, and
+  `R/cohort.R` is written in them; do not convert either style to the
+  other for its own sake. ⚠️ **Until issue \#20 this rule said the
+  opposite, and the sources ignored it.** 129 backtick spans, 10 bold
+  spans and 6 dead `[fn()]` cross-references shipped literally in
+  `man/`, past `R CMD check`, pkgdown and `docs-current`, because all of
+  it is legal Rd text. The `No literal markdown in man/` step in
+  `lint.yaml` is what catches a regression now. ⚠️ Sibling packages
+  differ: `hvtiRtemplates` has markdown OFF. Check `DESCRIPTION` before
+  writing roxygen in a repo you have not just read.
 - **`.lintr` disables three linters, each for a stated reason**:
   `object_name_linter` (`muE`/`muC`/`muL` are the Blackstone phase
   amplitudes and match the SAS parameter table), `commented_code_linter`

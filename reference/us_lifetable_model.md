@@ -1,7 +1,9 @@
 # One fitted parameter set
 
 Returns the raw fitted model for a single vintage and stratum, for
-inspection. \[us_matched()\] is the function most callers want.
+inspection.
+[`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+is the function most callers want.
 
 ## Usage
 
@@ -14,23 +16,21 @@ us_lifetable_model(vintage, stratum)
 - vintage:
 
   Character scalar. One of the identifiers returned by
-  \[us_lifetable_vintages()\]. \*\*There is no default\*\*; omitting it
-  is an error.
+  [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md).
+  **There is no default**; omitting it is an error.
 
 - stratum:
 
-  Character scalar. One of \`"all"\`, \`"f"\`, \`"m"\`, \`"w"\`,
-  \`"wf"\`, \`"wm"\`, or the vintage's non-white codes — \`"o"\`,
-  \`"of"\`, \`"om"\` for \`table84\`, \`"b"\`, \`"bf"\`, \`"bm"\`
-  otherwise.
+  Character scalar. One of `"all"`, `"f"`, `"m"`, `"w"`, `"wf"`, `"wm"`,
+  or the vintage's non-white codes — `"o"`, `"of"`, `"om"` for
+  `table84`, `"b"`, `"bf"`, `"bm"` otherwise.
 
 ## Value
 
-A list with elements \`vintage\` (character), \`stratum\` (character),
-\`params\` (named numeric of length 11), \`status\` (named integer of
-length 11, the \`\_STATUS\_\` gate), \`flags\` (named numeric of length
-6, metadata only), and \`vcov\` (11 by 11 numeric matrix, unused in this
-version).
+A list with elements `vintage` (character), `stratum` (character),
+`params` (named numeric of length 11), `status` (named integer of length
+11, the `_STATUS_` gate), `flags` (named numeric of length 6, metadata
+only), and `vcov` (11 by 11 numeric matrix, unused in this version).
 
 ## Examples
 
