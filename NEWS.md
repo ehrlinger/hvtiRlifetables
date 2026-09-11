@@ -72,6 +72,25 @@
 
   The fingerprint is now identical under `C`, `en_US.UTF-8` and `de_DE.UTF-8`.
 
+## Documentation
+
+- **The README carries the family's badge block.** It had none. It now shows
+  R CMD check, test coverage, repository status, the pkgdown site, the GitHub
+  version and lint, in the order the other `hvtiR*` packages use. Four report
+  on CI this repository already ran; the other two show its repository status
+  and the version in `DESCRIPTION`. Nothing new was wired up.
+  ([#27](https://github.com/ehrlinger/hvtiRlifetables/pull/27))
+
+## Repository
+
+- **Issues open from forms.** A bug report asks for the function, a
+  reproducible example, the expected result, `sessionInfo()` and how the
+  package was installed. That last one is not boilerplate: family versions
+  reach GitHub before CRAN, so an install can be behind the version a bug was
+  fixed in. Installation problems are routed to `hvtiR`, the family
+  installer, whose form collects the diagnostics an install failure needs.
+  ([#26](https://github.com/ehrlinger/hvtiRlifetables/pull/26))
+
 # hvtiRlifetables 0.1.2
 
 ## Bug fixes
