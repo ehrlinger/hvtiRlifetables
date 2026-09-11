@@ -215,6 +215,10 @@ exactly like what everyone expects.
   the new version and updates `DESCRIPTION` and its `Date`, at most once a day. The heading is
   gone again after a bump, so the next change re-adds it. `.claude/house-style.md` carries the
   rule and the reasoning.
+- **A change that ships nothing gets no `NEWS.md` entry and no bump.** That is one where
+  `.Rbuildignore` excludes every file it touches, here `.github/`, `AGENTS.md` and `CLAUDE.md`
+  among others. No user can observe it, so the pull request and its commit message are the
+  record. Read `.Rbuildignore` rather than judging by feel.
 
 ## Change discipline
 
