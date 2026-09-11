@@ -14,6 +14,14 @@
   pkgdown and `docs-current` all passed. `lint.yaml` now fails when a
   backtick, `**` or `[fn()]` reaches `man/`.
 
+- **Publishing a release no longer redeploys the pkgdown site.** The
+  `pkgdown` workflow deployed the tagged commit on every published release,
+  so a release cut while `main` was ahead rolled the site back. v0.1.3 did
+  that on 2026-09-11: the literal backticks and dead links fixed above came
+  back until the site was redeployed from `main`. A release here only tags a
+  commit that merging has already deployed, so the site now documents `main`.
+  ([#29](https://github.com/ehrlinger/hvtiRlifetables/pull/29))
+
 # hvtiRlifetables 0.1.3
 
 ## Bug fixes
