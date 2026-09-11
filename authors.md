@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ehrlinger/hvtiRlifetables/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ehrlinger/hvtiRlifetables/blob/v0.1.3/DESCRIPTION)
 
 Ehrlinger J (2026). *hvtiRlifetables: Age, Sex and Race Matched US
 Reference Survival*. R package version 0.1.3,
