@@ -68,9 +68,10 @@
 
 - **The README carries the family's badge block.** It had none. It now shows
   R CMD check, test coverage, repository status, the pkgdown site, the GitHub
-  version and lint, in the order the other `hvtiR*` packages use. Every badge
-  reports on a workflow this repository already ran; nothing new was wired
-  up. ([#27](https://github.com/ehrlinger/hvtiRlifetables/pull/27))
+  version and lint, in the order the other `hvtiR*` packages use. Four report
+  on CI this repository already ran; the other two show its repository status
+  and the version in `DESCRIPTION`. Nothing new was wired up.
+  ([#27](https://github.com/ehrlinger/hvtiRlifetables/pull/27))
 
 ## Repository
 
