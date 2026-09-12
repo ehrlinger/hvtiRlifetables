@@ -61,7 +61,7 @@
 <td>push to <code>main</code>, PR</td>
 </tr><tr><td><code>check-manual.yaml</code></td>
 <td>the PDF manual build</td>
-<td>push to <code>main</code>, release, dispatch — <strong>not PRs</strong>
+<td>push to <code>main</code>, dispatch — <strong>not PRs</strong>
 </td>
 </tr><tr><td><code>house-style.yaml</code></td>
 <td>
@@ -77,7 +77,7 @@
 </tr><tr><td><code>test-coverage.yaml</code></td>
 <td>coverage upload</td>
 <td>push to <code>main</code>, PR</td>
-</tr></tbody></table><p>⚠️ <strong><code>check-manual</code> does not gate pull requests.</strong> It has no <code>pull_request:</code> trigger, so it runs post-merge on <code>main</code>, on a published release, and on <code>workflow_dispatch</code>. That is deliberate and the file’s own header comment explains it — do not “fix” the trigger. The consequence is what matters: a PR green across every check is <strong>not</strong> evidence that the PDF manual builds, and the raw-Unicode-in-<code>.Rd</code> failure this workflow exists to catch will surface after the merge, not before it. Dispatch it by hand if you need that assurance first.</p>
+</tr></tbody></table><p>⚠️ <strong><code>check-manual</code> does not gate pull requests.</strong> It has no <code>pull_request:</code> trigger, so it runs post-merge on <code>main</code>, and on demand via <code>workflow_dispatch</code>. That is deliberate and the file’s own header comment explains it — do not “fix” the trigger. The consequence is what matters: a PR green across every check is <strong>not</strong> evidence that the PDF manual builds, and the raw-Unicode-in-<code>.Rd</code> failure this workflow exists to catch will surface after the merge, not before it. Dispatch it by hand if you need that assurance first.</p>
 <p>⚠️ <strong>Check names do not map one-to-one onto workflow filenames.</strong> Six files produce ten check runs on a PR, because GitHub names a check run after the <em>job</em>, not the file:</p>
 <table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>file</th>
 <th>check runs on a PR</th>
