@@ -14,10 +14,12 @@ line on a clinical survival figure — computed in R.
 [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md)
 and
 [`us_lifetable_model()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_model.md)
-are implemented and tested against the fitted blocks. What is not yet
-done is the SAS acceptance check — reproducing a real `%usmatchd` run to
-1e-12 — which is PHI-adjacent and so lives in the study’s own `R_parity`
-project rather than here. See [the design
+are implemented and tested against the fitted blocks. Production SAS
+acceptance is complete: all 32 stored `%usmatchd` answers from two
+studies matched to 7.9e-15 worst case, and one study carries a
+repeatable acceptance document outside this package. The remaining gap
+is narrower: the AVR/LV-function study’s 31 `table84` answers have not
+yet been installed as a repeatable test in that study. See [the design
 spec](https://ehrlinger.github.io/hvtiRlifetables/docs/specs/2026-08-13-hvtirlifetables-design.md).
 
 ## What this is

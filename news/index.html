@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,18 @@
       <small>Source: <a href="https://github.com/ehrlinger/hvtiRlifetables/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.4" id="hvtirlifetables-014">hvtiRlifetables 0.1.4<a class="anchor" aria-label="anchor" href="#hvtirlifetables-014"></a></h2>
+<div class="section level3">
+<h3 id="documentation-0-1-4">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-1-4"></a></h3>
+<ul><li><p>The README now reports the completed production SAS acceptance evidence and distinguishes it from the remaining repeatable-test gap. Operational docs now list all four exported functions, including <code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code>.</p></li>
+<li>
+<p><strong>Roxygen markdown is now enabled, so the help pages render as written.</strong> Without <code>Roxygen: list(markdown = TRUE)</code>, 129 backtick spans, 10 bold spans and 6 <code>[fn()]</code> cross-references reached <code>man/</code> as literal text, in <code><a href="../reference/us_matched.html">?us_matched</a></code>, the PDF manual and the pkgdown site. Four of the six dead links pointed at <code><a href="../reference/us_lifetable_vintages.html">us_lifetable_vintages()</a></code>, the page that says what a stratum code actually means. All six now link. (<a href="https://github.com/ehrlinger/hvtiRlifetables/issues/20" class="external-link">#20</a>)</p>
+<p>Nothing caught it: literal backticks are legal Rd, so <code>R CMD check</code>, pkgdown and <code>docs-current</code> all passed. <code>lint.yaml</code> now fails when a backtick, <code>**</code> or <code>[fn()]</code> reaches <code>man/</code>.</p>
+</li>
+<li><p><strong>Publishing a release no longer redeploys the pkgdown site.</strong> The <code>pkgdown</code> workflow deployed the tagged commit on every published release, so a release cut while <code>main</code> was ahead rolled the site back. v0.1.3 did that on 2026-09-11: the literal backticks and dead links fixed above came back until the site was redeployed from <code>main</code>. A release here only tags a commit that merging has already deployed, so the site now documents <code>main</code>. (<a href="https://github.com/ehrlinger/hvtiRlifetables/pull/29" class="external-link">#29</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.3" id="hvtirlifetables-013">hvtiRlifetables 0.1.3<a class="anchor" aria-label="anchor" href="#hvtirlifetables-013"></a></h2>
 <div class="section level3">

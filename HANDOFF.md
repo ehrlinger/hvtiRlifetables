@@ -4,6 +4,7 @@
 session. **State:** implemented and, as of 2026-08-21, **verified
 against production SAS output**.
 [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md),
+[`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
 [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md)
 and
 [`us_lifetable_model()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_model.md)

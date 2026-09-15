@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
 <p><a href="https://github.com/ehrlinger/hvtiRlifetables" class="external-link"><img src="https://img.shields.io/github/r-package/v/ehrlinger/hvtiRlifetables" alt="R package version"></a></p>
 <p><a href="https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/lint.yaml" class="external-link"><img src="https://github.com/ehrlinger/hvtiRlifetables/actions/workflows/lint.yaml/badge.svg" alt="lint"></a> <!-- badges: end --></p>
 <p>Age, sex and race matched US reference survival — the dashed comparison line on a clinical survival figure — computed in R.</p>
-<p><strong>Status: working.</strong> <code><a href="reference/us_matched.html">us_matched()</a></code>, <code><a href="reference/us_cohort_curve.html">us_cohort_curve()</a></code>, <code><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages()</a></code> and <code><a href="reference/us_lifetable_model.html">us_lifetable_model()</a></code> are implemented and tested against the fitted blocks. What is not yet done is the SAS acceptance check — reproducing a real <code>%usmatchd</code> run to 1e-12 — which is PHI-adjacent and so lives in the study’s own <code>R_parity</code> project rather than here. See <a href="docs/specs/2026-08-13-hvtirlifetables-design.html">the design spec</a>.</p>
+<p><strong>Status: working.</strong> <code><a href="reference/us_matched.html">us_matched()</a></code>, <code><a href="reference/us_cohort_curve.html">us_cohort_curve()</a></code>, <code><a href="reference/us_lifetable_vintages.html">us_lifetable_vintages()</a></code> and <code><a href="reference/us_lifetable_model.html">us_lifetable_model()</a></code> are implemented and tested against the fitted blocks. Production SAS acceptance is complete: all 32 stored <code>%usmatchd</code> answers from two studies matched to 7.9e-15 worst case, and one study carries a repeatable acceptance document outside this package. The remaining gap is narrower: the AVR/LV-function study’s 31 <code>table84</code> answers have not yet been installed as a repeatable test in that study. See <a href="docs/specs/2026-08-13-hvtirlifetables-design.html">the design spec</a>.</p>
 <div class="section level2">
 <h2 id="what-this-is">What this is<a class="anchor" aria-label="anchor" href="#what-this-is"></a>
 </h2>

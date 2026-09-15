@@ -1,9 +1,10 @@
 # hvtiRlifetables
 
 US reference survival: the R replacement for the CORR macro library’s
-`%usmatchd` family (`uslife.sas`, `usmatchd.sas`, `usmtch08.sas`). Three
+`%usmatchd` family (`uslife.sas`, `usmatchd.sas`, `usmtch08.sas`). Four
 exports —
 [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md),
+[`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
 [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md),
 [`us_lifetable_model()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_model.md)
 — plus the fitted models shipped as `data/us_lifetable_models.rda`.

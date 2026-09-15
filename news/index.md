@@ -1,5 +1,38 @@
 # Changelog
 
+## hvtiRlifetables 0.1.4
+
+### Documentation
+
+- The README now reports the completed production SAS acceptance
+  evidence and distinguishes it from the remaining repeatable-test gap.
+  Operational docs now list all four exported functions, including
+  [`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md).
+
+- **Roxygen markdown is now enabled, so the help pages render as
+  written.** Without `Roxygen: list(markdown = TRUE)`, 129 backtick
+  spans, 10 bold spans and 6 `[fn()]` cross-references reached `man/` as
+  literal text, in
+  [`?us_matched`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md),
+  the PDF manual and the pkgdown site. Four of the six dead links
+  pointed at
+  [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md),
+  the page that says what a stratum code actually means. All six now
+  link. ([\#20](https://github.com/ehrlinger/hvtiRlifetables/issues/20))
+
+  Nothing caught it: literal backticks are legal Rd, so `R CMD check`,
+  pkgdown and `docs-current` all passed. `lint.yaml` now fails when a
+  backtick, `**` or `[fn()]` reaches `man/`.
+
+- **Publishing a release no longer redeploys the pkgdown site.** The
+  `pkgdown` workflow deployed the tagged commit on every published
+  release, so a release cut while `main` was ahead rolled the site back.
+  v0.1.3 did that on 2026-09-11: the literal backticks and dead links
+  fixed above came back until the site was redeployed from `main`. A
+  release here only tags a commit that merging has already deployed, so
+  the site now documents `main`.
+  ([\#29](https://github.com/ehrlinger/hvtiRlifetables/pull/29))
+
 ## hvtiRlifetables 0.1.3
 
 ### Bug fixes
