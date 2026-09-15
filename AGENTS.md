@@ -1,9 +1,9 @@
 # hvtiRlifetables
 
 US reference survival: the R replacement for the CORR macro library's `%usmatchd` family
-(`uslife.sas`, `usmatchd.sas`, `usmtch08.sas`). Three exports — `us_matched()`,
-`us_lifetable_vintages()`, `us_lifetable_model()` — plus the fitted models shipped as
-`data/us_lifetable_models.rda`.
+(`uslife.sas`, `usmatchd.sas`, `usmtch08.sas`). Four exports — `us_matched()`,
+`us_cohort_curve()`, `us_lifetable_vintages()`, `us_lifetable_model()` — plus
+the fitted models shipped as `data/us_lifetable_models.rda`.
 
 This file is the operational contract and applies in full. It is tool neutral, so Codex and
 any other agent read the same rules. Claude Code affordances live in `CLAUDE.md`, which

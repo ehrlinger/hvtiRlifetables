@@ -2,6 +2,10 @@
 
 ## Documentation
 
+- The README now reports the completed production SAS acceptance evidence and
+  distinguishes it from the remaining repeatable-test gap. Operational docs
+  now list all four exported functions, including `us_cohort_curve()`.
+
 - **Roxygen markdown is now enabled, so the help pages render as written.**
   Without `Roxygen: list(markdown = TRUE)`, 129 backtick spans, 10 bold
   spans and 6 `[fn()]` cross-references reached `man/` as literal text, in
