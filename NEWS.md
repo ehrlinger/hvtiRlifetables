@@ -1,4 +1,4 @@
-# hvtiRlifetables (unreleased)
+# hvtiRlifetables 0.1.4
 
 ## Documentation
 
