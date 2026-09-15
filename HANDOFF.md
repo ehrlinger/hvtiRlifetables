@@ -2,7 +2,8 @@
 
 **Created:** 2026-08-13, from the AVR/LV-function survival study session.
 **State:** implemented and, as of 2026-08-21, **verified against production SAS
-output**. `us_matched()`, `us_lifetable_vintages()` and `us_lifetable_model()` are
+output**. `us_matched()`, `us_cohort_curve()`, `us_lifetable_vintages()` and
+`us_lifetable_model()` are
 complete, with Tier 1, 2 and 4 tests passing and `R CMD check --as-cran` at 0 errors,
 0 warnings, and only the unavoidable `New submission` note, with the manual.
 
