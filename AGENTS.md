@@ -41,6 +41,20 @@ that is restated here.
 - `devtools::document()` has been run and `man/` and `NAMESPACE` are
   committed with the source change.
 
+## The standard of care
+
+**This package is not headed to CRAN, and it is held to the CRAN
+standard anyway.** The hvtiR packages are distributed internally to get
+feedback faster than a public release allows, not to lower the bar.
+
+- Before a release, audit against every chapter of the [CRAN
+  Cookbook](https://contributor.r-project.org/cran-cookbook/), run
+  `R CMD check --as-cran` with the manual and vignettes built, check
+  reverse dependencies within the hvtiR family and check URLs.
+- Every Cookbook or `--as-cran` finding is real work to do. Order
+  findings by effort and risk, never by “would CRAN care”, and never
+  offer “skip it, it’s internal” as an option.
+
 ## The automated gates
 
 Six workflow files. Five were adopted 2026-08-20; `house-style` came
