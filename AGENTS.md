@@ -223,12 +223,16 @@ exactly like what everyone expects.
 - Versions are **straight three digits** (`0.1.0`). Never a `.9000` suffix or a fourth digit.
 - **Patch-digit bumps only**, as fixes land. Minor and major are the maintainer's decision.
 - **Bump when you name a version, not when you merge.** A pull request lands without touching
-  `Version:`. Its entry goes under a `# hvtiRlifetables (unreleased)` heading in `NEWS.md`,
-  which you add when it is not already there. A separate commit then renames that heading to
-  the new version and updates `DESCRIPTION` and its `Date`, at most once a day. The heading is
-  gone again after a bump, so the next change re-adds it. `.claude/house-style.md` carries the
-  rule and the reasoning.
-- **A change that ships nothing gets no `NEWS.md` entry and no bump.** That is a pull request
+  `Version:` and without editing `NEWS.md`. Its entry goes in a file of its own,
+  `news/<branch>.md` with `/` in the branch name replaced by `-`: the bullet or bullets exactly
+  as they will read in `NEWS.md`, and no heading. Two pull requests open at once never touch
+  the same file, so they no longer conflict at the top of `NEWS.md`. A separate commit then
+  moves `Version:` in `DESCRIPTION` and its `Date`, at most once a day, and runs
+  `python3 .github/scripts/news.py collect`, which files the fragments under
+  `# hvtiRlifetables X.Y.Z` in merge order and deletes them. The `news-fragment` job in
+  `lint.yaml` fails a pull request that ships something and adds no fragment.
+  `.claude/house-style.md` carries the rule and the reasoning.
+- **A change that ships nothing gets no `news/` fragment and no bump.** That is a pull request
   whose every changed file is left out of the tarball `R CMD build` produces, meaning the base
   branch's `.Rbuildignore` excludes it: here `.github/`, `AGENTS.md` and `CLAUDE.md` among
   others. One shipped file means the change ships, and the usual rules apply. No user can
