@@ -20,6 +20,9 @@ This package therefore ships the fitted parameter blocks, one set per
 vintage per stratum, and evaluates them through \pkg{TemporalHazard}.
 
 \code{vintage} is never defaulted. See the package README for why.
+
+The Overview vignette, \code{vignette("hvtiRlifetables")}, walks the
+workflow end to end.
 }
 \seealso{
 Useful links:

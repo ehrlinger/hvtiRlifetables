@@ -15,6 +15,9 @@
 #'
 #' `vintage` is never defaulted. See the package README for why.
 #'
+#' The Overview vignette, `vignette("hvtiRlifetables")`, walks the
+#' workflow end to end.
+#'
 #' @importFrom utils data
 "_PACKAGE"
 

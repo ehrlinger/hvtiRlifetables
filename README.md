@@ -188,6 +188,10 @@ remotes::install_github("ehrlinger/TemporalHazard")
 This is also why the repository has no CI workflow: any run would fail at the
 dependency-install step.
 
+## Documentation
+
+- [Overview](https://ehrlinger.github.io/hvtiRlifetables/articles/hvtiRlifetables.html), `vignette("hvtiRlifetables")`, takes a synthetic cohort from `us_lifetable_vintages()` through `us_matched()` to `us_cohort_curve()`, with and without a reporting group.
+
 ## License
 
 GPL-3. The fitted US life-table hazard parameters are the work of
