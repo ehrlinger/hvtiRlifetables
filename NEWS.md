@@ -14,6 +14,9 @@
   both moves; the shorter account undercounted the provenances a re-run job
   can have.
 
+- `DESCRIPTION` now declares the Quarto command line tool in
+  `SystemRequirements`, which the new vignette needs to build.
+
 # hvtiRlifetables 0.1.4
 
 ## Documentation
