@@ -82,8 +82,9 @@ the individual hazards.
 }
 \section{Why \code{vintage} has no default}{
 
-The macro's default silently moved from \code{table84} to \code{table2023}, and every
-job re-run across that change got different numbers with no signal. An
+The macro's default silently moved twice: from \code{table84} to \code{table2008}
+between 2010 and 2024, then to \code{table2023} on 2025-12-23. Every job re-run
+across either move got different numbers with no signal. An
 analysis that does not state its reference vintage is not reproducible, so
 this package refuses to guess. State it literally in analysis code.
 }

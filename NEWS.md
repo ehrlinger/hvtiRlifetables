@@ -8,6 +8,11 @@
   `nonwhite_meaning` column means for anything a reader will see. Vignettes put
   the table of contents on the left and use the full window width, as the
   other HVTI packages do (`vignettes/_quarto.yml`, `pkgdown/extra.css`).
+- The missing-`vintage` error, `?us_matched` and the README now say the SAS
+  macro's default moved twice, from `table84` to `table2008` and then to
+  `table2023`, rather than once straight to `table2023`. `HANDOFF.md` records
+  both moves; the shorter account undercounted the provenances a re-run job
+  can have.
 
 # hvtiRlifetables 0.1.4
 
@@ -188,9 +193,9 @@ location and errors loudly if they are absent.
 ## Design notes
 
 - `vintage` has no default. Omitting it is an error listing the available
-  vintages. The macro's own default silently moved from `table84` to
-  `table2023`, and jobs re-run across that change got different numbers with
-  no signal.
+  vintages. The macro's own default silently moved twice, from `table84` to
+  `table2008` and then to `table2023`, and jobs re-run across either move got
+  different numbers with no signal.
 - `hmatched` is per year regardless of `scale`, matching the macro's source
   rather than its header comment. See the README.
 - The `table2023` non-white stratum is stored under code `b` but is a
