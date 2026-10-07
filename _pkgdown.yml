@@ -32,3 +32,8 @@ reference:
       - us_lifetable_vintages
       - us_lifetable_model
       - us_lifetable_models
+
+articles:
+  - title: Overview
+    contents:
+      - hvtiRlifetables
