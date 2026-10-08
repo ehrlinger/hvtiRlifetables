@@ -20,3 +20,5 @@
 ^\.lintr$
 ^\.remember$
 ^AGENTS\.md$
+^vignettes/\.quarto$
+^vignettes/.*_files$

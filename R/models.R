@@ -42,8 +42,9 @@ hzl_check_vintage <- function(vintage) {
     stop("`vintage` has no default and must be given. Available: ",
          paste(usable_vintages(), collapse = ", "),
          ".\nThis package refuses to guess: the SAS macro's default silently ",
-         "moved from table84 to table2023, and every job re-run across that ",
-         "change got different numbers with no signal.", call. = FALSE)
+         "moved twice, from table84 to table2008 and then to table2023, and ",
+         "every job re-run across either move got different numbers with no ",
+         "signal.", call. = FALSE)
   }
   if (!is.character(vintage) || length(vintage) != 1L) {
     stop("`vintage` must be a single character string.", call. = FALSE)
