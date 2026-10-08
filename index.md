@@ -139,8 +139,9 @@ us_matched(70, 1, 0, times = 5)
 
 Omitting it is an error.
 
-`%usmatchd`’s own default silently moved from `table84` to `table2023`,
-and every job re-run across that change got different numbers with no
+`%usmatchd`’s own default silently moved twice: from `table84` to
+`table2008` between 2010 and 2024, then to `table2023` on 2025-12-23.
+Every job re-run across either move got different numbers with no
 signal. An analysis that does not state its reference vintage is not
 reproducible, so the package refuses to guess. This is deliberate
 friction and it is the package’s main value over calling the macro.
@@ -194,6 +195,18 @@ remotes::install_github("ehrlinger/TemporalHazard")
 
 This is also why the repository has no CI workflow: any run would fail
 at the dependency-install step.
+
+## Documentation
+
+- [Overview](https://ehrlinger.github.io/hvtiRlifetables/articles/hvtiRlifetables.html),
+  [`vignette("hvtiRlifetables")`](https://ehrlinger.github.io/hvtiRlifetables/articles/hvtiRlifetables.md),
+  takes a synthetic cohort from
+  [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md)
+  through
+  [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+  to
+  [`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
+  with and without a reporting group.
 
 ## License
 

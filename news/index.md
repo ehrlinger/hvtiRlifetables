@@ -216,9 +216,9 @@ loudly if they are absent.
 ### Design notes
 
 - `vintage` has no default. Omitting it is an error listing the
-  available vintages. The macro’s own default silently moved from
-  `table84` to `table2023`, and jobs re-run across that change got
-  different numbers with no signal.
+  available vintages. The macro’s own default silently moved twice, from
+  `table84` to `table2008` and then to `table2023`, and jobs re-run
+  across either move got different numbers with no signal.
 - `hmatched` is per year regardless of `scale`, matching the macro’s
   source rather than its header comment. See the README.
 - The `table2023` non-white stratum is stored under code `b` but is a

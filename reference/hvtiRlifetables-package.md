@@ -17,6 +17,10 @@ vintage per stratum, and evaluates them through TemporalHazard.
 
 `vintage` is never defaulted. See the package README for why.
 
+The Overview vignette,
+[`vignette("hvtiRlifetables")`](https://ehrlinger.github.io/hvtiRlifetables/articles/hvtiRlifetables.md),
+walks the workflow end to end.
+
 ## See also
 
 Useful links:
