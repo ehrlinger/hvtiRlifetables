@@ -1,5 +1,33 @@
 # Changelog
 
+## hvtiRlifetables 0.1.5
+
+### Documentation
+
+- The missing-`vintage` error,
+  [`?us_matched`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+  and the README now say the SAS macro’s default moved twice, from
+  `table84` to `table2008` and then to `table2023`, rather than once
+  straight to `table2023`. `HANDOFF.md` records both moves; the shorter
+  account undercounted the provenances a re-run job can have.
+
+- `DESCRIPTION` now declares the Quarto command line tool in
+  `SystemRequirements`, which the new vignette needs to build.
+
+- New Overview vignette,
+  [`vignette("hvtiRlifetables")`](https://ehrlinger.github.io/hvtiRlifetables/articles/hvtiRlifetables.md),
+  walks a synthetic cohort from
+  [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md)
+  through
+  [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+  to
+  [`us_cohort_curve()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
+  with and without a reporting group, and says what the
+  `nonwhite_meaning` column means for anything a reader will see. On the
+  pkgdown site, articles put the table of contents on the left and use
+  the full window width, as the other HVTI packages do
+  (`pkgdown/extra.css`).
+
 ## hvtiRlifetables 0.1.4
 
 ### Documentation
