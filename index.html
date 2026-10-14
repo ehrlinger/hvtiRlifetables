@@ -155,13 +155,16 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<p>hvtiRlifetables is part of the HVTI R family. Install it with the rest of the family through <a href="https://github.com/ehrlinger/hvtiR" class="external-link">hvtiR</a>:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/hvtiRlifetables"</span><span class="op">)</span></span></code></pre></div>
-<p><strong>This will not resolve its dependency yet.</strong> The package requires <code>TemporalHazard (&gt;= 1.2.0)</code>, and CRAN currently carries <strong>1.1.0</strong>. The <code>&gt;= 1.2.0</code> bound is real, not defensive — the evaluator calls <code>hzr_decompos_g3()</code>, which 1.1.0 does not provide — so until 1.2.0 reaches CRAN you need it from source:</p>
+<code class="sourceCode R"><span><span class="co"># install.packages("pak")</span></span>
+<span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"ehrlinger/hvtiR"</span><span class="op">)</span></span>
+<span><span class="fu">hvtiR</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><code>hvtiR::install()</code> installs every member in one call, so the versions the members require of one another resolve together. Update later with <code>hvtiR::update()</code>, from a fresh R session: it will not overwrite a package that is already loaded.</p>
+<p>To install hvtiRlifetables on its own:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"ehrlinger/TemporalHazard"</span><span class="op">)</span></span></code></pre></div>
-<p>This is also why the repository has no CI workflow: any run would fail at the dependency-install step.</p>
+<code class="sourceCode R"><span><span class="fu">pak</span><span class="fu">::</span><span class="fu"><a href="https://pak.r-lib.org/reference/pak.html" class="external-link">pak</a></span><span class="op">(</span><span class="st">"ehrlinger/hvtiRlifetables"</span><span class="op">)</span></span></code></pre></div>
+<p>The package requires <code>TemporalHazard (&gt;= 1.2.0)</code>, and CRAN currently carries <strong>1.1.0</strong>. The bound is real, not defensive: the evaluator calls <code>hzr_decompos_g3()</code>, which 1.1.0 does not provide. Both commands above take TemporalHazard from GitHub instead: <code>hvtiR::install()</code> installs it with the family, and the <code>Remotes:</code> field in <code>DESCRIPTION</code> points pak at it when you install hvtiRlifetables on its own.</p>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>

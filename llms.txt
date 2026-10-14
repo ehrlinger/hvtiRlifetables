@@ -176,25 +176,34 @@ per-day hazard, multiply by the corresponding `SCALEF` yourself.
 
 ## Installation
 
-``` r
-
-# install.packages("remotes")
-remotes::install_github("ehrlinger/hvtiRlifetables")
-```
-
-**This will not resolve its dependency yet.** The package requires
-`TemporalHazard (>= 1.2.0)`, and CRAN currently carries **1.1.0**. The
-`>= 1.2.0` bound is real, not defensive — the evaluator calls
-`hzr_decompos_g3()`, which 1.1.0 does not provide — so until 1.2.0
-reaches CRAN you need it from source:
+hvtiRlifetables is part of the HVTI R family. Install it with the rest
+of the family through [hvtiR](https://github.com/ehrlinger/hvtiR):
 
 ``` r
 
-remotes::install_github("ehrlinger/TemporalHazard")
+# install.packages("pak")
+pak::pak("ehrlinger/hvtiR")
+hvtiR::install()
 ```
 
-This is also why the repository has no CI workflow: any run would fail
-at the dependency-install step.
+`hvtiR::install()` installs every member in one call, so the versions
+the members require of one another resolve together. Update later with
+`hvtiR::update()`, from a fresh R session: it will not overwrite a
+package that is already loaded.
+
+To install hvtiRlifetables on its own:
+
+``` r
+
+pak::pak("ehrlinger/hvtiRlifetables")
+```
+
+The package requires `TemporalHazard (>= 1.2.0)`, and CRAN currently
+carries **1.1.0**. The bound is real, not defensive: the evaluator calls
+`hzr_decompos_g3()`, which 1.1.0 does not provide. Both commands above
+take TemporalHazard from GitHub instead: `hvtiR::install()` installs it
+with the family, and the `Remotes:` field in `DESCRIPTION` points pak at
+it when you install hvtiRlifetables on its own.
 
 ## Documentation
 
