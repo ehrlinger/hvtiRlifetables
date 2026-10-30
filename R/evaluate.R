@@ -26,9 +26,7 @@ hzl_assert_finite <- function(x, age, what) {
     stop(what, " is not finite at age ",
          paste(utils::head(bad, 5), collapse = ", "),
          if (length(bad) > 5) ", ..." else "",
-         ".\nTemporalHazard's early phase is indeterminate at exactly age 0 ",
-         "(0 * Inf); evaluate at a positive age. Any other age reaching this ",
-         "message means the fitted parameters are degenerate.", call. = FALSE)
+         ".\nThe fitted parameters are degenerate.", call. = FALSE)
   }
   invisible(TRUE)
 }
@@ -79,8 +77,18 @@ hzl_cumhaz <- function(params, status, age) {
 }
 
 ## Instantaneous hazard at `age`.
+##
+## Exactly age 0 is refused for every vintage, by this check rather than by the
+## finiteness one. table2008 and table2023 have NU < 0, so the early phase
+## diverges as age falls to 0; TemporalHazard clamps time to double.xmin and
+## returns about 1e163 to 1e199, which is finite and meaningless. Only table84
+## has a limit there, and refusing it too keeps one rule across vintages.
 hzl_hazard <- function(params, status, age) {
   hzl_check_model(params, status)
+  if (any(age == 0, na.rm = TRUE)) {
+    stop("the hazard is not evaluated at exactly age 0, where most of the ",
+         "fits diverge; evaluate at a positive age.", call. = FALSE)
+  }
 
   muE <- hzl_mu(params, status, "E0")
   muC <- hzl_mu(params, status, "C0")

@@ -26,22 +26,26 @@ test_that("hazard is strictly positive across the supported age range", {
   expect_true(all(is.finite(h)))
 })
 
-test_that("the hazard errors at exactly age 0 rather than returning NaN", {
-  # TemporalHazard's early phase is indeterminate at exactly 0: it computes
-  # G <- exp(-bt^(-1/nu)), which underflows to 0, then g <- G * bt^num1 where
-  # bt^num1 overflows to Inf -- so 0 * Inf = NaN. This hits 9 of the 27
-  # shipped strata (every one with an active early phase of this shape).
-  #
-  # H(0) is unaffected and is ~1.7e-311, which is why the cumulative-hazard
-  # test above passes.
-  #
-  # A silent NaN reaching a figure is exactly the "result-shaped nothing"
-  # failure this project keeps hitting, so the evaluator errors instead.
-  m <- wm84()
-  expect_error(hzl_hazard(m$params, m$status, 0), "not finite")
-  expect_error(hzl_hazard(m$params, m$status, c(0, 50)), "not finite")
-  # ...and the moment you step off 0, it is well behaved.
-  expect_true(all(is.finite(hzl_hazard(m$params, m$status, c(1e-12, 1e-6)))))
+test_that("the hazard errors at exactly age 0 in every vintage", {
+  # table84 has NU > 0 and a limit at 0: the constant phase. table2008 and
+  # table2023 have NU < 0, so the hazard diverges and TemporalHazard, which
+  # clamps time to double.xmin, returns a finite 1e163 to 1e199. A finiteness
+  # check cannot see that, so the evaluator refuses age 0 outright.
+  for (v in c("table84", "table2008", "table2023")) {
+    m <- us_lifetable_model(v, "all")
+    expect_error(hzl_hazard(m$params, m$status, 0), "exactly age 0")
+    expect_error(hzl_hazard(m$params, m$status, c(0, 50)), "exactly age 0")
+    # ...and the moment you step off 0, it is finite.
+    expect_true(all(is.finite(hzl_hazard(m$params, m$status, c(1e-12, 1e-6)))))
+  }
+})
+
+test_that("a newborn at time 0 stops rather than reaching the cohort density", {
+  expect_error(
+    us_matched(age = 0, male = 1, other = 0, times = c(0, 1),
+               vintage = "table2023"),
+    "exactly age 0"
+  )
 })
 
 test_that("both evaluators are vectorised and length-preserving", {
