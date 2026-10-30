@@ -1,3 +1,9 @@
+# hvtiRlifetables 0.1.6
+
+* The README's Installation section now leads with `hvtiR::install()`, which
+  installs the whole HVTI R family in one call, and then gives
+  `pak::pak("ehrlinger/hvtiRlifetables")` for this package alone.
+
 # hvtiRlifetables 0.1.5
 
 ## Documentation
