@@ -1,5 +1,20 @@
 # Changelog
 
+## hvtiRlifetables 0.1.6
+
+- The README’s Installation section now leads with `hvtiR::install()`,
+  which installs the whole HVTI R family in one call, and then gives
+  `pak::pak("ehrlinger/hvtiRlifetables")` for this package alone.
+
+- `hzl_hazard()`, and so
+  [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md),
+  now stops at exactly age 0 in every vintage. For `table2008` and
+  `table2023` the fit diverges there, and a value near 1e163 to 1e199
+  came back as `hmatched`, with no message, for a newborn at time 0, and
+  reached the cohort density. `table84` stopped only because
+  TemporalHazard returned `NaN` there, which it no longer does from
+  1.2.17.
+
 ## hvtiRlifetables 0.1.5
 
 ### Documentation
