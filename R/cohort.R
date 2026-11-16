@@ -11,10 +11,10 @@
 ##
 ## `by` always carries VALUES, never column names. Accepting a character
 ## vector of column names as well would make the meaning of `by = "arm"`
-## depend on whether `x` happens to have a column called `arm` -- one argument
-## with two readings, resolved from the data. Grouping by a column of `x` is
-## `by = x$arm`, which needs no rule.
-hzl_resolve_by <- function(x, by) {
+## depend on whether `data` happens to have a column called `arm` -- one
+## argument with two readings, resolved from the data. Grouping by a column of
+## `data` is `by = data$arm`, which needs no rule.
+hzl_resolve_by <- function(data, by) {
   if (is.null(by)) {
     return(NULL)
   }
@@ -29,12 +29,12 @@ hzl_resolve_by <- function(x, by) {
     g <- data.frame(group = by, stringsAsFactors = FALSE)
   }
 
-  if (nrow(g) != nrow(x)) {
-    stop("`by` has ", nrow(g), " value(s) but `x` has ", nrow(x),
-         " row(s). `x` carries one row per patient per time, so a ",
+  if (nrow(g) != nrow(data)) {
+    stop("`by` has ", nrow(g), " value(s) but `data` has ", nrow(data),
+         " row(s). `data` carries one row per patient per time, so a ",
          "patient-level grouping must be expanded to it -- for a grouping ",
-         "`g` whose order matches the ids in `x`, that is `g[match(x$id, ids)]`.",
-         call. = FALSE)
+         "`g` whose order matches the ids in `data`, that is ",
+         "`g[match(data$id, ids)]`.", call. = FALSE)
   }
   clash <- intersect(names(g), c("time", "smatched", "hmatched"))
   if (length(clash)) {
@@ -58,85 +58,85 @@ hzl_resolve_by <- function(x, by) {
 ## averaging either would weight some rows twice at some times only. With
 ## that excluded, each patient's times are a set, compared sorted so that
 ## row order does not matter.
-hzl_check_grid <- function(x) {
-  if (nrow(x) == 0L) return(invisible(TRUE))
-  ids <- unique(x$id)
-  pid <- match(x$id, ids)
-  dup <- duplicated(data.frame(pid = pid, time = x$time))
+hzl_check_grid <- function(data) {
+  if (nrow(data) == 0L) return(invisible(TRUE))
+  ids <- unique(data$id)
+  pid <- match(data$id, ids)
+  dup <- duplicated(data.frame(pid = pid, time = data$time))
   if (any(dup)) {
     first <- which(dup)[[1L]]
-    stop("us_cohort_curve(): id ", ids[[pid[[first]]]], " appears more than ",
-         "once at time ", x$time[[first]], ", so its rows cannot be told ",
-         "apart. Either results with overlapping ids were stacked -- give ",
-         "every patient a distinct `id` -- or `times` has ties -- pass ",
-         "unique(times).", call. = FALSE)
+    hzl_abort("grid",
+              "us_cohort_curve(): id ", ids[[pid[[first]]]], " appears more ",
+              "than once at time ", data$time[[first]], ", so its rows cannot ",
+              "be told apart. Either results with overlapping ids were ",
+              "stacked -- give every patient a distinct `id` -- or `times` ",
+              "has ties -- pass unique(times).")
   }
-  grids <- lapply(split(x$time, pid), sort)
+  grids <- lapply(split(data$time, pid), sort)
   same  <- vapply(grids, identical, logical(1), grids[[1L]])
   if (!all(same)) {
-    stop("us_cohort_curve(): the patients in `x` do not share one set of ",
-         "times -- id ", paste(utils::head(ids[!same], 5), collapse = ", "),
-         if (sum(!same) > 5) ", ..." else "",
-         " differ from id ", ids[[1L]], ". Averaging would change ",
-         "the denominator along the curve. Call us_matched() once, with ",
-         "one `times`, for the whole cohort.", call. = FALSE)
+    hzl_abort("grid",
+              "us_cohort_curve(): the patients in `data` do not share one ",
+              "set of times -- id ",
+              paste(utils::head(ids[!same], 5), collapse = ", "),
+              if (sum(!same) > 5) ", ..." else "",
+              " differ from id ", ids[[1L]], ". Averaging would change ",
+              "the denominator along the curve. Call us_matched() once, with ",
+              "one `times`, for the whole cohort.")
   }
   invisible(TRUE)
 }
 
 #' Cohort expected-survival curve, optionally within groups
 #'
-#' Reduces the per-patient output of \code{\link{us_matched}} to the curve a
-#' figure actually carries: the cohort's expected survival at each time, and
-#' its hazard. With \code{by}, one such curve per group.
+#' Reduces the per-patient output of [us_matched()] to the curve a figure
+#' actually carries: the cohort's expected survival at each time, and its
+#' hazard. With `by`, one such curve per group.
 #'
-#' @param x A data frame as returned by \code{\link{us_matched}} with
-#'   \code{individual = TRUE} -- columns \code{id}, \code{time},
-#'   \code{smatched} and \code{hmatched}. An already-aggregated frame is
-#'   rejected rather than averaged twice.
+#' @param data A data frame as returned by [us_matched()] with
+#'   `individual = TRUE` -- columns `id`, `time`, `smatched` and `hmatched`.
+#'   An already-aggregated frame is rejected rather than averaged twice.
 #' @param by How to group the result. One of:
-#'   \itemize{
-#'     \item \code{NULL} (default), for a single cohort-wide curve;
-#'     \item a vector or factor with one value per \emph{row} of \code{x},
-#'       reported in a column called \code{group};
-#'     \item a named list or data frame of such vectors, for a crossed
-#'       grouping, reported under its own names.
-#'   }
-#'   It carries values, not column names: group by a column of \code{x} with
-#'   \code{by = x$arm}. Because \code{x} holds one row per patient per time,
-#'   a patient-level grouping must be expanded to it -- see the examples.
+#'   * `NULL` (default), for a single cohort-wide curve;
+#'   * a vector or factor with one value per *row* of `data`, reported in a
+#'     column called `group`;
+#'   * a named list or data frame of such vectors, for a crossed grouping,
+#'     reported under its own names.
 #'
-#' @return A data frame with columns \code{time}, \code{smatched} and
-#'   \code{hmatched}, one row per distinct time -- or, with \code{by}, the
-#'   grouping columns first and one row per group per time. Groups and times
-#'   appear in
-#'   order of first appearance in \code{x}, so a factor grouping does not
-#'   reorder to its levels.
+#'   It carries values, not column names: group by a column of `data` with
+#'   `by = data$arm`. Because `data` holds one row per patient per time, a
+#'   patient-level grouping must be expanded to it -- see the examples.
+#' @param x Deprecated; use `data`. Still accepted, with a warning once per
+#'   session, and to be removed in a future release.
+#'
+#' @return A data frame with columns `time`, `smatched` and `hmatched`, one
+#'   row per distinct time -- or, with `by`, the grouping columns first and
+#'   one row per group per distinct time. Groups and times appear in order of
+#'   first appearance in `data`, so a factor grouping does not reorder to its
+#'   levels.
 #'
 #' @section The averaging, and why it is here:
-#' The reduction follows the SAS macro \code{\%usmatchd} (lines 338-350): the
-#' hazard is converted to a density (\code{hmatched * smatched}), the
-#' \strong{unweighted} cohort means of survival and of the density are taken at
+#' The reduction follows the SAS macro `%usmatchd` (lines 338-350): the
+#' hazard is converted to a density (`hmatched * smatched`), the
+#' **unweighted** cohort means of survival and of the density are taken at
 #' each time, and the mean hazard is recovered by division. It is deliberately
-#' \strong{not} the mean of the individual hazards; in a heterogeneous cohort
-#' the two differ, and the difference is not cosmetic.
+#' **not** the mean of the individual hazards; in a heterogeneous cohort the
+#' two differ, and the difference is not cosmetic.
 #'
-#' The mean is over \strong{survival}, not over cumulative hazard, and no
-#' patient is weighted by follow-up. Missing values are not dropped: every
-#' value \code{\link{us_matched}} returns is finite by construction, so an
-#' \code{NA} arriving here is a defect rather than a datum, and averaging
-#' around it would hide it.
+#' The mean is over **survival**, not over cumulative hazard, and no patient
+#' is weighted by follow-up. Missing values are not dropped: every value
+#' [us_matched()] returns is finite by construction, so an `NA` arriving here
+#' is a defect rather than a datum, and averaging around it would hide it.
 #'
 #' @section Grouping is not stratification:
-#' \code{us_matched}'s \code{table} argument chooses which strata the
-#' \emph{life table} is built from -- \code{"sexrace"}, \code{"race"},
-#' \code{"sex"}, \code{"overall"}. \code{by} chooses how the resulting curves
-#' are grouped for \emph{reporting} -- age band, treatment arm, era. The two
-#' axes are independent: a report broken down by age band is normally still
-#' matched on \code{"sexrace"}.
+#' `us_matched()`'s `table` argument chooses which strata the *life table* is
+#' built from -- `"sexrace"`, `"race"`, `"sex"`, `"overall"`. `by` chooses how
+#' the resulting curves are grouped for *reporting* -- age band, treatment
+#' arm, era. The two axes are independent: a report broken down by age band
+#' is normally still matched on `"sexrace"`.
 #'
-#' @seealso \code{\link{us_matched}}, whose \code{individual = FALSE} is the
-#'   ungrouped case of this function.
+#' @seealso [us_matched()], whose `individual = FALSE` is the ungrouped case
+#'   of this function.
 #'
 #' @examples
 #' x <- us_matched(age = c(55, 60, 78, 82), male = c(1, 0, 1, 0),
@@ -153,29 +153,52 @@ hzl_check_grid <- function(x) {
 #' us_cohort_curve(x, by = factor(band[x$id], levels = c("55-79", "80+")))
 #'
 #' @export
-us_cohort_curve <- function(x, by = NULL) {
-  if (!is.data.frame(x)) {
-    stop("`x` must be the data frame returned by us_matched(individual = ",
-         "TRUE); got ", class(x)[[1L]], ".", call. = FALSE)
+us_cohort_curve <- function(data, by = NULL, x) {
+  if (!missing(x)) {
+    if (!missing(data)) {
+      ## `us_cohort_curve(x = r, grp)` meant `by = grp` before the rename, and
+      ## `grp` now lands in `data` by position. Keep that call working, but
+      ## only when `data` really did arrive by position: the call's own tags
+      ## say whether it was named (in full or by partial matching), and a
+      ## named `data` beside `x` is two inputs, never a grouping. A positional
+      ## frame that is itself us_matched() output is two inputs as well.
+      tags  <- names(sys.call())[-1L]
+      named <- !is.null(tags) && any(nzchar(tags) & startsWith("data", tags))
+      both  <- is.data.frame(data) &&
+        all(c("id", "time", "smatched", "hmatched") %in% names(data))
+      if (!missing(by) || named || both) {
+        stop("us_cohort_curve(): give `data` only; `x` is its deprecated ",
+             "name.", call. = FALSE)
+      }
+      by <- data
+    }
+    hzl_warn_renamed("us_cohort_curve", "x", "data")
+    data <- x
+  }
+  if (!is.data.frame(data)) {
+    stop("us_cohort_curve(): `data` must be the data frame returned by ",
+         "us_matched(individual = TRUE); got ", class(data)[[1L]], ".",
+         call. = FALSE)
   }
   needed <- c("id", "time", "smatched", "hmatched")
-  absent <- setdiff(needed, names(x))
+  absent <- setdiff(needed, names(data))
   if (length(absent)) {
     ## A frame missing only `id` is the aggregate shape. Averaging it again
     ## would return a plausible curve computed from the wrong denominator, so
     ## name what happened rather than proceeding.
     if (identical(absent, "id")) {
-      stop("`x` has no `id` column, so it is already a cohort curve rather ",
-           "than one row per patient per time. Pass the ",
+      stop("us_cohort_curve(): `data` has no `id` column, so it is already a ",
+           "cohort curve rather than one row per patient per time. Pass the ",
            "us_matched(individual = TRUE) output.", call. = FALSE)
     }
-    stop("`x` is missing the column(s) ", paste(absent, collapse = ", "),
+    stop("us_cohort_curve(): `data` is missing the column(s) ",
+         paste(absent, collapse = ", "),
          " that us_matched(individual = TRUE) returns.", call. = FALSE)
   }
 
-  g <- hzl_resolve_by(x, by)
+  g <- hzl_resolve_by(data, by)
 
-  if (nrow(x) == 0L) {
+  if (nrow(data) == 0L) {
     ## An empty cohort is a legitimate input -- the same decision
     ## us_matched() makes -- so return the documented columns with zero rows.
     ## The grouping columns keep their own types via `[0, ]`.
@@ -186,8 +209,8 @@ us_cohort_curve <- function(x, by = NULL) {
   }
 
   if (is.null(g)) {
-    hzl_check_grid(x)
-    return(hzl_mean_curve(x))
+    hzl_check_grid(data)
+    return(hzl_mean_curve(data))
   }
 
   ## "\r" as the key separator rather than "." or "_": it cannot appear in a
@@ -198,8 +221,8 @@ us_cohort_curve <- function(x, by = NULL) {
 
   parts <- lapply(levels(key), function(k) {
     rows <- which(key == k)
-    hzl_check_grid(x[rows, , drop = FALSE])
-    curve <- hzl_mean_curve(x[rows, , drop = FALSE])
+    hzl_check_grid(data[rows, , drop = FALSE])
+    curve <- hzl_mean_curve(data[rows, , drop = FALSE])
     ## Repeated to the curve's length rather than left to cbind's recycling:
     ## a one-row frame recycles, but carries its row name into the result and
     ## warns that it discarded it. Row names dropped for the same reason.
