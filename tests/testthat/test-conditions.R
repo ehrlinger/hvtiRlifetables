@@ -55,6 +55,7 @@ test_that("the newborn and time-grid stops are classed", {
   s1 <- us_matched(50, 0, 0, times = c(0, 1), id = "s", vintage = "table84")
   s2 <- us_matched(80, 0, 0, times = c(0, 2), id = "s", vintage = "table84")
   expect_classed(us_cohort_curve(rbind(s1, s2)), "grid")
+})
 
 test_that("us_cohort_curve(x = r, grp) still groups by position", {
   r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
