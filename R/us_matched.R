@@ -103,7 +103,7 @@ hzl_assert_varies <- function(smatched, times) {
 #'   `smatched` (reference survival over `times`, conditional on having
 #'   reached `age`) and `hmatched` (the reference hazard), with one row per
 #'   patient per time. When `individual = FALSE`, columns `time`, `smatched`
-#'   and `hmatched` only, with one row per time.
+#'   and `hmatched` only, with one row per distinct time.
 #'
 #' @details
 #' `%usmatchd` is not a life-table lookup. It evaluates a stored three-phase

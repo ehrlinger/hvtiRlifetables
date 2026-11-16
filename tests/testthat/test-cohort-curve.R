@@ -178,3 +178,13 @@ test_that("patients with different times are refused rather than averaged", {
   b <- us_matched(70, 1, 0, times = c(0, 5), id = 3, vintage = "table84")
   expect_error(us_cohort_curve(rbind(a, b)), "do not share one set of times")
 })
+
+test_that("groups may carry different times from one another", {
+  a <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 10),
+                  vintage = "table84")
+  b <- us_matched(70, 1, 0, times = c(0, 5), id = 3, vintage = "table84")
+  x <- rbind(a, b)
+  out <- us_cohort_curve(x, by = ifelse(x$id == 3, "b", "a"))
+  expect_equal(out[out$group == "b", "time"], c(0, 5))
+  expect_equal(out[out$group == "a", "smatched"], us_cohort_curve(a)$smatched)
+})

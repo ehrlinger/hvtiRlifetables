@@ -44,20 +44,23 @@ hzl_resolve_by <- function(x, by) {
   g
 }
 
-## Every patient must carry the same `times`. The mean at a time is over the
-## rows at that time, so a patient missing a time -- two us_matched() calls
-## with different `times`, stacked -- silently changes the denominator part
-## of the way along the curve.
+## Every patient averaged into one curve must carry the same `times`. The
+## mean at a time is over the rows at that time, so a patient missing a time
+## -- two us_matched() calls with different `times`, stacked -- silently
+## changes the denominator part of the way along the curve. Checked per
+## curve, so groups may legitimately differ from one another. Ids are matched
+## on their values, not through factor(), which would drop NA and compare
+## numeric ids as 15-digit strings.
 hzl_check_grid <- function(x) {
   if (nrow(x) == 0L) return(invisible(TRUE))
-  grids <- split(x$time, factor(x$id, levels = unique(x$id)))
-  same <- vapply(grids, identical, logical(1), grids[[1L]])
+  ids   <- unique(x$id)
+  grids <- split(x$time, match(x$id, ids))
+  same  <- vapply(grids, identical, logical(1), grids[[1L]])
   if (!all(same)) {
     stop("us_cohort_curve(): the patients in `x` do not share one set of ",
-         "times -- id ", paste(utils::head(names(grids)[!same], 5),
-                               collapse = ", "),
+         "times -- id ", paste(utils::head(ids[!same], 5), collapse = ", "),
          if (sum(!same) > 5) ", ..." else "",
-         " differ from id ", names(grids)[[1L]], ". Averaging would change ",
+         " differ from id ", ids[[1L]], ". Averaging would change ",
          "the denominator along the curve. Call us_matched() once, with ",
          "one `times`, for the whole cohort.", call. = FALSE)
   }
@@ -87,8 +90,9 @@ hzl_check_grid <- function(x) {
 #'   a patient-level grouping must be expanded to it -- see the examples.
 #'
 #' @return A data frame with columns \code{time}, \code{smatched} and
-#'   \code{hmatched}, one row per time -- or, with \code{by}, the grouping
-#'   columns first and one row per group per time. Groups and times appear in
+#'   \code{hmatched}, one row per distinct time -- or, with \code{by}, the
+#'   grouping columns first and one row per group per time. Groups and times
+#'   appear in
 #'   order of first appearance in \code{x}, so a factor grouping does not
 #'   reorder to its levels.
 #'
@@ -152,7 +156,6 @@ us_cohort_curve <- function(x, by = NULL) {
          " that us_matched(individual = TRUE) returns.", call. = FALSE)
   }
 
-  hzl_check_grid(x)
   g <- hzl_resolve_by(x, by)
 
   if (nrow(x) == 0L) {
@@ -166,6 +169,7 @@ us_cohort_curve <- function(x, by = NULL) {
   }
 
   if (is.null(g)) {
+    hzl_check_grid(x)
     return(hzl_mean_curve(x))
   }
 
@@ -177,6 +181,7 @@ us_cohort_curve <- function(x, by = NULL) {
 
   parts <- lapply(levels(key), function(k) {
     rows <- which(key == k)
+    hzl_check_grid(x[rows, , drop = FALSE])
     curve <- hzl_mean_curve(x[rows, , drop = FALSE])
     ## Repeated to the curve's length rather than left to cbind's recycling:
     ## a one-row frame recycles, but carries its row name into the result and

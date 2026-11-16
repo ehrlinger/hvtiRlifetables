@@ -62,7 +62,7 @@ A data frame. When \code{individual = TRUE}, columns \code{id}, \code{time},
 \code{smatched} (reference survival over \code{times}, conditional on having
 reached \code{age}) and \code{hmatched} (the reference hazard), with one row per
 patient per time. When \code{individual = FALSE}, columns \code{time}, \code{smatched}
-and \code{hmatched} only, with one row per time.
+and \code{hmatched} only, with one row per distinct time.
 }
 \description{
 Reproduces the Cleveland Clinic SAS macro \verb{\%usmatchd}: for each patient, a
