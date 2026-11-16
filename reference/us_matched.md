@@ -26,16 +26,23 @@ us_matched(
 - age:
 
   Numeric vector of ages **in years**, always in years regardless of
-  `scale`.
+  `scale`. An age of exactly `0` is accepted, but not together with a
+  time of `0`: the reference hazard at birth is not defined (the
+  `table2008` and `table2023` fits diverge there), so a newborn's
+  `hmatched` cannot be reported at `time = 0` and the call stops, naming
+  the patients. Start `times` above `0` for such a cohort; `smatched` at
+  time `0` is `1` by definition.
 
 - male:
 
-  Numeric vector, `1` male, `0` female. The macro's coding, unchanged.
+  Numeric vector, `1` male, `0` female. The macro's coding, unchanged. A
+  logical vector is read as `TRUE` = `1`.
 
 - other:
 
   Numeric vector, `1` non-white, `0` white. The macro's coding,
-  unchanged. What "non-white" contains differs by vintage – see
+  unchanged. A logical vector is read as `TRUE` = `1`. What "non-white"
+  contains differs by vintage – see
   [`us_lifetable_vintages()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_lifetable_vintages.md).
 
 - times:
@@ -45,8 +52,9 @@ us_matched(
 
 - id:
 
-  Optional vector of patient identifiers, recycled into the output.
-  Defaults to `seq_along(age)`.
+  Optional vector of patient identifiers, one per patient and so the
+  same length as `age`, with no missing or repeated values, repeated
+  into the output once per time. Defaults to `seq_along(age)`.
 
 - vintage:
 
@@ -68,8 +76,9 @@ us_matched(
 
 - individual:
 
-  If `TRUE` (default), one row per patient per time. If `FALSE`, the
-  cohort mean curve, one row per time – the ungrouped case of
+  A single `TRUE` or `FALSE`. If `TRUE` (default), one row per patient
+  per time. If `FALSE`, the cohort mean curve, one row per time – the
+  ungrouped case of
   [`us_cohort_curve`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_cohort_curve.md),
   which is what to use for a curve within groups of the caller's own
   choosing.
@@ -81,7 +90,7 @@ A data frame. When `individual = TRUE`, columns `id`, `time`, `agesurv`
 (reference survival over `times`, conditional on having reached `age`)
 and `hmatched` (the reference hazard), with one row per patient per
 time. When `individual = FALSE`, columns `time`, `smatched` and
-`hmatched` only, with one row per time.
+`hmatched` only, with one row per distinct time.
 
 ## Details
 

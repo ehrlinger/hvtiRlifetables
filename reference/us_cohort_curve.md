@@ -40,9 +40,9 @@ us_cohort_curve(x, by = NULL)
 ## Value
 
 A data frame with columns `time`, `smatched` and `hmatched`, one row per
-time – or, with `by`, the grouping columns first and one row per group
-per time. Groups and times appear in order of first appearance in `x`,
-so a factor grouping does not reorder to its levels.
+distinct time – or, with `by`, the grouping columns first and one row
+per group per time. Groups and times appear in order of first appearance
+in `x`, so a factor grouping does not reorder to its levels.
 
 ## The averaging, and why it is here
 
