@@ -164,3 +164,17 @@ test_that("grouping is independent of the table= stratification", {
   s_o <- g$smatched[g$group == "o" & g$time == 5]
   expect_gt(s_y, s_o)
 })
+
+test_that("times survive the cohort reduction to full precision", {
+  # Grouping through factor() returned 1/3 as 0.333333333333333.
+  tm <- c(0, 1 / 3, 2 / 3)
+  x <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = tm, vintage = "table84")
+  expect_identical(us_cohort_curve(x)$time, tm)
+})
+
+test_that("patients with different times are refused rather than averaged", {
+  a <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 10),
+                  vintage = "table84")
+  b <- us_matched(70, 1, 0, times = c(0, 5), id = 3, vintage = "table84")
+  expect_error(us_cohort_curve(rbind(a, b)), "do not share one set of times")
+})

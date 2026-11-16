@@ -42,8 +42,11 @@ hzl_empty_result <- function(id, individual) {
 
 ## The failure shape this study has now hit five times: a reference curve
 ## that does not move. Catch it here rather than in a figure.
+##
+## Tied `times` are legal and give tied `smatched`, so the check counts
+## distinct times: with only one, a constant curve is the right answer.
 hzl_assert_varies <- function(smatched, times) {
-  if (length(times) < 2L) return(invisible(TRUE))
+  if (length(unique(times)) < 2L) return(invisible(TRUE))
   if (all(smatched == 1) || all(smatched == 0)) {
     stop("the reference survival curve is identically ",
          if (all(smatched == 1)) "1" else "0",
@@ -65,15 +68,21 @@ hzl_assert_varies <- function(smatched, times) {
 #' hazard. This is the dashed comparison line on a clinical survival figure.
 #'
 #' @param age Numeric vector of ages **in years**, always in years regardless
-#'   of `scale`.
+#'   of `scale`. An age of exactly `0` is accepted, but not together with a
+#'   time of `0`: the reference hazard at birth is not defined (the
+#'   `table2008` and `table2023` fits diverge there), so a newborn's
+#'   `hmatched` cannot be reported at `time = 0` and the call stops, naming
+#'   the patients. Start `times` above `0` for such a cohort; `smatched` at
+#'   time `0` is `1` by definition.
 #' @param male Numeric vector, `1` male, `0` female. The macro's coding,
-#'   unchanged.
+#'   unchanged. A logical vector is read as `TRUE` = `1`.
 #' @param other Numeric vector, `1` non-white, `0` white. The macro's coding,
-#'   unchanged. What "non-white" contains differs by vintage -- see
-#'   [us_lifetable_vintages()].
+#'   unchanged. A logical vector is read as `TRUE` = `1`. What "non-white"
+#'   contains differs by vintage -- see [us_lifetable_vintages()].
 #' @param times Numeric vector of follow-up times in the units of `scale`,
 #'   non-negative.
-#' @param id Optional vector of patient identifiers, recycled into the output.
+#' @param id Optional vector of patient identifiers, one per patient and so
+#'   the same length as `age`, repeated into the output once per time.
 #'   Defaults to `seq_along(age)`.
 #' @param vintage Character scalar naming the fitted-model vintage. **There is
 #'   no default.** Omitting it is an error. See Details.
@@ -84,10 +93,10 @@ hzl_assert_varies <- function(smatched, times) {
 #'   `male` and `other`.
 #' @param scale Units of `times`. Applies the macro's `SCALEF` of `1`,
 #'   `1/12` and `1/365.2425` respectively.
-#' @param individual If `TRUE` (default), one row per patient per time. If
-#'   `FALSE`, the cohort mean curve, one row per time -- the ungrouped case of
-#'   \code{\link{us_cohort_curve}}, which is what to use for a curve within
-#'   groups of the caller's own choosing.
+#' @param individual A single `TRUE` or `FALSE`. If `TRUE` (default), one
+#'   row per patient per time. If `FALSE`, the cohort mean curve, one row per
+#'   time -- the ungrouped case of \code{\link{us_cohort_curve}}, which is
+#'   what to use for a curve within groups of the caller's own choosing.
 #'
 #' @return A data frame. When `individual = TRUE`, columns `id`, `time`,
 #'   `agesurv` (survival from birth to the patient's current age),
@@ -156,11 +165,19 @@ us_matched <- function(age, male, other, times,
   if (!is.numeric(age) || anyNA(age)) {
     stop("`age` must be numeric with no missing values.", call. = FALSE)
   }
-  if (!all(male %in% c(0, 1))) {
-    stop("`male` must be 0 or 1 (the macro's coding).", call. = FALSE)
+  ## Type first: `%in%` coerces, so "1" and factor labels would pass a bare
+  ## value check and be read through a character match.
+  if (!(is.numeric(male) || is.logical(male)) || !all(male %in% c(0, 1))) {
+    stop("us_matched(): `male` must be numeric 0 or 1 (the macro's coding), ",
+         "with no missing values; got ", class(male)[[1L]], ".", call. = FALSE)
   }
-  if (!all(other %in% c(0, 1))) {
-    stop("`other` must be 0 or 1 (the macro's coding).", call. = FALSE)
+  if (!(is.numeric(other) || is.logical(other)) || !all(other %in% c(0, 1))) {
+    stop("us_matched(): `other` must be numeric 0 or 1 (the macro's coding), ",
+         "with no missing values; got ", class(other)[[1L]], ".", call. = FALSE)
+  }
+  if (!is.logical(individual) || length(individual) != 1L || is.na(individual)) {
+    stop("us_matched(): `individual` must be a single TRUE or FALSE.",
+         call. = FALSE)
   }
   if (!is.numeric(times) || anyNA(times)) {
     stop("`times` must be numeric with no missing values.", call. = FALSE)
@@ -195,6 +212,23 @@ us_matched <- function(age, male, other, times,
 
   scalef <- hzl_scalef(scale)
   years  <- times * scalef
+
+  ## The hazard at birth is undefined: table2008 and table2023 diverge there
+  ## and only table84 has a limit (see hzl_hazard()). It is reached only by a
+  ## patient aged 0 at a time of 0, so name those patients here rather than
+  ## let the evaluator stop without saying who.
+  if (any(years == 0)) {
+    newborn <- which(age == 0)
+    if (length(newborn)) {
+      stop("us_matched(): the reference hazard is not defined at birth, and ",
+           length(newborn), " patient(s) have `age` 0 with a time of 0 in ",
+           "`times` -- id ",
+           paste(utils::head(id[newborn], 5), collapse = ", "),
+           if (length(newborn) > 5) ", ..." else "",
+           ".\nStart `times` above 0 for them; `smatched` is 1 at time 0 ",
+           "by definition.", call. = FALSE)
+    }
+  }
   max_age <- max(age) + max(years)
   if (max_age > 110) {
     stop("age + follow-up reaches ", round(max_age, 1),
@@ -247,13 +281,17 @@ us_matched <- function(age, male, other, times,
 ## heterogeneous cohort.
 hzl_mean_curve <- function(out) {
   density  <- out$hmatched * out$smatched
-  by_time  <- factor(out$time, levels = unique(out$time))
+  ## Grouped on the numeric value, not through factor(): factor levels are
+  ## character with 15 significant digits, so as.numeric(levels(.)) would
+  ## return 1/3 as 0.333333333333333 and merge times that differ beyond it.
+  times    <- unique(out$time)
+  by_time  <- match(out$time, times)
 
-  mean_s <- tapply(out$smatched, by_time, mean)
-  mean_d <- tapply(density,      by_time, mean)
+  mean_s <- as.vector(tapply(out$smatched, by_time, mean))
+  mean_d <- as.vector(tapply(density,      by_time, mean))
 
   data.frame(
-    time     = as.numeric(levels(by_time)),
+    time     = times,
     smatched = as.numeric(mean_s),
     hmatched = as.numeric(mean_d / mean_s),
     stringsAsFactors = FALSE

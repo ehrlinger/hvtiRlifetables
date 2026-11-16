@@ -44,6 +44,26 @@ hzl_resolve_by <- function(x, by) {
   g
 }
 
+## Every patient must carry the same `times`. The mean at a time is over the
+## rows at that time, so a patient missing a time -- two us_matched() calls
+## with different `times`, stacked -- silently changes the denominator part
+## of the way along the curve.
+hzl_check_grid <- function(x) {
+  if (nrow(x) == 0L) return(invisible(TRUE))
+  grids <- split(x$time, factor(x$id, levels = unique(x$id)))
+  same <- vapply(grids, identical, logical(1), grids[[1L]])
+  if (!all(same)) {
+    stop("us_cohort_curve(): the patients in `x` do not share one set of ",
+         "times -- id ", paste(utils::head(names(grids)[!same], 5),
+                               collapse = ", "),
+         if (sum(!same) > 5) ", ..." else "",
+         " differ from id ", names(grids)[[1L]], ". Averaging would change ",
+         "the denominator along the curve. Call us_matched() once, with ",
+         "one `times`, for the whole cohort.", call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 #' Cohort expected-survival curve, optionally within groups
 #'
 #' Reduces the per-patient output of \code{\link{us_matched}} to the curve a
@@ -132,6 +152,7 @@ us_cohort_curve <- function(x, by = NULL) {
          " that us_matched(individual = TRUE) returns.", call. = FALSE)
   }
 
+  hzl_check_grid(x)
   g <- hzl_resolve_by(x, by)
 
   if (nrow(x) == 0L) {

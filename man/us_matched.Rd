@@ -18,19 +18,25 @@ us_matched(
 }
 \arguments{
 \item{age}{Numeric vector of ages \strong{in years}, always in years regardless
-of \code{scale}.}
+of \code{scale}. An age of exactly \code{0} is accepted, but not together with a
+time of \code{0}: the reference hazard at birth is not defined (the
+\code{table2008} and \code{table2023} fits diverge there), so a newborn's
+\code{hmatched} cannot be reported at \code{time = 0} and the call stops, naming
+the patients. Start \code{times} above \code{0} for such a cohort; \code{smatched} at
+time \code{0} is \code{1} by definition.}
 
 \item{male}{Numeric vector, \code{1} male, \code{0} female. The macro's coding,
-unchanged.}
+unchanged. A logical vector is read as \code{TRUE} = \code{1}.}
 
 \item{other}{Numeric vector, \code{1} non-white, \code{0} white. The macro's coding,
-unchanged. What "non-white" contains differs by vintage -- see
-\code{\link[=us_lifetable_vintages]{us_lifetable_vintages()}}.}
+unchanged. A logical vector is read as \code{TRUE} = \code{1}. What "non-white"
+contains differs by vintage -- see \code{\link[=us_lifetable_vintages]{us_lifetable_vintages()}}.}
 
 \item{times}{Numeric vector of follow-up times in the units of \code{scale},
 non-negative.}
 
-\item{id}{Optional vector of patient identifiers, recycled into the output.
+\item{id}{Optional vector of patient identifiers, one per patient and so
+the same length as \code{age}, repeated into the output once per time.
 Defaults to \code{seq_along(age)}.}
 
 \item{vintage}{Character scalar naming the fitted-model vintage. \strong{There is
@@ -45,10 +51,10 @@ against the vintage's non-white category, \code{"sex"} uses male and female,
 \item{scale}{Units of \code{times}. Applies the macro's \code{SCALEF} of \code{1},
 \code{1/12} and \code{1/365.2425} respectively.}
 
-\item{individual}{If \code{TRUE} (default), one row per patient per time. If
-\code{FALSE}, the cohort mean curve, one row per time -- the ungrouped case of
-\code{\link{us_cohort_curve}}, which is what to use for a curve within
-groups of the caller's own choosing.}
+\item{individual}{A single \code{TRUE} or \code{FALSE}. If \code{TRUE} (default), one
+row per patient per time. If \code{FALSE}, the cohort mean curve, one row per
+time -- the ungrouped case of \code{\link{us_cohort_curve}}, which is
+what to use for a curve within groups of the caller's own choosing.}
 }
 \value{
 A data frame. When \code{individual = TRUE}, columns \code{id}, \code{time},
