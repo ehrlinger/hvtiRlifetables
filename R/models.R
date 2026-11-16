@@ -37,33 +37,39 @@ usable_vintages <- function() {
   names(VINTAGE_META)[vapply(VINTAGE_META, function(x) x$usable, logical(1))]
 }
 
-hzl_check_vintage <- function(vintage) {
+## `fn` names the exported function the caller called, for the `fn(): `
+## prefix the rubric asks for: with call = NULL it is the only place the
+## function name appears.
+hzl_check_vintage <- function(vintage, fn) {
+  pre <- paste0(fn, "(): ")
   if (missing(vintage) || is.null(vintage)) {
-    hzl_abort("vintage", "`vintage` has no default and must be given. Available: ",
-         paste(usable_vintages(), collapse = ", "),
-         ".\nThis package refuses to guess: the SAS macro's default silently ",
-         "moved twice, from table84 to table2008 and then to table2023, and ",
-         "every job re-run across either move got different numbers with no ",
-         "signal.")
+    hzl_abort("vintage", pre,
+              "`vintage` has no default and must be given. Available: ",
+              paste(usable_vintages(), collapse = ", "),
+              ".\nThis package refuses to guess: the SAS macro's default ",
+              "silently moved twice, from table84 to table2008 and then to ",
+              "table2023, and every job re-run across either move got ",
+              "different numbers with no signal.")
   }
   if (!is.character(vintage) || length(vintage) != 1L) {
-    stop("`vintage` must be a single character string.", call. = FALSE)
+    stop(pre, "`vintage` must be a single character string.", call. = FALSE)
   }
   if (identical(vintage, "table2009")) {
-    hzl_abort("vintage", "vintage \"table2009\" is empty on disk -- the estimates directory ",
-         "exists but was never populated. It is not a missing file; there is ",
-         "nothing to load. Available: ",
-         paste(usable_vintages(), collapse = ", "), ".")
+    hzl_abort("vintage", pre,
+              "vintage \"table2009\" is empty on disk -- the estimates ",
+              "directory exists but was never populated. It is not a missing ",
+              "file; there is nothing to load. Available: ",
+              paste(usable_vintages(), collapse = ", "), ".")
   }
   if (!vintage %in% usable_vintages()) {
-    hzl_abort("vintage", "unknown vintage \"", vintage, "\". Available: ",
+    hzl_abort("vintage", pre, "unknown vintage \"", vintage, "\". Available: ",
               paste(usable_vintages(), collapse = ", "), ".")
   }
   invisible(TRUE)
 }
 
 hzl_nonwhite_code <- function(vintage) {
-  hzl_check_vintage(vintage)
+  hzl_check_vintage(vintage, "hzl_nonwhite_code")
   VINTAGE_META[[vintage]]$nonwhite_code
 }
 
@@ -137,7 +143,7 @@ us_lifetable_vintages <- function() {
 #'
 #' @export
 us_lifetable_model <- function(vintage, stratum) {
-  hzl_check_vintage(vintage)
+  hzl_check_vintage(vintage, "us_lifetable_model")
   if (missing(stratum) || !is.character(stratum) || length(stratum) != 1L) {
     stop("`stratum` must be a single character string.", call. = FALSE)
   }

@@ -151,7 +151,7 @@ us_matched <- function(age, male, other, times,
                        scale      = c("years", "months", "days"),
                        individual = TRUE) {
 
-  hzl_check_vintage(vintage)
+  hzl_check_vintage(vintage, "us_matched")
   table <- match.arg(table)
   scale <- match.arg(scale)
 

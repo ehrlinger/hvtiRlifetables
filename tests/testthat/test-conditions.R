@@ -55,4 +55,16 @@ test_that("the newborn and time-grid stops are classed", {
   s1 <- us_matched(50, 0, 0, times = c(0, 1), id = "s", vintage = "table84")
   s2 <- us_matched(80, 0, 0, times = c(0, 2), id = "s", vintage = "table84")
   expect_classed(us_cohort_curve(rbind(s1, s2)), "grid")
+
+test_that("us_cohort_curve(x = r, grp) still groups by position", {
+  r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                  vintage = "table84")
+  grp <- c("a", "b")[r$id]
+  expect_identical(suppressWarnings(us_cohort_curve(x = r, grp)),
+                   us_cohort_curve(r, by = grp))
+})
+
+test_that("vintage errors name the function called", {
+  expect_error(us_matched(70, 1, 0, times = 5), "^us_matched\\(\\): ")
+  expect_error(us_lifetable_model("nope", "wm"), "^us_lifetable_model\\(\\): ")
 })

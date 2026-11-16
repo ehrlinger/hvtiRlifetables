@@ -156,8 +156,16 @@ hzl_check_grid <- function(data) {
 us_cohort_curve <- function(data, by = NULL, x) {
   if (!missing(x)) {
     if (!missing(data)) {
-      stop("us_cohort_curve(): give `data` only; `x` is its deprecated name.",
-           call. = FALSE)
+      ## `us_cohort_curve(x = r, grp)` meant `by = grp` before the rename, and
+      ## `grp` now lands in `data` by position. Keep that call working, unless
+      ## `data` is itself us_matched() output: then both names were given.
+      both <- is.data.frame(data) &&
+        all(c("id", "time", "smatched", "hmatched") %in% names(data))
+      if (!missing(by) || both) {
+        stop("us_cohort_curve(): give `data` only; `x` is its deprecated ",
+             "name.", call. = FALSE)
+      }
+      by <- data
     }
     hzl_warn_renamed("us_cohort_curve", "x", "data")
     data <- x
