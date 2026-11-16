@@ -164,3 +164,64 @@ test_that("grouping is independent of the table= stratification", {
   s_o <- g$smatched[g$group == "o" & g$time == 5]
   expect_gt(s_y, s_o)
 })
+
+test_that("times survive the cohort reduction to full precision", {
+  # Grouping through factor() returned 1/3 as 0.333333333333333.
+  tm <- c(0, 1 / 3, 2 / 3)
+  x <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = tm, vintage = "table84")
+  expect_identical(us_cohort_curve(x)$time, tm)
+})
+
+test_that("patients with different times are refused rather than averaged", {
+  a <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 10),
+                  vintage = "table84")
+  b <- us_matched(70, 1, 0, times = c(0, 5), id = 3, vintage = "table84")
+  expect_error(us_cohort_curve(rbind(a, b)), "do not share one set of times")
+})
+
+test_that("groups may carry different times from one another", {
+  a <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 10),
+                  vintage = "table84")
+  b <- us_matched(70, 1, 0, times = c(0, 5), id = 3, vintage = "table84")
+  x <- rbind(a, b)
+  out <- us_cohort_curve(x, by = ifelse(x$id == 3, "b", "a"))
+  expect_equal(out[out$group == "b", "time"], c(0, 5))
+  expect_equal(out[out$group == "a", "smatched"], us_cohort_curve(a)$smatched)
+})
+
+test_that("stacked results with colliding ids are refused (review, #48)", {
+  a <- us_matched(50, 0, 0, times = c(0, 1), id = "same", vintage = "table84")
+  b <- us_matched(80, 0, 0, times = c(0, 2), id = "same", vintage = "table84")
+  expect_error(us_cohort_curve(rbind(a, b)), "appears more than once")
+  # Independently generated default ids both start at 1.
+  d1 <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                   vintage = "table84")
+  d2 <- us_matched(70, 1, 0, times = c(0, 10), vintage = "table84")
+  expect_error(us_cohort_curve(rbind(d1, d2)), "appears more than once")
+})
+
+test_that("missing or repeated ids are refused at the source", {
+  expect_error(us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                          id = c(NA, NA), vintage = "table84"), "`id`")
+  expect_error(us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                          id = c(1, 1), vintage = "table84"), "`id`")
+  expect_error(us_matched(50, 1, 0, times = c(0, 5), id = NA,
+                          vintage = "table84"), "`id`")
+})
+
+test_that("row order does not matter to the grid check (review, #48)", {
+  r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 1),
+                  vintage = "table84")
+  expect_equal(us_cohort_curve(r[c(1, 2, 4, 3), ]), us_cohort_curve(r))
+  expect_equal(us_cohort_curve(r[c(1, 3, 2, 4), ]), us_cohort_curve(r))
+})
+
+test_that("tied times reduce to one row per distinct time", {
+  r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 5),
+                  vintage = "table84")
+  expect_error(us_cohort_curve(r), "unique\\(times\\)")
+  agg <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 5),
+                    vintage = "table84", individual = FALSE)
+  expect_equal(agg, us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                               vintage = "table84", individual = FALSE))
+})

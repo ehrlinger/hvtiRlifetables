@@ -44,6 +44,46 @@ hzl_resolve_by <- function(x, by) {
   g
 }
 
+## Every patient averaged into one curve must carry the same `times`. The
+## mean at a time is over the rows at that time, so a patient missing a time
+## -- two us_matched() calls with different `times`, stacked -- silently
+## changes the denominator part of the way along the curve. Checked per
+## curve, so groups may legitimately differ from one another. Ids are matched
+## on their values, not through factor(), which would drop NA and compare
+## numeric ids as 15-digit strings.
+##
+## The output cannot tell two patients sharing an id from one patient, so an
+## id seen twice at one time is refused outright: it is either a collision
+## between stacked results (default ids all start at 1) or tied `times`, and
+## averaging either would weight some rows twice at some times only. With
+## that excluded, each patient's times are a set, compared sorted so that
+## row order does not matter.
+hzl_check_grid <- function(x) {
+  if (nrow(x) == 0L) return(invisible(TRUE))
+  ids <- unique(x$id)
+  pid <- match(x$id, ids)
+  dup <- duplicated(data.frame(pid = pid, time = x$time))
+  if (any(dup)) {
+    first <- which(dup)[[1L]]
+    stop("us_cohort_curve(): id ", ids[[pid[[first]]]], " appears more than ",
+         "once at time ", x$time[[first]], ", so its rows cannot be told ",
+         "apart. Either results with overlapping ids were stacked -- give ",
+         "every patient a distinct `id` -- or `times` has ties -- pass ",
+         "unique(times).", call. = FALSE)
+  }
+  grids <- lapply(split(x$time, pid), sort)
+  same  <- vapply(grids, identical, logical(1), grids[[1L]])
+  if (!all(same)) {
+    stop("us_cohort_curve(): the patients in `x` do not share one set of ",
+         "times -- id ", paste(utils::head(ids[!same], 5), collapse = ", "),
+         if (sum(!same) > 5) ", ..." else "",
+         " differ from id ", ids[[1L]], ". Averaging would change ",
+         "the denominator along the curve. Call us_matched() once, with ",
+         "one `times`, for the whole cohort.", call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
 #' Cohort expected-survival curve, optionally within groups
 #'
 #' Reduces the per-patient output of \code{\link{us_matched}} to the curve a
@@ -67,8 +107,9 @@ hzl_resolve_by <- function(x, by) {
 #'   a patient-level grouping must be expanded to it -- see the examples.
 #'
 #' @return A data frame with columns \code{time}, \code{smatched} and
-#'   \code{hmatched}, one row per time -- or, with \code{by}, the grouping
-#'   columns first and one row per group per time. Groups and times appear in
+#'   \code{hmatched}, one row per distinct time -- or, with \code{by}, the
+#'   grouping columns first and one row per group per time. Groups and times
+#'   appear in
 #'   order of first appearance in \code{x}, so a factor grouping does not
 #'   reorder to its levels.
 #'
@@ -145,6 +186,7 @@ us_cohort_curve <- function(x, by = NULL) {
   }
 
   if (is.null(g)) {
+    hzl_check_grid(x)
     return(hzl_mean_curve(x))
   }
 
@@ -156,6 +198,7 @@ us_cohort_curve <- function(x, by = NULL) {
 
   parts <- lapply(levels(key), function(k) {
     rows <- which(key == k)
+    hzl_check_grid(x[rows, , drop = FALSE])
     curve <- hzl_mean_curve(x[rows, , drop = FALSE])
     ## Repeated to the curve's length rather than left to cbind's recycling:
     ## a one-row frame recycles, but carries its row name into the result and

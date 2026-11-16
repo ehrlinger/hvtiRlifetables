@@ -165,3 +165,47 @@ test_that("ids are carried through", {
                   times = c(0, 5), id = c("a", "b"), vintage = "table84")
   expect_equal(r$id, c("a", "a", "b", "b"))
 })
+
+test_that("a newborn at time 0 stops, naming the patient", {
+  # The hazard at birth is undefined: table2008 and table2023 diverge at 0.
+  for (v in c("table84", "table2008", "table2023")) {
+    expect_error(
+      us_matched(c(40, 0), c(1, 0), c(0, 0), times = c(0, 1),
+                 id = c("p1", "p2"), vintage = v),
+      "id p2"
+    )
+  }
+})
+
+test_that("a newborn is fine once times start above 0", {
+  r <- us_matched(0, 1, 0, times = c(0.5, 1, 5), vintage = "table2023")
+  expect_true(all(is.finite(r$hmatched)))
+  expect_equal(r$agesurv, rep(1, 3))
+  expect_true(all(r$smatched < 1))
+})
+
+test_that("tied times are accepted and give tied rows", {
+  r <- us_matched(50, 1, 0, times = c(5, 5), vintage = "table84")
+  expect_equal(nrow(r), 2L)
+  expect_equal(r$smatched[1], r$smatched[2])
+  r0 <- us_matched(50, 1, 0, times = c(0, 0), vintage = "table84")
+  expect_equal(r0$smatched, c(1, 1))
+})
+
+test_that("individual must be a single TRUE or FALSE", {
+  for (bad in list("no", NA, c(TRUE, FALSE), 1)) {
+    expect_error(us_matched(50, 1, 0, times = c(0, 5), vintage = "table84",
+                            individual = bad), "`individual`")
+  }
+})
+
+test_that("male and other are type-checked, not just value-checked", {
+  # %in% coerces, so "1" and factor labels passed the old value-only check.
+  expect_error(us_matched(70, "1", 0, times = 5, vintage = "table84"),
+               "`male`.*character")
+  expect_error(us_matched(70, 1, factor(0), times = 5, vintage = "table84"),
+               "`other`.*factor")
+  expect_error(us_matched(70, NA, 0, times = 5, vintage = "table84"), "`male`")
+  expect_equal(us_matched(70, TRUE, FALSE, times = c(0, 5), vintage = "table84"),
+               us_matched(70, 1, 0, times = c(0, 5), vintage = "table84"))
+})

@@ -26,8 +26,9 @@ a patient-level grouping must be expanded to it -- see the examples.}
 }
 \value{
 A data frame with columns \code{time}, \code{smatched} and
-\code{hmatched}, one row per time -- or, with \code{by}, the grouping
-columns first and one row per group per time. Groups and times appear in
+\code{hmatched}, one row per distinct time -- or, with \code{by}, the
+grouping columns first and one row per group per time. Groups and times
+appear in
 order of first appearance in \code{x}, so a factor grouping does not
 reorder to its levels.
 }

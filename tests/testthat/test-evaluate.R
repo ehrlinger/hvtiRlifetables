@@ -44,7 +44,7 @@ test_that("a newborn at time 0 stops rather than reaching the cohort density", {
   expect_error(
     us_matched(age = 0, male = 1, other = 0, times = c(0, 1),
                vintage = "table2023"),
-    "exactly age 0"
+    "not defined at birth"
   )
 })
 
