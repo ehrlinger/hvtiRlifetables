@@ -53,7 +53,7 @@ us_matched(age, male, other, times,
            scale      = c("years", "months", "days"),
            individual = TRUE)
 
-us_cohort_curve(x, by = NULL)           # the cohort curve, or one per group
+us_cohort_curve(data, by = NULL)        # the cohort curve, or one per group
 
 us_lifetable_vintages()                 # vintages, provenance, race semantics
 us_lifetable_model(vintage, stratum)    # the raw parameter set

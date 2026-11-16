@@ -103,7 +103,7 @@ test_that("a `by` of the wrong length names the expansion needed", {
   # The mistake this catches: passing the PATIENT-level grouping straight in,
   # when x carries one row per patient per time.
   expect_error(us_cohort_curve(x, by = c("a", "a", "b", "b")),
-               "match\\(x\\$id, ids\\)")
+               "match\\(data\\$id, ids\\)")
 })
 
 test_that("a grouping column may not be called time, smatched or hmatched", {

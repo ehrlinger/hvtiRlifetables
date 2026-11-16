@@ -23,10 +23,10 @@
 hzl_assert_finite <- function(x, age, what) {
   if (!all(is.finite(x))) {
     bad <- age[!is.finite(x)]
-    stop(what, " is not finite at age ",
-         paste(utils::head(bad, 5), collapse = ", "),
-         if (length(bad) > 5) ", ..." else "",
-         ".\nThe fitted parameters are degenerate.", call. = FALSE)
+    hzl_abort("degenerate", what, " is not finite at age ",
+              paste(utils::head(bad, 5), collapse = ", "),
+              if (length(bad) > 5) ", ..." else "",
+              ".\nThe fitted parameters are degenerate.")
   }
   invisible(TRUE)
 }
@@ -34,9 +34,9 @@ hzl_assert_finite <- function(x, age, what) {
 hzl_check_model <- function(params, status) {
   if (!any(vapply(c("E0", "C0", "L0"),
                   function(n) isTRUE(status[[n]] == 1L), logical(1)))) {
-    stop("this model has no active phase: E0, C0 and L0 all have ",
-         "_STATUS_ != 1. A model with no phases is not a valid model.",
-         call. = FALSE)
+    hzl_abort("degenerate",
+              "this model has no active phase: E0, C0 and L0 all have ",
+              "_STATUS_ != 1. A model with no phases is not a valid model.")
   }
   invisible(TRUE)
 }
@@ -86,8 +86,9 @@ hzl_cumhaz <- function(params, status, age) {
 hzl_hazard <- function(params, status, age) {
   hzl_check_model(params, status)
   if (any(age == 0, na.rm = TRUE)) {
-    stop("the hazard is not evaluated at exactly age 0, where most of the ",
-         "fits diverge; evaluate at a positive age.", call. = FALSE)
+    hzl_abort("age_zero",
+              "the hazard is not evaluated at exactly age 0, where most of ",
+              "the fits diverge; evaluate at a positive age.")
   }
 
   muE <- hzl_mu(params, status, "E0")

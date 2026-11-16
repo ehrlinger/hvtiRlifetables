@@ -39,25 +39,25 @@ usable_vintages <- function() {
 
 hzl_check_vintage <- function(vintage) {
   if (missing(vintage) || is.null(vintage)) {
-    stop("`vintage` has no default and must be given. Available: ",
+    hzl_abort("vintage", "`vintage` has no default and must be given. Available: ",
          paste(usable_vintages(), collapse = ", "),
          ".\nThis package refuses to guess: the SAS macro's default silently ",
          "moved twice, from table84 to table2008 and then to table2023, and ",
          "every job re-run across either move got different numbers with no ",
-         "signal.", call. = FALSE)
+         "signal.")
   }
   if (!is.character(vintage) || length(vintage) != 1L) {
     stop("`vintage` must be a single character string.", call. = FALSE)
   }
   if (identical(vintage, "table2009")) {
-    stop("vintage \"table2009\" is empty on disk -- the estimates directory ",
+    hzl_abort("vintage", "vintage \"table2009\" is empty on disk -- the estimates directory ",
          "exists but was never populated. It is not a missing file; there is ",
          "nothing to load. Available: ",
-         paste(usable_vintages(), collapse = ", "), ".", call. = FALSE)
+         paste(usable_vintages(), collapse = ", "), ".")
   }
   if (!vintage %in% usable_vintages()) {
-    stop("unknown vintage \"", vintage, "\". Available: ",
-         paste(usable_vintages(), collapse = ", "), ".", call. = FALSE)
+    hzl_abort("vintage", "unknown vintage \"", vintage, "\". Available: ",
+              paste(usable_vintages(), collapse = ", "), ".")
   }
   invisible(TRUE)
 }
@@ -148,11 +148,11 @@ us_lifetable_model <- function(vintage, stratum) {
 
   if (length(i) != 1L) {
     available <- sort(models$stratum[in_vintage])
-    stop("vintage \"", vintage, "\" has no stratum \"", stratum,
-         "\". Available: ", paste(available, collapse = ", "),
-         ".\nNote that vintages differ in how they name the non-white ",
-         "stratum: table84 uses \"o\", table2008 and table2023 use \"b\".",
-         call. = FALSE)
+    hzl_abort("stratum",
+              "us_lifetable_model(): vintage \"", vintage, "\" has no stratum \"",
+              stratum, "\". Available: ", paste(available, collapse = ", "),
+              ".\nNote that vintages differ in how they name the non-white ",
+              "stratum: table84 uses \"o\", table2008 and table2023 use \"b\".")
   }
 
   list(

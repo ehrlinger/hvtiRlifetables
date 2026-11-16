@@ -48,15 +48,16 @@ hzl_empty_result <- function(id, individual) {
 hzl_assert_varies <- function(smatched, times) {
   if (length(unique(times)) < 2L) return(invisible(TRUE))
   if (all(smatched == 1) || all(smatched == 0)) {
-    stop("the reference survival curve is identically ",
-         if (all(smatched == 1)) "1" else "0",
-         " -- this is not a survival curve. Check the _STATUS_ gating and ",
-         "the vintage.", call. = FALSE)
+    hzl_abort("degenerate", "the reference survival curve is identically ",
+              if (all(smatched == 1)) "1" else "0",
+              " -- this is not a survival curve. Check the _STATUS_ gating ",
+              "and the vintage.")
   }
   if (length(unique(smatched)) == 1L) {
-    stop("the reference survival curve is constant across `times`. ",
-         "Check that `times` actually varies and that the model has an ",
-         "active phase.", call. = FALSE)
+    hzl_abort("degenerate",
+              "the reference survival curve is constant across `times`. ",
+              "Check that `times` actually varies and that the model has an ",
+              "active phase.")
   }
   invisible(TRUE)
 }
@@ -227,20 +228,22 @@ us_matched <- function(age, male, other, times,
   if (any(years == 0)) {
     newborn <- which(age == 0)
     if (length(newborn)) {
-      stop("us_matched(): the reference hazard is not defined at birth, and ",
-           length(newborn), " patient(s) have `age` 0 with a time of 0 in ",
-           "`times` -- id ",
-           paste(utils::head(id[newborn], 5), collapse = ", "),
-           if (length(newborn) > 5) ", ..." else "",
-           ".\nStart `times` above 0 for them; `smatched` is 1 at time 0 ",
-           "by definition.", call. = FALSE)
+      hzl_abort("age_zero",
+                "us_matched(): the reference hazard is not defined at birth, ",
+                "and ", length(newborn), " patient(s) have `age` 0 with a ",
+                "time of 0 in `times` -- id ",
+                paste(utils::head(id[newborn], 5), collapse = ", "),
+                if (length(newborn) > 5) ", ..." else "",
+                ".\nStart `times` above 0 for them; `smatched` is 1 at time ",
+                "0 by definition.")
     }
   }
   max_age <- max(age) + max(years)
   if (max_age > 110) {
-    stop("age + follow-up reaches ", round(max_age, 1),
-         " years, beyond the fits' support of 110. These models are not ",
-         "extrapolated past the life table's range.", call. = FALSE)
+    hzl_abort("support",
+              "us_matched(): age + follow-up reaches ", round(max_age, 1),
+              " years, beyond the fits' support of 110. These models are not ",
+              "extrapolated past the life table's range.")
   }
 
   strata <- hzl_assign_stratum(male, other, table, vintage)
