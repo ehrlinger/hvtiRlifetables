@@ -1,22 +1,22 @@
 # Cohort expected-survival curve, optionally within groups
 
 Reduces the per-patient output of
-[`us_matched`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+[`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
 to the curve a figure actually carries: the cohort's expected survival
 at each time, and its hazard. With `by`, one such curve per group.
 
 ## Usage
 
 ``` r
-us_cohort_curve(x, by = NULL)
+us_cohort_curve(data, by = NULL, x)
 ```
 
 ## Arguments
 
-- x:
+- data:
 
   A data frame as returned by
-  [`us_matched`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+  [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
   with `individual = TRUE` – columns `id`, `time`, `smatched` and
   `hmatched`. An already-aggregated frame is rejected rather than
   averaged twice.
@@ -27,22 +27,28 @@ us_cohort_curve(x, by = NULL)
 
   - `NULL` (default), for a single cohort-wide curve;
 
-  - a vector or factor with one value per *row* of `x`, reported in a
+  - a vector or factor with one value per *row* of `data`, reported in a
     column called `group`;
 
   - a named list or data frame of such vectors, for a crossed grouping,
     reported under its own names.
 
-  It carries values, not column names: group by a column of `x` with
-  `by = x$arm`. Because `x` holds one row per patient per time, a
+  It carries values, not column names: group by a column of `data` with
+  `by = data$arm`. Because `data` holds one row per patient per time, a
   patient-level grouping must be expanded to it – see the examples.
+
+- x:
+
+  Deprecated; use `data`. Still accepted, with a warning once per
+  session, and to be removed in a future release.
 
 ## Value
 
 A data frame with columns `time`, `smatched` and `hmatched`, one row per
 distinct time – or, with `by`, the grouping columns first and one row
-per group per time. Groups and times appear in order of first appearance
-in `x`, so a factor grouping does not reorder to its levels.
+per group per distinct time. Groups and times appear in order of first
+appearance in `data`, so a factor grouping does not reorder to its
+levels.
 
 ## The averaging, and why it is here
 
@@ -56,21 +62,22 @@ heterogeneous cohort the two differ, and the difference is not cosmetic.
 The mean is over **survival**, not over cumulative hazard, and no
 patient is weighted by follow-up. Missing values are not dropped: every
 value
-[`us_matched`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
+[`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
 returns is finite by construction, so an `NA` arriving here is a defect
 rather than a datum, and averaging around it would hide it.
 
 ## Grouping is not stratification
 
-`us_matched`'s `table` argument chooses which strata the *life table* is
-built from – `"sexrace"`, `"race"`, `"sex"`, `"overall"`. `by` chooses
-how the resulting curves are grouped for *reporting* – age band,
-treatment arm, era. The two axes are independent: a report broken down
-by age band is normally still matched on `"sexrace"`.
+[`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)'s
+`table` argument chooses which strata the *life table* is built from –
+`"sexrace"`, `"race"`, `"sex"`, `"overall"`. `by` chooses how the
+resulting curves are grouped for *reporting* – age band, treatment arm,
+era. The two axes are independent: a report broken down by age band is
+normally still matched on `"sexrace"`.
 
 ## See also
 
-[`us_matched`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md),
+[`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md),
 whose `individual = FALSE` is the ungrouped case of this function.
 
 ## Examples

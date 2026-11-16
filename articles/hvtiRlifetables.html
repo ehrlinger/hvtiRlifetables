@@ -113,7 +113,7 @@ S_{matched}(t) = \exp\{-(H(\text{age} + t) - H(\text{age}))\}
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/us_matched.html">us_matched</a></span><span class="op">(</span>age <span class="op">=</span> <span class="fl">70</span>, male <span class="op">=</span> <span class="fl">1</span>, other <span class="op">=</span> <span class="fl">0</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error:</span></span>
-<span><span class="co">#&gt; ! `vintage` has no default and must be given. Available: table84, table2008, table2023.</span></span>
+<span><span class="co">#&gt; ! us_matched(): `vintage` has no default and must be given. Available: table84, table2008, table2023.</span></span>
 <span><span class="co">#&gt; This package refuses to guess: the SAS macro's default silently moved twice, from table84 to table2008 and then to table2023, and every job re-run across either move got different numbers with no signal.</span></span></code></pre></div>
 </div>
 <p>The macro’s default moved twice, from <code>table84</code> to <code>table2008</code> and then to <code>table2023</code>, and jobs re-run across either move got different numbers with no warning. Writing the vintage into the analysis code is the only way a reader can tell which reference population a figure used.</p>

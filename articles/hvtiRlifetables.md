@@ -97,7 +97,7 @@ Leaving the vintage out is an error, on purpose:
 
 us_matched(age = 70, male = 1, other = 0, times = 5)
 #> Error:
-#> ! `vintage` has no default and must be given. Available: table84, table2008, table2023.
+#> ! us_matched(): `vintage` has no default and must be given. Available: table84, table2008, table2023.
 #> This package refuses to guess: the SAS macro's default silently moved twice, from table84 to table2008 and then to table2023, and every job re-run across either move got different numbers with no signal.
 ```
 
