@@ -157,11 +157,16 @@ us_cohort_curve <- function(data, by = NULL, x) {
   if (!missing(x)) {
     if (!missing(data)) {
       ## `us_cohort_curve(x = r, grp)` meant `by = grp` before the rename, and
-      ## `grp` now lands in `data` by position. Keep that call working, unless
-      ## `data` is itself us_matched() output: then both names were given.
-      both <- is.data.frame(data) &&
+      ## `grp` now lands in `data` by position. Keep that call working, but
+      ## only when `data` really did arrive by position: the call's own tags
+      ## say whether it was named (in full or by partial matching), and a
+      ## named `data` beside `x` is two inputs, never a grouping. A positional
+      ## frame that is itself us_matched() output is two inputs as well.
+      tags  <- names(sys.call())[-1L]
+      named <- !is.null(tags) && any(nzchar(tags) & startsWith("data", tags))
+      both  <- is.data.frame(data) &&
         all(c("id", "time", "smatched", "hmatched") %in% names(data))
-      if (!missing(by) || both) {
+      if (!missing(by) || named || both) {
         stop("us_cohort_curve(): give `data` only; `x` is its deprecated ",
              "name.", call. = FALSE)
       }

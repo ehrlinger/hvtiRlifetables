@@ -68,3 +68,15 @@ test_that("vintage errors name the function called", {
   expect_error(us_matched(70, 1, 0, times = 5), "^us_matched\\(\\): ")
   expect_error(us_lifetable_model("nope", "wm"), "^us_lifetable_model\\(\\): ")
 })
+
+test_that("a named `data` beside `x` is refused, never read as `by` (#49)", {
+  r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                  vintage = "table84")
+  g <- data.frame(group = rep(c("a", "b"), each = 2))
+  expect_error(us_cohort_curve(data = g, x = r), "deprecated name")
+  expect_error(us_cohort_curve(x = r, data = g), "deprecated name")
+  expect_error(us_cohort_curve(dat = g, x = r), "deprecated name")
+  # The positional legacy form still groups.
+  expect_identical(suppressWarnings(us_cohort_curve(x = r, g)),
+                   us_cohort_curve(r, by = g))
+})
