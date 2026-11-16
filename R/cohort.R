@@ -51,10 +51,27 @@ hzl_resolve_by <- function(x, by) {
 ## curve, so groups may legitimately differ from one another. Ids are matched
 ## on their values, not through factor(), which would drop NA and compare
 ## numeric ids as 15-digit strings.
+##
+## The output cannot tell two patients sharing an id from one patient, so an
+## id seen twice at one time is refused outright: it is either a collision
+## between stacked results (default ids all start at 1) or tied `times`, and
+## averaging either would weight some rows twice at some times only. With
+## that excluded, each patient's times are a set, compared sorted so that
+## row order does not matter.
 hzl_check_grid <- function(x) {
   if (nrow(x) == 0L) return(invisible(TRUE))
-  ids   <- unique(x$id)
-  grids <- split(x$time, match(x$id, ids))
+  ids <- unique(x$id)
+  pid <- match(x$id, ids)
+  dup <- duplicated(data.frame(pid = pid, time = x$time))
+  if (any(dup)) {
+    first <- which(dup)[[1L]]
+    stop("us_cohort_curve(): id ", ids[[pid[[first]]]], " appears more than ",
+         "once at time ", x$time[[first]], ", so its rows cannot be told ",
+         "apart. Either results with overlapping ids were stacked -- give ",
+         "every patient a distinct `id` -- or `times` has ties -- pass ",
+         "unique(times).", call. = FALSE)
+  }
+  grids <- lapply(split(x$time, pid), sort)
   same  <- vapply(grids, identical, logical(1), grids[[1L]])
   if (!all(same)) {
     stop("us_cohort_curve(): the patients in `x` do not share one set of ",

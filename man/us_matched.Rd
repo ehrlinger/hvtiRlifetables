@@ -36,7 +36,8 @@ contains differs by vintage -- see \code{\link[=us_lifetable_vintages]{us_lifeta
 non-negative.}
 
 \item{id}{Optional vector of patient identifiers, one per patient and so
-the same length as \code{age}, repeated into the output once per time.
+the same length as \code{age}, with no missing or repeated values, repeated
+into the output once per time.
 Defaults to \code{seq_along(age)}.}
 
 \item{vintage}{Character scalar naming the fitted-model vintage. \strong{There is

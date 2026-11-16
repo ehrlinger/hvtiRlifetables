@@ -188,3 +188,40 @@ test_that("groups may carry different times from one another", {
   expect_equal(out[out$group == "b", "time"], c(0, 5))
   expect_equal(out[out$group == "a", "smatched"], us_cohort_curve(a)$smatched)
 })
+
+test_that("stacked results with colliding ids are refused (review, #48)", {
+  a <- us_matched(50, 0, 0, times = c(0, 1), id = "same", vintage = "table84")
+  b <- us_matched(80, 0, 0, times = c(0, 2), id = "same", vintage = "table84")
+  expect_error(us_cohort_curve(rbind(a, b)), "appears more than once")
+  # Independently generated default ids both start at 1.
+  d1 <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                   vintage = "table84")
+  d2 <- us_matched(70, 1, 0, times = c(0, 10), vintage = "table84")
+  expect_error(us_cohort_curve(rbind(d1, d2)), "appears more than once")
+})
+
+test_that("missing or repeated ids are refused at the source", {
+  expect_error(us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                          id = c(NA, NA), vintage = "table84"), "`id`")
+  expect_error(us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                          id = c(1, 1), vintage = "table84"), "`id`")
+  expect_error(us_matched(50, 1, 0, times = c(0, 5), id = NA,
+                          vintage = "table84"), "`id`")
+})
+
+test_that("row order does not matter to the grid check (review, #48)", {
+  r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 1),
+                  vintage = "table84")
+  expect_equal(us_cohort_curve(r[c(1, 2, 4, 3), ]), us_cohort_curve(r))
+  expect_equal(us_cohort_curve(r[c(1, 3, 2, 4), ]), us_cohort_curve(r))
+})
+
+test_that("tied times reduce to one row per distinct time", {
+  r <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 5),
+                  vintage = "table84")
+  expect_error(us_cohort_curve(r), "unique\\(times\\)")
+  agg <- us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5, 5),
+                    vintage = "table84", individual = FALSE)
+  expect_equal(agg, us_matched(c(50, 60), c(1, 0), c(0, 0), times = c(0, 5),
+                               vintage = "table84", individual = FALSE))
+})

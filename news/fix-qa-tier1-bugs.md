@@ -19,7 +19,13 @@
   `time` at full precision. It grouped through factor levels, which returned
   `1/3` as `0.333333333333333`.
 
+* `us_matched()` requires `id` to have no missing or repeated values. The
+  output identifies patients by `id` alone, so a shared id merged patients.
+
 * `us_cohort_curve()` stops when the patients in `x` do not share one set of
-  times, as when two `us_matched()` calls with different `times` are stacked.
-  The mean at each time would otherwise be over a different set of patients
-  along the curve.
+  times, as when two `us_matched()` calls with different `times` are stacked,
+  and when an id appears twice at one time, as when stacked results reuse the
+  default ids. The mean at each time would otherwise be over a different set
+  of patients along the curve. Row order does not matter. Tied `times` must
+  be made unique before `us_cohort_curve()`; `us_matched(individual = FALSE)`
+  does that itself.

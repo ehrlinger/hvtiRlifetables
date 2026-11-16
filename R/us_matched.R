@@ -82,7 +82,8 @@ hzl_assert_varies <- function(smatched, times) {
 #' @param times Numeric vector of follow-up times in the units of `scale`,
 #'   non-negative.
 #' @param id Optional vector of patient identifiers, one per patient and so
-#'   the same length as `age`, repeated into the output once per time.
+#'   the same length as `age`, with no missing or repeated values, repeated
+#'   into the output once per time.
 #'   Defaults to `seq_along(age)`.
 #' @param vintage Character scalar naming the fitted-model vintage. **There is
 #'   no default.** Omitting it is an error. See Details.
@@ -161,6 +162,12 @@ us_matched <- function(age, male, other, times,
   if (length(id) != n) {
     stop("`id` must be the same length as `age`; got ", length(id),
          " and ", n, ".", call. = FALSE)
+  }
+  ## The output identifies patients by `id` alone, so a repeated or missing
+  ## id merges patients in us_cohort_curve()'s checks.
+  if (anyNA(id) || anyDuplicated(id)) {
+    stop("us_matched(): `id` must identify each patient: no missing and no ",
+         "repeated values.", call. = FALSE)
   }
   if (!is.numeric(age) || anyNA(age)) {
     stop("`age` must be numeric with no missing values.", call. = FALSE)
@@ -269,8 +276,10 @@ us_matched <- function(age, male, other, times,
 
   ## Routed through the export rather than calling hzl_mean_curve() directly,
   ## so `individual = FALSE` and us_cohort_curve() cannot drift into two
-  ## different cohort averages.
-  us_cohort_curve(out)
+  ## different cohort averages. Tied `times` give identical rows, which the
+  ## export refuses as ambiguous; here they are known to be ties, and the
+  ## cohort curve has one row per distinct time either way.
+  us_cohort_curve(out[!duplicated(out[c("id", "time")]), , drop = FALSE])
 }
 
 ## The macro's mean-curve reduction, from usmatchd.sas:338-350.
