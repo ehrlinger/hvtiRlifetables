@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,11 @@
       <small>Source: <a href="https://github.com/ehrlinger/hvtiRlifetables/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.8" id="hvtirlifetables-018">hvtiRlifetables 0.1.8<a class="anchor" aria-label="anchor" href="#hvtirlifetables-018"></a></h2>
+<ul><li>
+<code>withr</code> and <code>rmarkdown</code> are no longer in <code>Suggests</code>. Nothing in the package, its tests or its vignette called either. The Quarto vignette engine still reaches <code>rmarkdown</code> through the <code>quarto</code> package, which imports it.</li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.7" id="hvtirlifetables-017">hvtiRlifetables 0.1.7<a class="anchor" aria-label="anchor" href="#hvtirlifetables-017"></a></h2>
 <ul><li><p><code><a href="../reference/us_matched.html">us_matched()</a></code> with a patient aged 0 and a time of 0 now stops naming those patients’ ids, and says to start <code>times</code> above 0. The reference hazard is not defined at birth (the <code>table2008</code> and <code>table2023</code> fits diverge there), so the call still stops; before, it stopped inside the evaluator without saying who. <code><a href="../reference/us_matched.html">?us_matched</a></code> documents the limitation under <code>age</code>.</p></li>

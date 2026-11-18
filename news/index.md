@@ -1,5 +1,12 @@
 # Changelog
 
+## hvtiRlifetables 0.1.8
+
+- `withr` and `rmarkdown` are no longer in `Suggests`. Nothing in the
+  package, its tests or its vignette called either. The Quarto vignette
+  engine still reaches `rmarkdown` through the `quarto` package, which
+  imports it.
+
 ## hvtiRlifetables 0.1.7
 
 - [`us_matched()`](https://ehrlinger.github.io/hvtiRlifetables/reference/us_matched.md)
