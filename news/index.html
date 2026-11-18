@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">hvtiRlifetables</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,6 +34,19 @@
       <small>Source: <a href="https://github.com/ehrlinger/hvtiRlifetables/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.1.7" id="hvtirlifetables-017">hvtiRlifetables 0.1.7<a class="anchor" aria-label="anchor" href="#hvtirlifetables-017"></a></h2>
+<ul><li><p><code><a href="../reference/us_matched.html">us_matched()</a></code> with a patient aged 0 and a time of 0 now stops naming those patients’ ids, and says to start <code>times</code> above 0. The reference hazard is not defined at birth (the <code>table2008</code> and <code>table2023</code> fits diverge there), so the call still stops; before, it stopped inside the evaluator without saying who. <code><a href="../reference/us_matched.html">?us_matched</a></code> documents the limitation under <code>age</code>.</p></li>
+<li><p><code><a href="../reference/us_matched.html">us_matched()</a></code> accepts tied <code>times</code>, such as <code>c(5, 5)</code>. They stopped with a message blaming the <code>_STATUS_</code> gating and the vintage.</p></li>
+<li><p><code><a href="../reference/us_matched.html">us_matched()</a></code> checks that <code>individual</code> is a single <code>TRUE</code> or <code>FALSE</code>, and that <code>male</code> and <code>other</code> are numeric (or logical) as well as 0 or 1. A character <code>"1"</code> or a factor used to pass through <code>%in%</code>’s coercion, and <code>individual = "no"</code> returned the cohort curve.</p></li>
+<li><p><code><a href="../reference/us_matched.html">?us_matched</a></code> no longer says <code>id</code> is recycled: it is one per patient, the same length as <code>age</code>, as the code has always required.</p></li>
+<li><p><code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code>, and so <code>us_matched(individual = FALSE)</code>, returns <code>time</code> at full precision. It grouped through factor levels, which returned <code>1/3</code> as <code>0.333333333333333</code>.</p></li>
+<li><p><code><a href="../reference/us_matched.html">us_matched()</a></code> requires <code>id</code> to have no missing or repeated values. The output identifies patients by <code>id</code> alone, so a shared id merged patients.</p></li>
+<li><p><code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code> stops when the patients in <code>x</code> do not share one set of times, as when two <code><a href="../reference/us_matched.html">us_matched()</a></code> calls with different <code>times</code> are stacked, and when an id appears twice at one time, as when stacked results reuse the default ids. The mean at each time would otherwise be over a different set of patients along the curve. Row order does not matter. Tied <code>times</code> must be made unique before <code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code>; <code>us_matched(individual = FALSE)</code> does that itself.</p></li>
+<li><p><code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code>’s first argument is now <code>data</code>, per the hvtiR API rubric. <code>x</code> still works for this release, with a once-per-session <code>hvtiRlifetables_deprecated</code> warning, and will then be removed. Positional calls such as <code>us_cohort_curve(r)</code> are unaffected.</p></li>
+<li><p>Errors a caller may want to handle now carry a condition class: <code>hvtiRlifetables_vintage</code> (missing, unknown or empty vintage), <code>hvtiRlifetables_stratum</code>, <code>hvtiRlifetables_support</code> (age plus follow-up beyond 110), <code>hvtiRlifetables_age_zero</code> (including a newborn at time 0), <code>hvtiRlifetables_grid</code> (patients in <code><a href="../reference/us_cohort_curve.html">us_cohort_curve()</a></code> not sharing one set of times, or an id repeated at one time) and <code>hvtiRlifetables_degenerate</code>, each also <code>hvtiRlifetables_error</code>. Messages are unchanged apart from a <code>fn():</code> prefix where they were touched.</p></li>
+<li><p><code><a href="../reference/us_cohort_curve.html">?us_cohort_curve</a></code> is written in roxygen markdown, as the rest of the package is.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.6" id="hvtirlifetables-016">hvtiRlifetables 0.1.6<a class="anchor" aria-label="anchor" href="#hvtirlifetables-016"></a></h2>
 <ul><li><p>The README’s Installation section now leads with <code>hvtiR::install()</code>, which installs the whole HVTI R family in one call, and then gives <code>pak::pak("ehrlinger/hvtiRlifetables")</code> for this package alone.</p></li>
