@@ -233,8 +233,9 @@ everyone expects.
   claim.** Measured 2026-08-24 across the **fourteen** repositories
   carrying `protect main` (not twelve): `hvtiPlotR`, `hvtiRtables`,
   `hvtiRdatabuild`, `hvtiBoostmtree` and `TemporalHazard` have
-  `require_code_owner_review` `false` where the rest have `true` — inert
-  either way. `ggRandomForests` alone adds a fifth rule type,
+  `require_code_owner_review` `false` where the rest have `true`
+  (`hvtiBoostmtree` was deleted on 2026-11-18) — inert either way.
+  `ggRandomForests` alone adds a fifth rule type,
   `required_status_checks`, gating on the three `R CMD check` platforms
   — kept deliberately, as that package’s CRAN merge gate.
   **`bypass_actors` is now empty in all fourteen**,
