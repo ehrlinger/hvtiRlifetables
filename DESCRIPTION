@@ -42,9 +42,7 @@ Suggests:
     haven,
     knitr,
     quarto,
-    rmarkdown,
-    testthat (>= 3.0.0),
-    withr
+    testthat (>= 3.0.0)
 Remotes:
     TemporalHazard=ehrlinger/TemporalHazard
 VignetteBuilder: quarto
