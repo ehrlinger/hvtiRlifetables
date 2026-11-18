@@ -1,8 +1,8 @@
 Package: hvtiRlifetables
 Type: Package
 Title: Age, Sex and Race Matched US Reference Survival
-Version: 0.1.7
-Date: 2026-11-17
+Version: 0.1.8
+Date: 2026-11-18
 Authors@R: c(
     person(
       "John", "Ehrlinger",
